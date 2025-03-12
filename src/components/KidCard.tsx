@@ -3,6 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
 import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +38,21 @@ const KidCard = ({
   onResetPoints 
 }: KidCardProps) => {
   return (
-    <Card className="overflow-hidden transition-colors hover:shadow-md">
+    <Card className="overflow-hidden transition-colors hover:shadow-md relative">
+      {/* Start Questions Mini Button */}
+      {onStartQuestions && (
+        <Button
+          size="icon"
+          variant="outline"
+          className="absolute top-2 left-2 w-8 h-8 rounded-full z-10 bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => onStartQuestions(id, name)}
+          title="Start Questions"
+        >
+          <PlayCircle className="h-4 w-4" />
+          <span className="sr-only">Start Questions</span>
+        </Button>
+      )}
+      
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="self-stretch flex justify-end items-center mb-4">
@@ -46,16 +61,6 @@ const KidCard = ({
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {onStartQuestions && (
-                  <DropdownMenuItem 
-                    onClick={() => onStartQuestions(id, name)}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <PlayCircle className="h-4 w-4" />
-                    <span>Start Questions</span>
-                  </DropdownMenuItem>
-                )}
-              
                 {onAssignPackages && (
                   <DropdownMenuItem 
                     onClick={() => onAssignPackages(id, name)}
