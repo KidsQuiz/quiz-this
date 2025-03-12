@@ -69,9 +69,10 @@ const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete }: KidCard
           <div>
             <h3 className="text-lg font-medium">{name}</h3>
             <p className="text-sm text-muted-foreground">{age} years old</p>
-            <div className="mt-2 flex items-center justify-center gap-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-medium">{points} points</span>
+            
+            <div className="mt-4 bg-primary/10 rounded-full py-2 px-4 inline-flex items-center justify-center gap-1.5 transform transition-all hover:scale-105">
+              <Star className="h-5 w-5 fill-primary text-primary" />
+              <span className="font-semibold text-primary">{points} points</span>
             </div>
           </div>
         </div>
