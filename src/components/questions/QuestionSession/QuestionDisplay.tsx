@@ -22,7 +22,6 @@ interface QuestionDisplayProps {
   selectedAnswerId: string | null;
   isCorrect: boolean;
   showWowEffect: boolean;
-  timeBetweenQuestions: number;
   handleSelectAnswer: (answerId: string) => void;
 }
 
@@ -36,7 +35,6 @@ const QuestionDisplay = ({
   selectedAnswerId,
   isCorrect,
   showWowEffect,
-  timeBetweenQuestions,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
   // Play sound effect when answer is submitted
@@ -79,7 +77,6 @@ const QuestionDisplay = ({
         <FeedbackMessage 
           isCorrect={isCorrect}
           points={currentQuestion.points}
-          timeBetweenQuestions={timeBetweenQuestions}
           answerSubmitted={answerSubmitted}
         />
       </div>

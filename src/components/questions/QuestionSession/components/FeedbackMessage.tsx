@@ -5,14 +5,12 @@ import { cn } from '@/lib/utils';
 interface FeedbackMessageProps {
   isCorrect: boolean;
   points: number;
-  timeBetweenQuestions: number;
   answerSubmitted: boolean;
 }
 
 const FeedbackMessage = ({ 
   isCorrect, 
   points, 
-  timeBetweenQuestions, 
   answerSubmitted 
 }: FeedbackMessageProps) => {
   if (!answerSubmitted) return null;
@@ -30,9 +28,6 @@ const FeedbackMessage = ({
         {isCorrect 
           ? `Correct! +${points} points 🎉` 
           : 'Incorrect. The correct answer is highlighted.'}
-      </p>
-      <p className="text-base mt-2">
-        Next question in <span className="font-bold">{timeBetweenQuestions}</span> seconds...
       </p>
     </div>
   );

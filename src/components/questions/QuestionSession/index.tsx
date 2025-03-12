@@ -9,8 +9,6 @@ import { QuestionSessionProps } from './types';
 
 const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionProps) => {
   const {
-    timeBetweenQuestions,
-    setTimeBetweenQuestions,
     isConfiguring,
     isLoading,
     currentQuestion,
@@ -83,12 +81,10 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
           <ConfigScreen
             questionPackages={questionPackages}
             selectedPackageIds={selectedPackageIds}
-            timeBetweenQuestions={timeBetweenQuestions}
             isLoading={isLoading}
             togglePackageSelection={togglePackageSelection}
             selectAllPackages={selectAllPackages}
             deselectAllPackages={deselectAllPackages}
-            setTimeBetweenQuestions={setTimeBetweenQuestions}
             onStartSession={handleStartSession}
             onClose={onClose}
           />
@@ -105,7 +101,6 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
             selectedAnswerId={selectedAnswerId}
             isCorrect={isCorrect}
             showWowEffect={showWowEffect}
-            timeBetweenQuestions={timeBetweenQuestions}
             handleSelectAnswer={handleSelectAnswer}
           />
         )}

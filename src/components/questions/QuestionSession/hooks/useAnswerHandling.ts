@@ -8,7 +8,6 @@ export const useAnswerHandling = (
   setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>,
   setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
   setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  timeBetweenQuestions: number,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
@@ -34,17 +33,17 @@ export const useAnswerHandling = (
       setTotalPoints(prev => prev + currentQuestion.points);
       setShowWowEffect(true);
       
-      // Extended the wow effect to 3 seconds to enjoy the animations
+      // Show celebration effect for a short duration
       setTimeout(() => {
         setShowWowEffect(false);
-      }, 3000);
+      }, 1500);
     }
     
-    // Close the modal after a delay to show the result
-    // Added extra time to allow for the enhanced celebration animation
+    // Close the modal after a short delay to show the result
+    // The duration depends on whether the answer was correct (with celebration) or not
     setTimeout(() => {
       setIsModalOpen(false);
-    }, wasCorrect ? 3500 : 2000);
+    }, wasCorrect ? 1500 : 1000);
     
     return wasCorrect;
   };

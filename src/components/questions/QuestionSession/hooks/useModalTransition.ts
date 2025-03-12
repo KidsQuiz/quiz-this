@@ -7,7 +7,6 @@ export const useModalTransition = (
   sessionComplete: boolean,
   currentQuestionIndex: number,
   questions: Question[],
-  timeBetweenQuestions: number,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,14 +21,10 @@ export const useModalTransition = (
         // If we've reached the end, mark session as complete
         setSessionComplete(true);
       } else {
-        // Otherwise, set up a timer to show the next question
-        const timer = setTimeout(() => {
-          setCurrentQuestionIndex(nextQuestionIndex);
-          setIsModalOpen(true);
-        }, timeBetweenQuestions * 1000);
-        
-        return () => clearTimeout(timer);
+        // Immediately show the next question without any delay
+        setCurrentQuestionIndex(nextQuestionIndex);
+        setIsModalOpen(true);
       }
     }
-  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, timeBetweenQuestions, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
+  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
 };

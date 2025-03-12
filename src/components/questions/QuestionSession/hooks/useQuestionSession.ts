@@ -16,8 +16,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   
   // Use session state hook for state management
   const {
-    timeBetweenQuestions,
-    setTimeBetweenQuestions,
     isConfiguring,
     setIsConfiguring,
     sessionComplete,
@@ -80,7 +78,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCorrectAnswers,
     setTotalPoints,
     setShowWowEffect,
-    timeBetweenQuestions,
     setCurrentQuestionIndex,
     setIsModalOpen
   );
@@ -99,7 +96,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionComplete,
     currentQuestionIndex,
     questions,
-    timeBetweenQuestions,
     setCurrentQuestionIndex,
     setIsModalOpen,
     setSessionComplete
@@ -141,8 +137,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   );
 
   return {
-    timeBetweenQuestions,
-    setTimeBetweenQuestions,
     isConfiguring,
     isLoading,
     currentQuestion,

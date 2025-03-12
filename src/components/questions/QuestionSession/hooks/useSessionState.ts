@@ -10,7 +10,6 @@ interface KidAnswer {
 }
 
 export const useSessionState = () => {
-  const [timeBetweenQuestions, setTimeBetweenQuestions] = useState(5);
   const [isConfiguring, setIsConfiguring] = useState(true);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -20,8 +19,6 @@ export const useSessionState = () => {
   const [kidAnswers, setKidAnswers] = useState<KidAnswer[]>([]);
 
   return {
-    timeBetweenQuestions,
-    setTimeBetweenQuestions,
     isConfiguring,
     setIsConfiguring,
     sessionComplete,
