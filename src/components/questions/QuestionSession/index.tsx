@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
 import ConfigScreen from './ConfigScreen';
@@ -34,9 +34,19 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     handleSelectAnswer
   } = useQuestionSession(kidId, kidName, onClose);
 
+  // Clean up effect
+  useEffect(() => {
+    return () => {
+      // Clean up any resources when component unmounts
+      document.body.style.pointerEvents = '';
+    };
+  }, []);
+
   // Handle dialog close properly
   const handleOpenChange = (open: boolean) => {
     if (!open) {
+      // Reset any DOM manipulations
+      document.body.style.pointerEvents = '';
       // Ensure we call onClose to properly clean up state
       onClose();
     }
