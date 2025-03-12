@@ -9,8 +9,11 @@ import { useModalTransition } from './useModalTransition';
 import { useCurrentQuestion } from './useCurrentQuestion';
 import { useSessionCompletion } from './useSessionCompletion';
 import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
+import { useToast } from '@/hooks/use-toast';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
+  const { toast } = useToast();
+  
   // Use session state hook for state management
   const {
     timeBetweenQuestions,
@@ -38,7 +41,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages
-  } = usePackageSelection(kidId);
+  } = usePackageSelection(kidId, kidName, onClose, toast);
 
   // Load questions and answer options
   const {
