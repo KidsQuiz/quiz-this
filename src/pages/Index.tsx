@@ -1,11 +1,14 @@
 
 import React from 'react';
 import Dashboard from '@/components/Dashboard';
+import Header from '@/components/Header';
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <main className="flex-1 flex items-center justify-center py-12">
+      <Header />
+      
+      <main className="flex-1 flex items-start justify-center pt-8">
         <Dashboard />
       </main>
       
