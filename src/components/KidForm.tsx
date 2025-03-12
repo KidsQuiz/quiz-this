@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface Kid {
   name: string;
   age: number;
   avatar_url: string | null;
+  position: number;
 }
 
 const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
@@ -112,6 +114,26 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     }
   };
   
+  const getMaxPosition = async (): Promise<number> => {
+    if (!user) return 0;
+    
+    try {
+      const { data, error } = await supabase
+        .from('kids')
+        .select('position')
+        .eq('parent_id', user.id)
+        .order('position', { ascending: false })
+        .limit(1);
+        
+      if (error) throw error;
+      
+      return data && data.length > 0 ? data[0].position + 1 : 0;
+    } catch (error) {
+      console.error('Error getting max position:', error);
+      return 0;
+    }
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -156,13 +178,17 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
           description: "Kid updated successfully!"
         });
       } else {
+        // Get the next position for the new kid
+        const nextPosition = await getMaxPosition();
+        
         const { error } = await supabase
           .from('kids')
           .insert({
             parent_id: user.id,
             name,
             age: parseInt(age),
-            avatar_url: newAvatarUrl
+            avatar_url: newAvatarUrl,
+            position: nextPosition
           });
           
         if (error) throw error;

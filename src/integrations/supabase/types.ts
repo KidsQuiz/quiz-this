@@ -17,6 +17,7 @@ export type Database = {
           id: string
           name: string
           parent_id: string
+          position: number
           updated_at: string
         }
         Insert: {
@@ -26,6 +27,7 @@ export type Database = {
           id?: string
           name: string
           parent_id: string
+          position?: number
           updated_at?: string
         }
         Update: {
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           name?: string
           parent_id?: string
+          position?: number
           updated_at?: string
         }
         Relationships: []

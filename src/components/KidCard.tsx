@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby } from 'lucide-react';
+import { Baby, GripVertical } from 'lucide-react';
 
 interface KidCardProps {
   id: string;
@@ -18,6 +18,10 @@ const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) =
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <div className="p-6">
         <div className="flex flex-col items-center text-center gap-4">
+          <div className="self-stretch flex justify-center items-center mb-2">
+            <GripVertical className="text-muted-foreground h-5 w-5" />
+          </div>
+          
           {avatarUrl ? (
             <Avatar 
               src={avatarUrl} 
