@@ -39,23 +39,23 @@ const KidCard = ({
 }: KidCardProps) => {
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
-      {/* Start Questions Mini Button */}
-      {onStartQuestions && (
-        <Button
-          size="icon"
-          variant="outline"
-          className="absolute top-2 left-2 w-8 h-8 rounded-full z-10 bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={() => onStartQuestions(id, name)}
-          title="Start Questions"
-        >
-          <PlayCircle className="h-4 w-4" />
-          <span className="sr-only">Start Questions</span>
-        </Button>
-      )}
-      
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="self-stretch flex justify-end items-center mb-4">
+          <div className="self-stretch flex justify-end items-center mb-4 gap-2">
+            {/* Start Questions Mini Button */}
+            {onStartQuestions && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 p-0 rounded-full bg-background text-primary hover:bg-accent flex items-center justify-center"
+                onClick={() => onStartQuestions(id, name)}
+                title="Start Questions"
+              >
+                <PlayCircle className="h-4 w-4" />
+                <span className="sr-only">Start Questions</span>
+              </Button>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
                 <MoreVertical className="h-4 w-4" />
