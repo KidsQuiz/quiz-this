@@ -4,7 +4,6 @@ import Dashboard from '@/components/Dashboard';
 import Header from '@/components/Header';
 import QuestionsManager from '@/components/questions/QuestionsManager';
 import { useLocation } from 'react-router-dom';
-import { Tabs } from '@/components/ui/tabs';
 
 const Index = () => {
   const location = useLocation();
@@ -23,9 +22,7 @@ const Index = () => {
         {isQuestionsPage ? (
           <QuestionsManager />
         ) : (
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <Dashboard activeTab={activeTab} />
-          </Tabs>
+          <Dashboard activeTab={activeTab} />
         )}
       </main>
       

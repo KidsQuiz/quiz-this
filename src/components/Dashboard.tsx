@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import KidsManager from './KidsManager';
 import PackagesManager from './packages/PackagesManager';
-import { TabsContent } from '@/components/ui/tabs';
 
 interface ProfileData {
   username: string | null;
@@ -48,13 +47,8 @@ const Dashboard = ({ activeTab }) => {
   
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6">
-      <TabsContent value="kids" className="mt-0">
-        <KidsManager />
-      </TabsContent>
-      
-      <TabsContent value="packages" className="mt-0">
-        <PackagesManager />
-      </TabsContent>
+      {activeTab === 'kids' && <KidsManager />}
+      {activeTab === 'packages' && <PackagesManager />}
     </div>
   );
 };

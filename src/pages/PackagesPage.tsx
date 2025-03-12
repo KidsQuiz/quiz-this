@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react';
 import Header from '@/components/Header';
-import PackagesManager from '@/components/packages/PackagesManager';
-import KidsManager from '@/components/KidsManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Dashboard from '@/components/Dashboard';
 import { Users, Package } from 'lucide-react';
 
 const PackagesPage = () => {
@@ -18,28 +16,7 @@ const PackagesPage = () => {
       <Header activeTab={activeTab} onTabChange={handleTabChange} />
       
       <main className="flex-1 flex items-start justify-center pt-8">
-        <div className="w-full max-w-4xl mx-auto px-4">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-              <TabsTrigger value="kids" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>Kids</span>
-              </TabsTrigger>
-              <TabsTrigger value="packages" className="flex items-center gap-2">
-                <Package className="h-4 w-4" />
-                <span>Packages</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="kids">
-              <KidsManager />
-            </TabsContent>
-            
-            <TabsContent value="packages">
-              <PackagesManager />
-            </TabsContent>
-          </Tabs>
-        </div>
+        <Dashboard activeTab={activeTab} />
       </main>
       
       <footer className="py-6 text-center text-sm text-muted-foreground">
