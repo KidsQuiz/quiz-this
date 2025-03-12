@@ -109,12 +109,43 @@ export const useKidsData = () => {
     }
   };
 
+  const resetPoints = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to reset ${name}'s points to 0?`)) return;
+    
+    try {
+      const { error } = await supabase
+        .from('kids')
+        .update({ points: 0 })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      // Update the local state
+      setKids(kids.map(kid => 
+        kid.id === id ? { ...kid, points: 0 } : kid
+      ));
+      
+      toast({
+        title: "Success",
+        description: `${name}'s points have been reset to 0`
+      });
+    } catch (error: any) {
+      console.error('Error resetting points:', error.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to reset points"
+      });
+    }
+  };
+
   return {
     kids,
     setKids,
     isLoading,
     fetchKids,
     updateKidsPositions,
-    deleteKid
+    deleteKid,
+    resetPoints
   };
 };

@@ -2,12 +2,13 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle, RotateCcw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 
 interface KidCardProps {
@@ -20,6 +21,7 @@ interface KidCardProps {
   onDelete: (id: string) => void;
   onAssignPackages?: (id: string, name: string) => void;
   onStartQuestions?: (id: string, name: string) => void;
+  onResetPoints?: (id: string, name: string) => void;
 }
 
 const KidCard = ({ 
@@ -31,7 +33,8 @@ const KidCard = ({
   onEdit, 
   onDelete, 
   onAssignPackages,
-  onStartQuestions 
+  onStartQuestions,
+  onResetPoints 
 }: KidCardProps) => {
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md">
@@ -70,6 +73,18 @@ const KidCard = ({
                   <Edit className="h-4 w-4" />
                   <span>Edit</span>
                 </DropdownMenuItem>
+                
+                {onResetPoints && (
+                  <DropdownMenuItem 
+                    onClick={() => onResetPoints(id, name)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    <span>Reset Points</span>
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator />
                 
                 <DropdownMenuItem 
                   onClick={() => onDelete(id)}

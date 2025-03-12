@@ -14,6 +14,7 @@ interface KidsListProps {
   onAddKid: () => void;
   onAssignPackages?: (id: string, name: string) => void;
   onStartQuestions?: (id: string, name: string) => void;
+  onResetPoints?: (id: string, name: string) => void;
 }
 
 const KidsList = ({
@@ -24,7 +25,8 @@ const KidsList = ({
   onDeleteKid,
   onAddKid,
   onAssignPackages,
-  onStartQuestions
+  onStartQuestions,
+  onResetPoints
 }: KidsListProps) => {
   if (isLoading) {
     return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -57,6 +59,7 @@ const KidsList = ({
                         onDelete={onDeleteKid} 
                         onAssignPackages={onAssignPackages}
                         onStartQuestions={onStartQuestions}
+                        onResetPoints={onResetPoints}
                       />
                     </div>}
                 </Draggable>)}

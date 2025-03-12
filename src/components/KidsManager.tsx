@@ -10,7 +10,7 @@ import { UserPlus } from 'lucide-react';
 import { DropResult } from 'react-beautiful-dnd';
 
 const KidsManager = () => {
-  const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid } = useKidsData();
+  const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid, resetPoints } = useKidsData();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isPackagesFormOpen, setIsPackagesFormOpen] = useState(false);
   const [isQuestionSessionOpen, setIsQuestionSessionOpen] = useState(false);
@@ -48,6 +48,10 @@ const KidsManager = () => {
     setSelectedKidId(id);
     setSelectedKidName(name);
     setIsQuestionSessionOpen(true);
+  };
+  
+  const handleResetPoints = (id: string, name: string) => {
+    resetPoints(id, name);
   };
   
   const handlePackagesFormClose = () => {
@@ -124,6 +128,7 @@ const KidsManager = () => {
         onAddKid={handleAddKid}
         onAssignPackages={handleAssignPackages}
         onStartQuestions={handleStartQuestions}
+        onResetPoints={handleResetPoints}
       />
       
       <KidForm
