@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
-import { Clock, Star, CheckCircle, XCircle, Package } from 'lucide-react';
+import { Clock, Star, CheckCircle, XCircle, Package, Sparkles } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -37,6 +36,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showWowEffect, setShowWowEffect] = useState(false);
 
   // Load assigned packages
   useEffect(() => {
@@ -253,6 +253,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       setAnswerSubmitted(false);
       setSelectedAnswerId(null);
       setIsCorrect(false);
+      setShowWowEffect(false);
       
       await loadAnswerOptions(question.id);
       
@@ -315,6 +316,12 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     if (wasCorrect && currentQuestion) {
       setCorrectAnswers(prev => prev + 1);
       setTotalPoints(prev => prev + currentQuestion.points);
+      setShowWowEffect(true);
+      
+      // Hide the effect after 2 seconds
+      setTimeout(() => {
+        setShowWowEffect(false);
+      }, 2000);
     }
     
     // Wait for the time between questions before moving to next
@@ -414,30 +421,37 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
           <div className="flex justify-between items-center">
             <DialogTitle className="text-xl">Question {currentQuestionIndex + 1}/{questions.length}</DialogTitle>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{timeRemaining}s</span>
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <span className="font-medium text-lg">{timeRemaining}s</span>
             </div>
           </div>
         </DialogHeader>
         
-        <div className="py-4 space-y-6">
-          <Progress value={(timeRemaining / currentQuestion.time_limit) * 100} />
+        <div className="py-6 space-y-6">
+          <Progress value={(timeRemaining / currentQuestion.time_limit) * 100} className="h-2" />
           
-          <div className="bg-primary/10 p-4 rounded-lg">
-            <p className="text-lg font-medium">{currentQuestion.content}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <Star className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">{currentQuestion.points} points</span>
+          <div className="bg-primary/10 p-6 rounded-lg relative">
+            <p className="text-xl font-medium">{currentQuestion.content}</p>
+            <div className="flex items-center gap-2 mt-3">
+              <Star className="h-5 w-5 text-primary" />
+              <span className="text-base font-medium text-primary">{currentQuestion.points} points</span>
             </div>
+            
+            {showWowEffect && (
+              <div className="absolute inset-0 flex items-center justify-center animate-enter">
+                <div className="absolute inset-0 bg-primary/10 rounded-lg animate-pulse"></div>
+                <Sparkles className="h-20 w-20 text-primary animate-bounce" />
+              </div>
+            )}
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {answerOptions.map(option => (
               <button
                 key={option.id}
                 onClick={() => handleSelectAnswer(option.id)}
                 disabled={answerSubmitted}
-                className={`w-full p-3 text-left rounded-lg border transition-all ${
+                className={`w-full p-4 text-left rounded-lg border text-lg transition-all ${
                   answerSubmitted && option.is_correct 
                     ? 'bg-green-100 border-green-500' 
                     : answerSubmitted && selectedAnswerId === option.id && !option.is_correct
@@ -450,10 +464,10 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
                 <div className="flex items-center justify-between">
                   <span>{option.content}</span>
                   {answerSubmitted && option.is_correct && (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <CheckCircle className="h-6 w-6 text-green-600" />
                   )}
                   {answerSubmitted && selectedAnswerId === option.id && !option.is_correct && (
-                    <XCircle className="h-5 w-5 text-red-600" />
+                    <XCircle className="h-6 w-6 text-red-600" />
                   )}
                 </div>
               </button>
@@ -461,13 +475,13 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
           </div>
           
           {answerSubmitted && (
-            <div className={`p-3 rounded-lg ${isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <div className={`p-4 rounded-lg text-lg ${isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               <p className="font-medium">
                 {isCorrect 
                   ? 'Correct! +' + currentQuestion.points + ' points'
                   : 'Incorrect. The correct answer is highlighted.'}
               </p>
-              <p className="text-sm mt-1">
+              <p className="text-base mt-1">
                 Next question in {timeBetweenQuestions} seconds...
               </p>
             </div>
@@ -509,7 +523,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
         if (!open) onClose();
       }}
     >
-      <DialogContent className={`sm:max-w-[${isConfiguring ? '500px' : '650px'}]`}>
+      <DialogContent className={`sm:max-w-[${isConfiguring ? '500px' : '750px'}] max-h-[90vh] overflow-y-auto`}>
         {isConfiguring && renderConfigScreen()}
         {!isConfiguring && !sessionComplete && renderQuestion()}
         {!isConfiguring && sessionComplete && renderCompletionScreen()}
@@ -519,4 +533,3 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
 };
 
 export default QuestionSession;
-
