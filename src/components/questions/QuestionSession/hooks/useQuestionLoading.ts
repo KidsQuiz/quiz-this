@@ -2,8 +2,10 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
+import { useToast } from '@/hooks/use-toast';
 
-export const useQuestionLoading = (toast: any) => {
+export const useQuestionLoading = () => {
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
