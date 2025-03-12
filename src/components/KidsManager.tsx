@@ -37,7 +37,7 @@ const KidsManager = () => {
     setTimeout(() => {
       setSelectedKidId(undefined);
       setSelectedKidName('');
-    }, 100);
+    }, 300); // Increased timeout for better cleanup
   };
   
   const onDragEnd = async (result: DropResult) => {
@@ -101,6 +101,7 @@ const KidsManager = () => {
         kidId={selectedKidId}
       />
       
+      {/* Only render the package form when we actually have a selected kid */}
       {selectedKidId && (
         <KidPackagesForm
           isOpen={isPackagesFormOpen}

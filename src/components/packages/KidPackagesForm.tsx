@@ -59,10 +59,11 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
   
   const handleDialogChange = (open: boolean) => {
     if (!open) {
-      // Use setTimeout to allow React to process events properly
+      // Use setTimeout with a slight delay to ensure React properly cleans up the modal
+      // before resetting any state in the parent component
       setTimeout(() => {
         onClose();
-      }, 0);
+      }, 100);
     }
   };
   
