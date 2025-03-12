@@ -76,6 +76,9 @@ const AuthPage = () => {
         navigate('/');
       }
     } catch (error: any) {
+      // Log the error to get more details for debugging
+      console.error("Authentication error:", error);
+      
       toast({
         variant: "destructive",
         title: "Authentication failed",
