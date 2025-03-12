@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import QuestionsManager from "./components/questions/QuestionsManager";
+import PackagesPage from "./pages/PackagesPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,11 @@ const App = () => (
             <Route path="/" element={
               <ProtectedRoute>
                 <Index />
+              </ProtectedRoute>
+            } />
+            <Route path="/packages" element={
+              <ProtectedRoute>
+                <PackagesPage />
               </ProtectedRoute>
             } />
             <Route path="/questions/:packageId" element={
