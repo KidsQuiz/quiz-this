@@ -1,3 +1,4 @@
+
 import React from 'react';
 import KidCard from './KidCard';
 import { Button } from '@/components/ui/button';
@@ -59,7 +60,6 @@ const KidsList = ({ kids, isLoading, onDragEnd, onEditKid, onDeleteKid, onAddKid
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="transition-all focus:outline-none"
                     >
                       <KidCard
                         id={kid.id}

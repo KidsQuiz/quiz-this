@@ -22,15 +22,13 @@ interface KidCardProps {
 
 const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete }: KidCardProps) => {
   return (
-    <Card className="overflow-hidden transition-colors hover:shadow-md cursor-grab active:cursor-grabbing">
+    <Card className="overflow-hidden transition-colors hover:shadow-md">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="self-stretch flex justify-end items-center mb-4">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
-                  <MoreVertical className="h-4 w-4" />
-                </button>
+              <DropdownMenuTrigger className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
+                <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem 
