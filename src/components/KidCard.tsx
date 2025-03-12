@@ -23,8 +23,8 @@ const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) =
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md cursor-grab active:cursor-grabbing">
       <div className="p-6">
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="self-stretch flex justify-end items-center mb-2">
+        <div className="flex flex-col items-center text-center">
+          <div className="self-stretch flex justify-end items-center mb-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
@@ -51,18 +51,19 @@ const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) =
             </DropdownMenu>
           </div>
           
-          {avatarUrl ? (
-            <Avatar 
-              src={avatarUrl} 
-              alt={name} 
-              size="lg"
-              className="mb-2" 
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-              <Baby className="w-12 h-12 text-primary" />
-            </div>
-          )}
+          <div className="mb-4">
+            {avatarUrl ? (
+              <Avatar 
+                src={avatarUrl} 
+                alt={name} 
+                size="lg"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+                <Baby className="w-12 h-12 text-primary" />
+              </div>
+            )}
+          </div>
           
           <div>
             <h3 className="text-lg font-medium">{name}</h3>
