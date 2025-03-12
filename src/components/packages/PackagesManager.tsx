@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import PackagesList from './PackagesList';
 import PackageForm from './PackageForm';
 import { usePackagesData } from '@/hooks/usePackagesData';
@@ -23,14 +22,11 @@ const PackagesManager = () => {
   
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6">
         <h3 className="text-lg font-medium flex items-center gap-2">
           <PackageIcon className="h-5 w-5" />
           <span>Question Packages</span>
         </h3>
-        <Button onClick={handleAddPackage} className="flex items-center gap-2">
-          <span>Create Package</span>
-        </Button>
       </div>
       
       <PackagesList 
@@ -39,6 +35,7 @@ const PackagesManager = () => {
         onEditPackage={handleEditPackage}
         onDeletePackage={deletePackage}
         onAddPackage={handleAddPackage}
+        alwaysShowAddCard={true}
       />
       
       <PackageForm

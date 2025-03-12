@@ -12,6 +12,7 @@ interface PackagesListProps {
   onEditPackage: (id: string) => void;
   onDeletePackage: (id: string) => void;
   onAddPackage: () => void;
+  alwaysShowAddCard?: boolean;
 }
 
 const PackagesList = ({ 
@@ -19,7 +20,8 @@ const PackagesList = ({
   isLoading, 
   onEditPackage, 
   onDeletePackage, 
-  onAddPackage 
+  onAddPackage,
+  alwaysShowAddCard = false
 }: PackagesListProps) => {
   const navigate = useNavigate();
   
@@ -33,7 +35,7 @@ const PackagesList = ({
     );
   }
   
-  if (packages.length === 0) {
+  if (packages.length === 0 && !alwaysShowAddCard) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No packages created yet.</p>
@@ -47,6 +49,23 @@ const PackagesList = ({
       </div>
     );
   }
+  
+  const AddNewPackageCard = () => (
+    <Card 
+      className="overflow-hidden transition-colors hover:shadow-md border-dashed flex items-center justify-center cursor-pointer hover:bg-accent/10"
+      onClick={onAddPackage}
+    >
+      <div className="p-6 text-center">
+        <div className="flex justify-center mb-2">
+          <div className="bg-primary/10 p-3 rounded-full">
+            <Plus className="h-6 w-6 text-primary" />
+          </div>
+        </div>
+        <h3 className="font-medium">Add New Package</h3>
+        <p className="text-sm text-muted-foreground mt-1">Create a new collection of questions</p>
+      </div>
+    </Card>
+  );
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,20 +118,7 @@ const PackagesList = ({
         </Card>
       ))}
       
-      <Card 
-        className="overflow-hidden transition-colors hover:shadow-md border-dashed flex items-center justify-center cursor-pointer hover:bg-accent/10"
-        onClick={onAddPackage}
-      >
-        <div className="p-6 text-center">
-          <div className="flex justify-center mb-2">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Plus className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-          <h3 className="font-medium">Add New Package</h3>
-          <p className="text-sm text-muted-foreground mt-1">Create a new collection of questions</p>
-        </div>
-      </Card>
+      <AddNewPackageCard />
     </div>
   );
 };
