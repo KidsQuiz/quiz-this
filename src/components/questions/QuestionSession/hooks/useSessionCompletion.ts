@@ -2,13 +2,14 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Question } from '@/hooks/questionsTypes';
 
 export const useSessionCompletion = (
   kidId: string,
   kidName: string,
   sessionComplete: boolean,
   currentQuestionIndex: number,
-  questions: any[],
+  questions: Question[],
   totalPoints: number,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {

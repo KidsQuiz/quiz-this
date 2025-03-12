@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
-import { AnswerOption } from '@/hooks/questionsTypes';
-import { Question } from '@/hooks/questionsTypes';
+import { AnswerOption, Question } from '@/hooks/questionsTypes';
 
 export const useAnswerHandling = (
   answerOptions: AnswerOption[],

@@ -1,10 +1,12 @@
+
 import { useEffect } from 'react';
+import { Question } from '@/hooks/questionsTypes';
 
 export const useModalTransition = (
   isModalOpen: boolean,
   sessionComplete: boolean,
   currentQuestionIndex: number,
-  questions: any[],
+  questions: Question[],
   timeBetweenQuestions: number,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,

@@ -1,11 +1,12 @@
 
 import { useEffect } from 'react';
+import { Question } from '@/hooks/questionsTypes';
 
 export const useCurrentQuestion = (
   isConfiguring: boolean,
-  questions: any[],
+  questions: Question[],
   currentQuestionIndex: number,
-  setCurrentQuestion: React.Dispatch<React.SetStateAction<any>>,
+  setCurrentQuestion: React.Dispatch<React.SetStateAction<Question | null>>,
   setTimeRemaining: React.Dispatch<React.SetStateAction<number>>,
   setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
   setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>,
