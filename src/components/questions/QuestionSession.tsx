@@ -3,13 +3,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
-import { Clock, Star, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, Star, CheckCircle, XCircle, Package } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface QuestionSessionProps {
   isOpen: boolean;
@@ -26,7 +26,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answerOptions, setAnswerOptions] = useState<AnswerOption[]>([]);
   const [questionPackages, setQuestionPackages] = useState<{ id: string, name: string }[]>([]);
-  const [selectedPackageId, setSelectedPackageId] = useState<string>('');
+  const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -74,9 +74,6 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
         if (packagesError) throw packagesError;
         
         setQuestionPackages(packagesData || []);
-        if (packagesData && packagesData.length > 0) {
-          setSelectedPackageId(packagesData[0].id);
-        }
       } catch (error: any) {
         console.error('Error loading assigned packages:', error.message);
         toast({
@@ -95,33 +92,41 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [isOpen, kidId, kidName, onClose, toast]);
 
-  // Load questions when package is selected
+  // Load questions when packages are selected
   const loadQuestions = useCallback(async () => {
-    if (!selectedPackageId) return;
+    if (!selectedPackageIds.length) return;
     
     try {
       setIsLoading(true);
       
-      // Get questions for the selected package
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('package_id', selectedPackageId)
-        .order('created_at');
-        
-      if (error) throw error;
+      let allQuestions: Question[] = [];
       
-      if (!data || data.length === 0) {
+      // Get questions for all selected packages
+      for (const packageId of selectedPackageIds) {
+        const { data, error } = await supabase
+          .from('questions')
+          .select('*')
+          .eq('package_id', packageId)
+          .order('created_at');
+          
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          allQuestions = [...allQuestions, ...data];
+        }
+      }
+      
+      if (allQuestions.length === 0) {
         toast({
           title: "No questions found",
-          description: "This package doesn't have any questions yet.",
+          description: "The selected packages don't have any questions.",
           variant: "destructive"
         });
         return;
       }
       
       // Randomize the order of questions
-      const shuffledQuestions = [...data].sort(() => Math.random() - 0.5);
+      const shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
       
     } catch (error: any) {
@@ -134,7 +139,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     } finally {
       setIsLoading(false);
     }
-  }, [selectedPackageId, toast]);
+  }, [selectedPackageIds, toast]);
 
   // Load answer options for the current question
   const loadAnswerOptions = useCallback(async (questionId: string) => {
@@ -161,8 +166,38 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [toast]);
 
+  // Handle package selection
+  const togglePackageSelection = (packageId: string) => {
+    setSelectedPackageIds(prev => {
+      if (prev.includes(packageId)) {
+        return prev.filter(id => id !== packageId);
+      } else {
+        return [...prev, packageId];
+      }
+    });
+  };
+
+  // Select all packages
+  const selectAllPackages = () => {
+    setSelectedPackageIds(questionPackages.map(pkg => pkg.id));
+  };
+
+  // Deselect all packages
+  const deselectAllPackages = () => {
+    setSelectedPackageIds([]);
+  };
+
   // Start session
   const handleStartSession = async () => {
+    if (selectedPackageIds.length === 0) {
+      toast({
+        title: "No packages selected",
+        description: "Please select at least one package to start the session.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     await loadQuestions();
     setCurrentQuestionIndex(0);
     setCorrectAnswers(0);
@@ -294,24 +329,54 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       <DialogHeader>
         <DialogTitle>Start Question Session for {kidName}</DialogTitle>
         <DialogDescription>
-          Choose a question package and set the time between questions.
+          Select packages to include and set the time between questions.
         </DialogDescription>
       </DialogHeader>
       
       <div className="py-6 space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="package">Question Package</Label>
-          <select
-            id="package"
-            className="w-full p-2 border rounded-md"
-            value={selectedPackageId}
-            onChange={(e) => setSelectedPackageId(e.target.value)}
-            disabled={isLoading}
-          >
-            {questionPackages.map(pkg => (
-              <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
-            ))}
-          </select>
+          <Label>Select Question Packages</Label>
+          <div className="flex gap-2 mb-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={selectAllPackages}
+              disabled={isLoading || questionPackages.length === 0}
+            >
+              Select All
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={deselectAllPackages}
+              disabled={isLoading || selectedPackageIds.length === 0}
+            >
+              Deselect All
+            </Button>
+          </div>
+          <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
+            {questionPackages.length > 0 ? (
+              questionPackages.map(pkg => (
+                <div key={pkg.id} className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`package-${pkg.id}`}
+                    checked={selectedPackageIds.includes(pkg.id)}
+                    onCheckedChange={() => togglePackageSelection(pkg.id)}
+                    disabled={isLoading}
+                  />
+                  <label 
+                    htmlFor={`package-${pkg.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center gap-2"
+                  >
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    {pkg.name}
+                  </label>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Loading packages...</p>
+            )}
+          </div>
         </div>
         
         <div className="space-y-2">
@@ -329,7 +394,10 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       
       <DialogFooter>
         <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleStartSession} disabled={isLoading || !selectedPackageId}>
+        <Button 
+          onClick={handleStartSession} 
+          disabled={isLoading || selectedPackageIds.length === 0}
+        >
           Start Session
         </Button>
       </DialogFooter>
@@ -451,3 +519,4 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
 };
 
 export default QuestionSession;
+
