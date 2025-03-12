@@ -40,10 +40,9 @@ export const useAnswerHandling = (
       }, 2000);
     }
     
-    // Wait for the time between questions before moving to next
-    setTimeout(() => {
-      setCurrentQuestionIndex(prev => prev + 1);
-    }, timeBetweenQuestions * 1000);
+    // Let the parent decide when to move to the next question
+    // We no longer advance the question here
+    return wasCorrect;
   };
 
   return {

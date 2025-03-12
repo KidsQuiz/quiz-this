@@ -27,6 +27,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    isModalOpen,
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
@@ -42,19 +43,25 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     };
   }, []);
 
+  // Determine effective open state as a combination of parent control and internal state
+  const effectiveOpenState = isOpen && isModalOpen;
+
   // Handle dialog close with proper cleanup
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       // Remove any applied styles before closing
       document.body.style.removeProperty('pointer-events');
-      // Call the parent's onClose to properly clean up session state
-      onClose();
+      
+      // If we're closing because the session is complete, call the parent's onClose
+      if (sessionComplete) {
+        onClose();
+      }
     }
   };
 
   return (
     <Dialog 
-      open={isOpen} 
+      open={effectiveOpenState} 
       onOpenChange={handleOpenChange}
     >
       <DialogContent 

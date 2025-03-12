@@ -15,6 +15,14 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [showWowEffect, setShowWowEffect] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [kidAnswers, setKidAnswers] = useState<Array<{
+    questionId: string,
+    answerId: string,
+    isCorrect: boolean,
+    points: number,
+    timestamp: Date
+  }>>([]);
 
   // Load packages and handle selection
   const {
@@ -55,7 +63,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setAnswerSubmitted,
     setSelectedAnswerId,
     setIsCorrect,
-    handleSelectAnswer
+    handleSelectAnswer: originalHandleSelectAnswer
   } = useAnswerHandling(
     answerOptions,
     currentQuestion,
@@ -66,24 +74,53 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCurrentQuestionIndex
   );
 
-  // Start session
-  const handleStartSession = async () => {
-    if (selectedPackageIds.length === 0) {
-      toast({
-        title: "No packages selected",
-        description: "Please select at least one package to start the session.",
-        variant: "destructive"
-      });
-      return;
+  // Modified handleSelectAnswer to close modal after answer
+  const handleSelectAnswer = async (answerId: string) => {
+    // Call the original handler which processes the answer
+    await originalHandleSelectAnswer(answerId);
+    
+    // Record this answer
+    if (currentQuestion) {
+      const answerRecord = {
+        questionId: currentQuestion.id,
+        answerId: answerId,
+        isCorrect: answerOptions.find(opt => opt.id === answerId)?.is_correct || false,
+        points: (answerOptions.find(opt => opt.id === answerId)?.is_correct || false) ? currentQuestion.points : 0,
+        timestamp: new Date()
+      };
+      
+      setKidAnswers(prev => [...prev, answerRecord]);
+      
+      try {
+        // Store the answer in the database for future reference
+        await supabase.from('kid_answers').insert({
+          kid_id: kidId,
+          question_id: currentQuestion.id,
+          answer_id: answerId,
+          is_correct: answerOptions.find(opt => opt.id === answerId)?.is_correct || false,
+          points_earned: answerOptions.find(opt => opt.id === answerId)?.is_correct ? currentQuestion.points : 0
+        });
+      } catch (error) {
+        console.error('Error recording answer:', error);
+      }
     }
-
-    await loadQuestions(selectedPackageIds);
-    setCurrentQuestionIndex(0);
-    setCorrectAnswers(0);
-    setTotalPoints(0);
-    setSessionComplete(false);
-    setIsConfiguring(false);
+    
+    // Wait for the animation to complete, then close the modal
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 2000); // Short delay to show the correct/incorrect indication
   };
+
+  // Show next question after delay
+  useEffect(() => {
+    if (!isModalOpen && !sessionComplete && currentQuestionIndex < questions.length) {
+      const timer = setTimeout(() => {
+        setIsModalOpen(true);
+      }, timeBetweenQuestions * 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, timeBetweenQuestions]);
 
   // Display the current question
   useEffect(() => {
@@ -162,6 +199,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    isModalOpen,
+    kidAnswers,
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
@@ -169,3 +208,4 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleSelectAnswer
   };
 };
+
