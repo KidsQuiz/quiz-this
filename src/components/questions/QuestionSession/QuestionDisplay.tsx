@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Clock, Star, CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { cn } from '@/lib/utils';
+import { playSound } from '@/utils/soundEffects';
 
 interface QuestionDisplayProps {
   currentQuestion: Question;
@@ -42,6 +43,13 @@ const QuestionDisplay = ({
     : progressPercent > 20 
       ? "bg-amber-500" 
       : "bg-red-500";
+      
+  // Play sound effect when answer is submitted
+  useEffect(() => {
+    if (answerSubmitted) {
+      playSound(isCorrect ? 'correct' : 'incorrect');
+    }
+  }, [answerSubmitted, isCorrect]);
 
   return (
     <>
