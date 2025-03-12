@@ -1,10 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
 import { useAnswerHandling } from './useAnswerHandling';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
@@ -29,6 +30,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     isLoading,
     questions,
     currentQuestion,
+    setCurrentQuestion,
     answerOptions,
     loadQuestions,
     loadAnswerOptions
@@ -84,7 +86,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   };
 
   // Display the current question
-  useState(() => {
+  useEffect(() => {
     if (isConfiguring || questions.length === 0) return;
     
     const loadCurrentQuestion = async () => {
@@ -139,7 +141,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     };
     
     loadCurrentQuestion();
-  }, [currentQuestionIndex, isConfiguring, questions]);
+  }, [currentQuestionIndex, isConfiguring, questions, kidId, kidName, loadAnswerOptions, setAnswerSubmitted, setCurrentQuestion, setIsCorrect, setSelectedAnswerId, setShowWowEffect, setTimeRemaining, setTimerActive, toast, totalPoints]);
 
   return {
     timeBetweenQuestions,
