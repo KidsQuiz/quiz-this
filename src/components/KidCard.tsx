@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, Edit, Trash2, MoreVertical, Star } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical, Star, Package } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,10 @@ interface KidCardProps {
   points: number;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onAssignPackages?: (id: string, name: string) => void;
 }
 
-const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete }: KidCardProps) => {
+const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete, onAssignPackages }: KidCardProps) => {
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md">
       <div className="p-6">
@@ -31,6 +32,16 @@ const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete }: KidCard
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                {onAssignPackages && (
+                  <DropdownMenuItem 
+                    onClick={() => onAssignPackages(id, name)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Package className="h-4 w-4" />
+                    <span>Assign Packages</span>
+                  </DropdownMenuItem>
+                )}
+                
                 <DropdownMenuItem 
                   onClick={() => onEdit(id)}
                   className="flex items-center gap-2 cursor-pointer"

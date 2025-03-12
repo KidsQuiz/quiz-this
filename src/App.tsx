@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import QuestionsManager from "./components/questions/QuestionsManager";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,11 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/" element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            } />
+            <Route path="/questions/:packageId" element={
               <ProtectedRoute>
                 <Index />
               </ProtectedRoute>

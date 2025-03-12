@@ -12,9 +12,10 @@ interface KidsListProps {
   onEditKid: (id: string) => void;
   onDeleteKid: (id: string) => void;
   onAddKid: () => void;
+  onAssignPackages?: (id: string, name: string) => void;
 }
 
-const KidsList = ({ kids, isLoading, onDragEnd, onEditKid, onDeleteKid, onAddKid }: KidsListProps) => {
+const KidsList = ({ kids, isLoading, onDragEnd, onEditKid, onDeleteKid, onAddKid, onAssignPackages }: KidsListProps) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -69,6 +70,7 @@ const KidsList = ({ kids, isLoading, onDragEnd, onEditKid, onDeleteKid, onAddKid
                         points={kid.points}
                         onEdit={onEditKid}
                         onDelete={onDeleteKid}
+                        onAssignPackages={onAssignPackages}
                       />
                     </div>
                   )}

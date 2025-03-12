@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import KidForm from './KidForm';
 import KidsList from './KidsList';
+import KidPackagesForm from './packages/KidPackagesForm';
 import { Button } from '@/components/ui/button';
 import { useKidsData } from '@/hooks/useKidsData';
 import { UserPlus } from 'lucide-react';
@@ -10,7 +11,9 @@ import { DropResult } from 'react-beautiful-dnd';
 const KidsManager = () => {
   const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid } = useKidsData();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPackagesFormOpen, setIsPackagesFormOpen] = useState(false);
   const [selectedKidId, setSelectedKidId] = useState<string | undefined>(undefined);
+  const [selectedKidName, setSelectedKidName] = useState<string>('');
   
   const handleAddKid = () => {
     setSelectedKidId(undefined);
@@ -20,6 +23,12 @@ const KidsManager = () => {
   const handleEditKid = (id: string) => {
     setSelectedKidId(id);
     setIsFormOpen(true);
+  };
+  
+  const handleAssignPackages = (id: string, name: string) => {
+    setSelectedKidId(id);
+    setSelectedKidName(name);
+    setIsPackagesFormOpen(true);
   };
   
   const onDragEnd = async (result: DropResult) => {
@@ -73,6 +82,7 @@ const KidsManager = () => {
         onEditKid={handleEditKid}
         onDeleteKid={deleteKid}
         onAddKid={handleAddKid}
+        onAssignPackages={handleAssignPackages}
       />
       
       <KidForm
@@ -81,6 +91,15 @@ const KidsManager = () => {
         onSave={fetchKids}
         kidId={selectedKidId}
       />
+      
+      {selectedKidId && (
+        <KidPackagesForm
+          isOpen={isPackagesFormOpen}
+          onClose={() => setIsPackagesFormOpen(false)}
+          kidId={selectedKidId}
+          kidName={selectedKidName}
+        />
+      )}
     </div>
   );
 };

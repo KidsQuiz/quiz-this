@@ -9,6 +9,71 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      answer_options: {
+        Row: {
+          content: string
+          id: string
+          is_correct: boolean
+          question_id: string
+        }
+        Insert: {
+          content: string
+          id?: string
+          is_correct?: boolean
+          question_id: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          is_correct?: boolean
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answer_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kid_packages: {
+        Row: {
+          created_at: string
+          id: string
+          kid_id: string
+          package_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kid_id: string
+          package_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kid_id?: string
+          package_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kid_packages_kid_id_fkey"
+            columns: ["kid_id"]
+            isOneToOne: false
+            referencedRelation: "kids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kid_packages_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kids: {
         Row: {
           age: number
@@ -45,6 +110,33 @@ export type Database = {
         }
         Relationships: []
       }
+      packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          parent_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          parent_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          parent_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -63,6 +155,36 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          package_id: string
+          points: number
+          time_limit: number
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          package_id: string
+          points?: number
+          time_limit?: number
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          package_id?: string
+          points?: number
+          time_limit?: number
+          updated_at?: string
         }
         Relationships: []
       }
