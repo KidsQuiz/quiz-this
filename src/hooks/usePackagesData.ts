@@ -10,6 +10,7 @@ export interface Package {
   description: string | null;
   created_at: string;
   updated_at: string;
+  question_count?: number;
 }
 
 export const usePackagesData = () => {
@@ -22,15 +23,41 @@ export const usePackagesData = () => {
     
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      
+      // First, get all packages
+      const { data: packagesData, error: packagesError } = await supabase
         .from('packages')
         .select('*')
         .eq('parent_id', user.id)
         .order('created_at', { ascending: false });
         
-      if (error) throw error;
+      if (packagesError) throw packagesError;
       
-      setPackages(data || []);
+      if (!packagesData || packagesData.length === 0) {
+        setPackages([]);
+        return;
+      }
+      
+      // Then, get the question count for each package
+      const packageIds = packagesData.map(pkg => pkg.id);
+      const { data: questionsData, error: questionsError } = await supabase
+        .from('questions')
+        .select('package_id, count')
+        .in('package_id', packageIds)
+        .group('package_id');
+      
+      if (questionsError) throw questionsError;
+      
+      // Map question counts to packages
+      const packageWithCounts = packagesData.map(pkg => {
+        const countData = questionsData?.find(q => q.package_id === pkg.id);
+        return {
+          ...pkg,
+          question_count: countData ? parseInt(countData.count) : 0
+        };
+      });
+      
+      setPackages(packageWithCounts);
     } catch (error: any) {
       console.error('Error fetching packages:', error.message);
       toast({

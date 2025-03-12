@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Package } from '@/hooks/usePackagesData';
 import { Edit, Trash2, Package as PackageIcon, Plus, MessageCircleQuestion } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 interface PackagesListProps {
   packages: Package[];
@@ -103,7 +104,12 @@ const PackagesList = ({
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{pkg.description}</p>
             )}
             
-            <div className="flex gap-2 mt-4">
+            <div className="flex items-center justify-between mt-4">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <MessageCircleQuestion className="h-3 w-3" />
+                <span>{pkg.question_count || 0} Questions</span>
+              </Badge>
+              
               <Button
                 variant="outline"
                 size="sm"
