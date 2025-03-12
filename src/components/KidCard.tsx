@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, GripVertical, Edit, Trash2, MoreVertical } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,11 +21,10 @@ interface KidCardProps {
 
 const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) => {
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md">
+    <Card className="overflow-hidden transition-all hover:shadow-md cursor-grab active:cursor-grabbing">
       <div className="p-6">
         <div className="flex flex-col items-center text-center gap-4">
-          <div className="self-stretch flex justify-between items-center mb-2">
-            <GripVertical className="text-muted-foreground h-5 w-5" />
+          <div className="self-stretch flex justify-end items-center mb-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
