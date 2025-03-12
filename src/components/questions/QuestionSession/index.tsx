@@ -34,20 +34,20 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     handleSelectAnswer
   } = useQuestionSession(kidId, kidName, onClose);
 
-  // Clean up effect
+  // Clean up effect for when component unmounts
   useEffect(() => {
     return () => {
-      // Clean up any resources when component unmounts
-      document.body.style.pointerEvents = '';
+      // Remove any global styles or event listeners
+      document.body.style.removeProperty('pointer-events');
     };
   }, []);
 
-  // Handle dialog close properly
+  // Handle dialog close with proper cleanup
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      // Reset any DOM manipulations
-      document.body.style.pointerEvents = '';
-      // Ensure we call onClose to properly clean up state
+      // Remove any applied styles before closing
+      document.body.style.removeProperty('pointer-events');
+      // Call the parent's onClose to properly clean up session state
       onClose();
     }
   };
@@ -57,7 +57,21 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       open={isOpen} 
       onOpenChange={handleOpenChange}
     >
-      <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto"
+        // Don't trap the focus inside the dialog when it's closing
+        onEscapeKeyDown={() => {
+          document.body.style.removeProperty('pointer-events');
+        }}
+        onInteractOutside={() => {
+          document.body.style.removeProperty('pointer-events');
+        }}
+        onCloseAutoFocus={(e) => {
+          // Prevent the default focus behavior which can cause issues
+          e.preventDefault();
+          document.body.style.removeProperty('pointer-events');
+        }}
+      >
         {isConfiguring && (
           <ConfigScreen
             questionPackages={questionPackages}
