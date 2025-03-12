@@ -38,6 +38,58 @@ export type Database = {
           },
         ]
       }
+      kid_answers: {
+        Row: {
+          answer_id: string
+          created_at: string
+          id: string
+          is_correct: boolean
+          kid_id: string
+          points_earned: number
+          question_id: string
+        }
+        Insert: {
+          answer_id: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          kid_id: string
+          points_earned?: number
+          question_id: string
+        }
+        Update: {
+          answer_id?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          kid_id?: string
+          points_earned?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kid_answers_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "answer_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kid_answers_kid_id_fkey"
+            columns: ["kid_id"]
+            isOneToOne: false
+            referencedRelation: "kids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kid_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kid_packages: {
         Row: {
           created_at: string

@@ -10,7 +10,8 @@ export const useAnswerHandling = (
   setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
   setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
   timeBetweenQuestions: number,
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
@@ -40,8 +41,11 @@ export const useAnswerHandling = (
       }, 2000);
     }
     
-    // Let the parent decide when to move to the next question
-    // We no longer advance the question here
+    // Close the modal after a delay to show the result
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 2000);
+    
     return wasCorrect;
   };
 

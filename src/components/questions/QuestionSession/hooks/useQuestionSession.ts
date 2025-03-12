@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -71,21 +70,42 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTotalPoints,
     setShowWowEffect,
     timeBetweenQuestions,
-    setCurrentQuestionIndex
+    setCurrentQuestionIndex,
+    setIsModalOpen
   );
 
-  // Modified handleSelectAnswer to close modal after answer
+  // Start the session with the selected packages
+  const handleStartSession = useCallback(async () => {
+    if (selectedPackageIds.length === 0) {
+      toast({
+        title: "No packages selected",
+        description: "Please select at least one question package to start.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    await loadQuestions(selectedPackageIds);
+    setIsConfiguring(false);
+    setCurrentQuestionIndex(0);
+  }, [loadQuestions, selectedPackageIds, setCurrentQuestionIndex, toast]);
+
+  // Modified handleSelectAnswer to record answers
   const handleSelectAnswer = async (answerId: string) => {
     // Call the original handler which processes the answer
     await originalHandleSelectAnswer(answerId);
     
     // Record this answer
     if (currentQuestion) {
+      const selectedAnswer = answerOptions.find(opt => opt.id === answerId);
+      const isCorrectAnswer = selectedAnswer?.is_correct || false;
+      const pointsEarned = isCorrectAnswer ? currentQuestion.points : 0;
+      
       const answerRecord = {
         questionId: currentQuestion.id,
         answerId: answerId,
-        isCorrect: answerOptions.find(opt => opt.id === answerId)?.is_correct || false,
-        points: (answerOptions.find(opt => opt.id === answerId)?.is_correct || false) ? currentQuestion.points : 0,
+        isCorrect: isCorrectAnswer,
+        points: pointsEarned,
         timestamp: new Date()
       };
       
@@ -93,34 +113,41 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
       
       try {
         // Store the answer in the database for future reference
-        await supabase.from('kid_answers').insert({
-          kid_id: kidId,
-          question_id: currentQuestion.id,
-          answer_id: answerId,
-          is_correct: answerOptions.find(opt => opt.id === answerId)?.is_correct || false,
-          points_earned: answerOptions.find(opt => opt.id === answerId)?.is_correct ? currentQuestion.points : 0
-        });
+        await supabase
+          .from('kid_answers')
+          .insert({
+            kid_id: kidId,
+            question_id: currentQuestion.id,
+            answer_id: answerId,
+            is_correct: isCorrectAnswer,
+            points_earned: pointsEarned
+          });
       } catch (error) {
         console.error('Error recording answer:', error);
       }
     }
-    
-    // Wait for the animation to complete, then close the modal
-    setTimeout(() => {
-      setIsModalOpen(false);
-    }, 2000); // Short delay to show the correct/incorrect indication
   };
 
-  // Show next question after delay
+  // Advance to the next question when modal is closed
   useEffect(() => {
     if (!isModalOpen && !sessionComplete && currentQuestionIndex < questions.length) {
-      const timer = setTimeout(() => {
-        setIsModalOpen(true);
-      }, timeBetweenQuestions * 1000);
+      // Move to the next question
+      const nextQuestionIndex = currentQuestionIndex + 1;
       
-      return () => clearTimeout(timer);
+      if (nextQuestionIndex >= questions.length) {
+        // If we've reached the end, mark session as complete
+        setSessionComplete(true);
+      } else {
+        // Otherwise, set up a timer to show the next question
+        const timer = setTimeout(() => {
+          setCurrentQuestionIndex(nextQuestionIndex);
+          setIsModalOpen(true);
+        }, timeBetweenQuestions * 1000);
+        
+        return () => clearTimeout(timer);
+      }
     }
-  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, timeBetweenQuestions]);
+  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, timeBetweenQuestions, setCurrentQuestionIndex]);
 
   // Display the current question
   useEffect(() => {
@@ -208,4 +235,3 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleSelectAnswer
   };
 };
-
