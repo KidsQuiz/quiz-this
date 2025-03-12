@@ -35,16 +35,17 @@ export const useAnswerHandling = (
       setTotalPoints(prev => prev + currentQuestion.points);
       setShowWowEffect(true);
       
-      // Hide the effect after 2 seconds
+      // Extended the wow effect to 3 seconds to enjoy the animations
       setTimeout(() => {
         setShowWowEffect(false);
-      }, 2000);
+      }, 3000);
     }
     
     // Close the modal after a delay to show the result
+    // Added extra time to allow for the enhanced celebration animation
     setTimeout(() => {
       setIsModalOpen(false);
-    }, 2000);
+    }, wasCorrect ? 3500 : 2000);
     
     return wasCorrect;
   };
