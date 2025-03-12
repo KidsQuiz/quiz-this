@@ -17,6 +17,7 @@ export type Database = {
           id: string
           name: string
           parent_id: string
+          points: number
           position: number
           updated_at: string
         }
@@ -27,6 +28,7 @@ export type Database = {
           id?: string
           name: string
           parent_id: string
+          points?: number
           position?: number
           updated_at?: string
         }
@@ -37,6 +39,7 @@ export type Database = {
           id?: string
           name?: string
           parent_id?: string
+          points?: number
           position?: number
           updated_at?: string
         }

@@ -22,12 +22,14 @@ interface Kid {
   age: number;
   avatar_url: string | null;
   position: number;
+  points: number;
 }
 
 const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
   const [age, setAge] = useState<string>('');
+  const [points, setPoints] = useState<string>('0');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +53,7 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
         if (data) {
           setName(data.name);
           setAge(data.age.toString());
+          setPoints(data.points.toString());
           setAvatarUrl(data.avatar_url);
         }
       } catch (error: any) {
@@ -68,6 +71,7 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     } else {
       setName('');
       setAge('');
+      setPoints('0');
       setAvatarFile(null);
       setAvatarUrl(null);
       setPreviewUrl(null);
@@ -166,6 +170,7 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
           .update({
             name,
             age: parseInt(age),
+            points: parseInt(points),
             avatar_url: newAvatarUrl,
             updated_at: new Date().toISOString()
           })
@@ -187,6 +192,7 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
             parent_id: user.id,
             name,
             age: parseInt(age),
+            points: parseInt(points),
             avatar_url: newAvatarUrl,
             position: nextPosition
           });
@@ -247,6 +253,20 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
               placeholder="Child's age"
               min="0"
               max="18"
+              disabled={isLoading}
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="points">Points</Label>
+            <Input
+              id="points"
+              type="number"
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+              placeholder="Points"
+              min="0"
               disabled={isLoading}
               required
             />

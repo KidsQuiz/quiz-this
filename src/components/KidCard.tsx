@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, Edit, Trash2, MoreVertical } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical, Star } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +15,12 @@ interface KidCardProps {
   name: string;
   age: number;
   avatarUrl: string | null;
+  points: number;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) => {
+const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete }: KidCardProps) => {
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md cursor-grab active:cursor-grabbing">
       <div className="p-6">
@@ -68,6 +69,10 @@ const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) =
           <div>
             <h3 className="text-lg font-medium">{name}</h3>
             <p className="text-sm text-muted-foreground">{age} years old</p>
+            <div className="mt-2 flex items-center justify-center gap-1">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="font-medium">{points} points</span>
+            </div>
           </div>
         </div>
       </div>

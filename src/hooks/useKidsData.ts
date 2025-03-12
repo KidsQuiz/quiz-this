@@ -10,6 +10,7 @@ export interface Kid {
   age: number;
   avatar_url: string | null;
   position: number;
+  points: number;
 }
 
 export const useKidsData = () => {

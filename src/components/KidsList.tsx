@@ -1,4 +1,3 @@
-
 import React from 'react';
 import KidCard from './KidCard';
 import { Button } from '@/components/ui/button';
@@ -67,6 +66,7 @@ const KidsList = ({ kids, isLoading, onDragEnd, onEditKid, onDeleteKid, onAddKid
                         name={kid.name}
                         age={kid.age}
                         avatarUrl={kid.avatar_url}
+                        points={kid.points}
                         onEdit={onEditKid}
                         onDelete={onDeleteKid}
                       />
