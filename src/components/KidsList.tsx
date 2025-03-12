@@ -1,8 +1,10 @@
+
 import React from 'react';
 import KidCard from './KidCard';
 import { Button } from '@/components/ui/button';
 import { Kid } from '@/hooks/useKidsData';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+
 interface KidsListProps {
   kids: Kid[];
   isLoading: boolean;
@@ -12,6 +14,7 @@ interface KidsListProps {
   onAddKid: () => void;
   onAssignPackages?: (id: string, name: string) => void;
 }
+
 const KidsList = ({
   kids,
   isLoading,
@@ -26,6 +29,7 @@ const KidsList = ({
         {[1, 2, 3].map(i => <div key={i} className="h-56 rounded-lg bg-muted animate-pulse"></div>)}
       </div>;
   }
+  
   if (kids.length === 0) {
     return <div className="text-center py-12">
         <p className="text-muted-foreground">No kids added yet.</p>
@@ -34,8 +38,8 @@ const KidsList = ({
         </Button>
       </div>;
   }
+  
   return <div className="mb-4">
-      
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="kids-list" direction="horizontal">
           {provided => <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" {...provided.droppableProps} ref={provided.innerRef}>
@@ -50,4 +54,5 @@ const KidsList = ({
       </DragDropContext>
     </div>;
 };
+
 export default KidsList;
