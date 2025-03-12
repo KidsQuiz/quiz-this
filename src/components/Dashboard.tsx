@@ -4,6 +4,7 @@ import Card from './Card';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import KidsManager from './KidsManager';
 
 interface ProfileData {
   username: string | null;
@@ -45,14 +46,18 @@ const Dashboard = () => {
   }, [user]);
   
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-6">
-      <div className="mb-6 text-center animate-fade-in">
+    <div className="w-full max-w-4xl mx-auto px-4 py-6">
+      <div className="mb-8 text-center animate-fade-in">
         <h2 className="text-xl md:text-2xl font-medium tracking-tight text-balance">
-          Your Activity Summary
+          Your Family Dashboard
         </h2>
         <p className="text-muted-foreground mt-2 max-w-lg mx-auto text-sm">
-          View your profile information and activity stats.
+          Manage your profile information and family members.
         </p>
+      </div>
+      
+      <div className="mb-12">
+        <KidsManager />
       </div>
     </div>
   );
