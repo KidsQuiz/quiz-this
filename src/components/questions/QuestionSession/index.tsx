@@ -63,7 +63,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       onOpenChange={handleOpenChange}
     >
       <DialogContent 
-        className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto"
+        className="sm:max-w-[90vw] md:max-w-[85vw] lg:max-w-[950px] max-h-[90vh] overflow-y-auto"
         // Don't trap the focus inside the dialog when it's closing
         onEscapeKeyDown={() => {
           document.body.style.removeProperty('pointer-events');
