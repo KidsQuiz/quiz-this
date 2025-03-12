@@ -3,19 +3,16 @@ import React from 'react';
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Package } from 'lucide-react';
 
 interface ConfigScreenProps {
   questionPackages: { id: string, name: string }[];
   selectedPackageIds: string[];
-  timeBetweenQuestions: number;
   isLoading: boolean;
   togglePackageSelection: (packageId: string) => void;
   selectAllPackages: () => void;
   deselectAllPackages: () => void;
-  setTimeBetweenQuestions: (value: number) => void;
   onStartSession: () => void;
   onClose: () => void;
 }
@@ -23,12 +20,10 @@ interface ConfigScreenProps {
 const ConfigScreen = ({
   questionPackages,
   selectedPackageIds,
-  timeBetweenQuestions,
   isLoading,
   togglePackageSelection,
   selectAllPackages,
   deselectAllPackages,
-  setTimeBetweenQuestions,
   onStartSession,
   onClose
 }: ConfigScreenProps) => {
@@ -37,7 +32,7 @@ const ConfigScreen = ({
       <DialogHeader>
         <DialogTitle>Start Question Session</DialogTitle>
         <DialogDescription>
-          Select packages to include and set the time between questions.
+          Select packages to include for this quiz session.
         </DialogDescription>
       </DialogHeader>
       
@@ -85,18 +80,6 @@ const ConfigScreen = ({
               <p className="text-sm text-muted-foreground">Loading packages...</p>
             )}
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="timeBetween">Time Between Questions: {timeBetweenQuestions} seconds</Label>
-          <Slider
-            id="timeBetween"
-            min={1}
-            max={10}
-            step={1}
-            value={[timeBetweenQuestions]}
-            onValueChange={(value) => setTimeBetweenQuestions(value[0])}
-          />
         </div>
       </div>
       
