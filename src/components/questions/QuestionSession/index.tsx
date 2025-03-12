@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useQuestionSession } from './useQuestionSession';
+import { useQuestionSession } from './hooks/useQuestionSession';
 import ConfigScreen from './ConfigScreen';
 import QuestionDisplay from './QuestionDisplay';
 import CompletionScreen from './CompletionScreen';
