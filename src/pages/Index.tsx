@@ -11,16 +11,20 @@ const Index = () => {
   const isQuestionsPage = location.pathname.startsWith('/questions/');
   const [activeTab, setActiveTab] = useState('kids');
   
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <Header />
+      <Header activeTab={activeTab} onTabChange={handleTabChange} />
       
       <main className="flex-1 flex items-start justify-center pt-8">
         {isQuestionsPage ? (
           <QuestionsManager />
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <Dashboard />
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <Dashboard activeTab={activeTab} />
           </Tabs>
         )}
       </main>

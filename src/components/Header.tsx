@@ -14,13 +14,17 @@ interface ProfileData {
   avatar_url: string | null;
 }
 
-const Header = () => {
+interface HeaderProps {
+  activeTab: string;
+  onTabChange: (value: string) => void;
+}
+
+const Header = ({ activeTab, onTabChange }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const isQuestionsPage = location.pathname.startsWith('/questions/');
-  const [activeTab, setActiveTab] = useState('kids');
 
   useEffect(() => {
     const getProfile = async () => {
@@ -70,7 +74,7 @@ const Header = () => {
           <h1 className="text-lg font-medium">Dashboard</h1>
           
           {!isQuestionsPage && (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="ml-6">
+            <Tabs value={activeTab} onValueChange={onTabChange} className="ml-6">
               <TabsList className="grid grid-cols-2 w-48">
                 <TabsTrigger value="kids" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />

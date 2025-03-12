@@ -12,12 +12,11 @@ interface ProfileData {
   avatar_url: string | null;
 }
 
-const Dashboard = () => {
+const Dashboard = ({ activeTab }) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('kids');
-
+  
   useEffect(() => {
     const getProfile = async () => {
       if (!user) return;
