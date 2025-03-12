@@ -10,7 +10,6 @@ import { useState, useEffect } from 'react';
 interface ProfileData {
   username: string | null;
   avatar_url: string | null;
-  points: number;
 }
 
 const Header = () => {
@@ -25,7 +24,7 @@ const Header = () => {
       try {
         const { data, error } = await (supabase as any)
           .from('profiles')
-          .select('username, avatar_url, points')
+          .select('username, avatar_url')
           .eq('id', user.id)
           .single();
           
@@ -70,9 +69,6 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
               <span className="text-sm font-medium">{profile.username || "User"}</span>
-              <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
-                {profile.points || 0} points
-              </span>
             </div>
             
             <div className="flex items-center gap-2">
