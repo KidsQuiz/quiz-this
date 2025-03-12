@@ -9,13 +9,17 @@ import { Users, Package } from 'lucide-react';
 const PackagesPage = () => {
   const [activeTab, setActiveTab] = useState('packages');
 
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <Header />
+      <Header activeTab={activeTab} onTabChange={handleTabChange} />
       
       <main className="flex-1 flex items-start justify-center pt-8">
         <div className="w-full max-w-4xl mx-auto px-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
               <TabsTrigger value="kids" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
