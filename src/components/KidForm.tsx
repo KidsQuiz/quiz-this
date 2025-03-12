@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { v4 as uuidv4 } from '@supabase/supabase-js/dist/main/lib/helpers';
+import { v4 as uuidv4 } from 'uuid';
 
 interface KidFormProps {
   isOpen: boolean;
@@ -65,7 +64,6 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     if (isOpen && isEditMode) {
       fetchKid();
     } else {
-      // Reset form when opening in add mode
       setName('');
       setAge('');
       setAvatarFile(null);
@@ -79,7 +77,6 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
       const file = e.target.files[0];
       setAvatarFile(file);
       
-      // Create a preview URL
       const fileUrl = URL.createObjectURL(file);
       setPreviewUrl(fileUrl);
     }
@@ -139,11 +136,9 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     setIsLoading(true);
     
     try {
-      // Upload avatar if there's a new file
       const newAvatarUrl = avatarFile ? await uploadAvatar() : avatarUrl;
       
       if (isEditMode) {
-        // Update existing kid
         const { error } = await supabase
           .from('kids')
           .update({
@@ -161,7 +156,6 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
           description: "Kid updated successfully!"
         });
       } else {
-        // Add new kid
         const { error } = await supabase
           .from('kids')
           .insert({
@@ -179,7 +173,6 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
         });
       }
       
-      // Clean up any preview URLs
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
