@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import AnswerOptionItem from './AnswerOptionItem';
 
 export interface AnswerFormOption {
-  id?: string;
+  id: string;  // Added id field to make it required
   content: string;
   isCorrect: boolean;
 }

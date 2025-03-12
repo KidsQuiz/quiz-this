@@ -14,10 +14,10 @@ export const useQuestionForm = (
   const [timeLimit, setTimeLimit] = useState('30');
   const [points, setPoints] = useState('10');
   const [answers, setAnswers] = useState<AnswerFormOption[]>([
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false },
-    { content: '', isCorrect: false }
+    { id: 'temp-1', content: '', isCorrect: false },
+    { id: 'temp-2', content: '', isCorrect: false },
+    { id: 'temp-3', content: '', isCorrect: false },
+    { id: 'temp-4', content: '', isCorrect: false }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -61,7 +61,11 @@ export const useQuestionForm = (
             
             // If less than 4 answers, fill the rest with empty answers
             while (formattedAnswers.length < 4) {
-              formattedAnswers.push({ content: '', isCorrect: false });
+              formattedAnswers.push({ 
+                id: `temp-${formattedAnswers.length + 1}`, 
+                content: '', 
+                isCorrect: false 
+              });
             }
             
             setAnswers(formattedAnswers);
@@ -88,10 +92,10 @@ export const useQuestionForm = (
         setTimeLimit('30');
         setPoints('10');
         setAnswers([
-          { content: '', isCorrect: false },
-          { content: '', isCorrect: false },
-          { content: '', isCorrect: false },
-          { content: '', isCorrect: false }
+          { id: 'temp-1', content: '', isCorrect: false },
+          { id: 'temp-2', content: '', isCorrect: false },
+          { id: 'temp-3', content: '', isCorrect: false },
+          { id: 'temp-4', content: '', isCorrect: false }
         ]);
       }
     };
