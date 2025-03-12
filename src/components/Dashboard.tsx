@@ -5,8 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import KidsManager from './KidsManager';
 import PackagesManager from './packages/PackagesManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Package } from 'lucide-react';
+import { TabsContent } from '@/components/ui/tabs';
 
 interface ProfileData {
   username: string | null;
@@ -50,35 +49,13 @@ const Dashboard = () => {
   
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6">
-      <div className="mb-8 text-center animate-fade-in">
-        <h2 className="text-xl md:text-2xl font-medium tracking-tight text-balance">
-          Your Family Dashboard
-        </h2>
-        <p className="text-muted-foreground mt-2 max-w-lg mx-auto text-sm">
-          Manage your profile information, family members and learning packages.
-        </p>
-      </div>
+      <TabsContent value="kids" className="mt-0">
+        <KidsManager />
+      </TabsContent>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-          <TabsTrigger value="kids" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span>Kids</span>
-          </TabsTrigger>
-          <TabsTrigger value="packages" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            <span>Packages</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="kids">
-          <KidsManager />
-        </TabsContent>
-        
-        <TabsContent value="packages">
-          <PackagesManager />
-        </TabsContent>
-      </Tabs>
+      <TabsContent value="packages" className="mt-0">
+        <PackagesManager />
+      </TabsContent>
     </div>
   );
 };

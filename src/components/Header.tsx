@@ -3,9 +3,11 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import Avatar from './Avatar';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Users, Package } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLocation } from 'react-router-dom';
 
 interface ProfileData {
   username: string | null;
@@ -16,6 +18,9 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
+  const isQuestionsPage = location.pathname.startsWith('/questions/');
+  const [activeTab, setActiveTab] = useState('kids');
 
   useEffect(() => {
     const getProfile = async () => {
@@ -63,6 +68,21 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <User className="h-5 w-5 text-primary" />
           <h1 className="text-lg font-medium">Dashboard</h1>
+          
+          {!isQuestionsPage && (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="ml-6">
+              <TabsList className="grid grid-cols-2 w-48">
+                <TabsTrigger value="kids" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>Kids</span>
+                </TabsTrigger>
+                <TabsTrigger value="packages" className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  <span>Packages</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
         </div>
         
         {!isLoading && profile && (
