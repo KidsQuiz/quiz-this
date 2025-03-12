@@ -29,21 +29,27 @@ export const useAnswerHandling = (
     
     // Update scores
     if (wasCorrect && currentQuestion) {
+      const points = currentQuestion.points;
+      console.log(`Correct answer! Adding ${points} points to session total`);
+      
       setCorrectAnswers(prev => prev + 1);
-      setTotalPoints(prev => prev + currentQuestion.points);
+      setTotalPoints(prev => prev + points);
       setShowWowEffect(true);
       
       // Show celebration effect for a short duration
       setTimeout(() => {
         setShowWowEffect(false);
+        // Move to next question immediately after celebration
+        setCurrentQuestionIndex(prev => prev + 1);
+        setIsModalOpen(true);
       }, 1500);
+    } else {
+      // For incorrect answers, move to next question after a shorter delay
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev + 1);
+        setIsModalOpen(true);
+      }, 1000);
     }
-    
-    // Close the modal after a short delay to show the result
-    // The duration depends on whether the answer was correct (with celebration) or not
-    setTimeout(() => {
-      setIsModalOpen(false);
-    }, wasCorrect ? 1500 : 1000);
     
     return wasCorrect;
   };

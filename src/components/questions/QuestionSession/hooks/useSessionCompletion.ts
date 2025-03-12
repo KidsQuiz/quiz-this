@@ -28,6 +28,8 @@ export const useSessionCompletion = (
         if (totalPoints <= 0) return;
         
         try {
+          console.log(`Updating points for kid ${kidId} - adding ${totalPoints} points`);
+          
           const { data: kidData, error: kidError } = await supabase
             .from('kids')
             .select('points')
@@ -38,6 +40,8 @@ export const useSessionCompletion = (
           
           const currentPoints = kidData?.points || 0;
           const newTotalPoints = currentPoints + totalPoints;
+          
+          console.log(`Current points: ${currentPoints}, new total: ${newTotalPoints}`);
           
           const { error: updateError } = await supabase
             .from('kids')
@@ -52,6 +56,11 @@ export const useSessionCompletion = (
           });
         } catch (error) {
           console.error('Error updating points:', error);
+          toast({
+            variant: "destructive",
+            title: "Error updating points",
+            description: "There was a problem updating the points total."
+          });
         }
       };
       

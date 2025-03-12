@@ -28,6 +28,8 @@ export const useEnhancedAnswerHandling = (
       const isCorrect = selectedAnswer?.is_correct || false;
       const pointsEarned = isCorrect ? currentQuestion.points : 0;
       
+      console.log(`Recording answer for question ${currentQuestion.id}: ${isCorrect ? 'Correct' : 'Incorrect'}, points: ${pointsEarned}`);
+      
       const answerRecord = {
         questionId: currentQuestion.id,
         answerId: answerId,
