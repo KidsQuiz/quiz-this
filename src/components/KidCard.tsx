@@ -21,7 +21,7 @@ interface KidCardProps {
 
 const KidCard = ({ id, name, age, avatarUrl, onEdit, onDelete }: KidCardProps) => {
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-grab active:cursor-grabbing">
+    <Card className="overflow-hidden transition-colors hover:shadow-md cursor-grab active:cursor-grabbing">
       <div className="p-6">
         <div className="flex flex-col items-center text-center gap-4">
           <div className="self-stretch flex justify-end items-center mb-2">
