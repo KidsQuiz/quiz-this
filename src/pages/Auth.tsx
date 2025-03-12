@@ -11,6 +11,7 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +42,7 @@ const AuthPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
 
     try {
       if (isSignUp) {
@@ -79,6 +81,9 @@ const AuthPage = () => {
       // Log the error to get more details for debugging
       console.error("Authentication error:", error);
       
+      // Set a more user-friendly error message
+      setErrorMessage(error.message || "Something went wrong. Please try again.");
+      
       toast({
         variant: "destructive",
         title: "Authentication failed",
@@ -103,6 +108,12 @@ const AuthPage = () => {
               {isSignUp ? 'Sign up to start your journey' : 'Sign in to your account'}
             </p>
           </div>
+          
+          {errorMessage && (
+            <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+              {errorMessage}
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-6 mt-8">
             <div className="space-y-4">
