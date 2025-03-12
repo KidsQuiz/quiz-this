@@ -57,18 +57,15 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
     }
   };
   
-  const handleDialogChange = (open: boolean) => {
-    if (!open) {
-      // Use setTimeout with a slight delay to ensure React properly cleans up the modal
-      // before resetting any state in the parent component
-      setTimeout(() => {
-        onClose();
-      }, 100);
-    }
+  const handleDialogClose = () => {
+    // Call the onClose prop directly
+    onClose();
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) handleDialogClose();
+    }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Assign Question Packages to {kidName}</DialogTitle>
@@ -122,7 +119,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
         </div>
         
         <DialogFooter>
-          <Button onClick={onClose}>Done</Button>
+          <Button onClick={handleDialogClose}>Done</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

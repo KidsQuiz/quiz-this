@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import KidForm from './KidForm';
 import KidsList from './KidsList';
 import KidPackagesForm from './packages/KidPackagesForm';
@@ -14,6 +14,16 @@ const KidsManager = () => {
   const [isPackagesFormOpen, setIsPackagesFormOpen] = useState(false);
   const [selectedKidId, setSelectedKidId] = useState<string | undefined>(undefined);
   const [selectedKidName, setSelectedKidName] = useState<string>('');
+  
+  // Reset form open state on component unmount
+  useEffect(() => {
+    return () => {
+      setIsFormOpen(false);
+      setIsPackagesFormOpen(false);
+      setSelectedKidId(undefined);
+      setSelectedKidName('');
+    };
+  }, []);
   
   const handleAddKid = () => {
     setSelectedKidId(undefined);
@@ -32,12 +42,12 @@ const KidsManager = () => {
   };
   
   const handlePackagesFormClose = () => {
+    // First, close the modal
     setIsPackagesFormOpen(false);
-    // Reset focus and ensure state is clean
-    setTimeout(() => {
-      setSelectedKidId(undefined);
-      setSelectedKidName('');
-    }, 300); // Increased timeout for better cleanup
+    
+    // Clear state immediately after closing the modal
+    setSelectedKidId(undefined);
+    setSelectedKidName('');
   };
   
   const onDragEnd = async (result: DropResult) => {
@@ -101,8 +111,7 @@ const KidsManager = () => {
         kidId={selectedKidId}
       />
       
-      {/* Only render the package form when we actually have a selected kid */}
-      {selectedKidId && (
+      {isPackagesFormOpen && selectedKidId && (
         <KidPackagesForm
           isOpen={isPackagesFormOpen}
           onClose={handlePackagesFormClose}
