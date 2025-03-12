@@ -38,26 +38,25 @@ export const usePackagesData = () => {
         return;
       }
       
-      // Then, get the question count for each package
-      const packageIds = packagesData.map(pkg => pkg.id);
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('package_id, count')
-        .in('package_id', packageIds)
-        .group('package_id');
+      // Then, get question counts for each package individually
+      const packagesWithCounts = await Promise.all(
+        packagesData.map(async (pkg) => {
+          // Count questions for this package
+          const { count, error: countError } = await supabase
+            .from('questions')
+            .select('*', { count: 'exact', head: true })
+            .eq('package_id', pkg.id);
+          
+          if (countError) {
+            console.error('Error counting questions:', countError.message);
+            return { ...pkg, question_count: 0 };
+          }
+          
+          return { ...pkg, question_count: count || 0 };
+        })
+      );
       
-      if (questionsError) throw questionsError;
-      
-      // Map question counts to packages
-      const packageWithCounts = packagesData.map(pkg => {
-        const countData = questionsData?.find(q => q.package_id === pkg.id);
-        return {
-          ...pkg,
-          question_count: countData ? parseInt(countData.count) : 0
-        };
-      });
-      
-      setPackages(packageWithCounts);
+      setPackages(packagesWithCounts);
     } catch (error: any) {
       console.error('Error fetching packages:', error.message);
       toast({
