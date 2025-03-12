@@ -38,7 +38,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages
-  } = usePackageSelection(kidId, kidName, onClose);
+  } = usePackageSelection(kidId);
 
   // Load questions and answer options
   const {
