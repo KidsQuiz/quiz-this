@@ -42,8 +42,18 @@ export const useQuestionLoading = (toast: any) => {
         return;
       }
       
-      // Randomize the order of questions
-      const shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+      // Deduplicate questions by ID to ensure each question appears only once
+      const uniqueQuestionsMap = new Map<string, Question>();
+      allQuestions.forEach(question => {
+        if (!uniqueQuestionsMap.has(question.id)) {
+          uniqueQuestionsMap.set(question.id, question);
+        }
+      });
+      
+      // Convert back to array and randomize the order
+      const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
+      const shuffledQuestions = [...uniqueQuestions].sort(() => Math.random() - 0.5);
+      
       setQuestions(shuffledQuestions);
       
     } catch (error: any) {
