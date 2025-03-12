@@ -6,6 +6,7 @@ import { Trophy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import UserProfile from './UserProfile';
+import { toast } from '@/hooks/use-toast';
 
 interface ProfileData {
   username: string | null;
@@ -35,6 +36,11 @@ const Dashboard = () => {
         setProfile(data);
       } catch (error: any) {
         console.error('Error fetching profile:', error.message);
+        toast({
+          variant: "destructive",
+          title: "Error fetching profile",
+          description: error.message || "Couldn't load your profile information"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -58,42 +64,11 @@ const Dashboard = () => {
         <UserProfile />
       </div>
       
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Name Card */}
-        <Card title="Name" delay={100}>
-          {isLoading ? (
-            <div className="mt-2 h-8 bg-muted/50 rounded animate-pulse"></div>
-          ) : (
-            <>
-              <div className="mt-2 text-2xl font-semibold">{profile?.username || user?.email?.split('@')[0] || 'User'}</div>
-              <div className="text-sm text-muted-foreground mt-1">Your profile name</div>
-            </>
-          )}
-        </Card>
-        
-        {/* Points Card */}
-        <Card title="Points" className="relative overflow-visible" delay={200}>
-          {isLoading ? (
-            <div className="mt-2 h-8 bg-muted/50 rounded animate-pulse"></div>
-          ) : (
-            <>
-              <div className="flex items-center mt-2">
-                <div className="text-2xl font-semibold">{(profile?.points || 0).toLocaleString()}</div>
-                <div className="ml-2 bg-primary/10 text-primary p-1 rounded-full">
-                  <Trophy size={16} className="animate-float" />
-                </div>
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">Total earned points</div>
-            </>
-          )}
-          
-          {/* Decorative element */}
-          <div className="absolute -bottom-2 -right-2 w-16 h-16 rounded-full bg-primary/5 blur-xl" />
-        </Card>
-        
-        {/* Avatar Card */}
-        <Card title="Avatar" delay={300}>
-          <div className="flex justify-center items-center min-h-[100px] mt-2">
+      {/* Combined User Info Card */}
+      <Card title="User Profile" className="relative overflow-visible" delay={100}>
+        <div className="flex flex-col md:flex-row items-center gap-6 mt-4">
+          {/* Avatar Section */}
+          <div className="flex flex-col items-center">
             {isLoading ? (
               <div className="w-24 h-24 rounded-full bg-muted/50 animate-pulse"></div>
             ) : (
@@ -104,8 +79,41 @@ const Dashboard = () => {
               />
             )}
           </div>
-        </Card>
-      </div>
+          
+          {/* User Info Section */}
+          <div className="flex-1 space-y-4 text-center md:text-left">
+            {/* Name */}
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Username</div>
+              {isLoading ? (
+                <div className="h-8 bg-muted/50 rounded animate-pulse w-48 mx-auto md:mx-0"></div>
+              ) : (
+                <div className="text-2xl font-semibold">
+                  {profile?.username || user?.email?.split('@')[0] || 'User'}
+                </div>
+              )}
+            </div>
+            
+            {/* Points */}
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Achievement Points</div>
+              {isLoading ? (
+                <div className="h-8 bg-muted/50 rounded animate-pulse w-32 mx-auto md:mx-0"></div>
+              ) : (
+                <div className="flex items-center justify-center md:justify-start">
+                  <div className="text-2xl font-semibold">{(profile?.points || 0).toLocaleString()}</div>
+                  <div className="ml-2 bg-primary/10 text-primary p-1 rounded-full">
+                    <Trophy size={16} className="animate-float" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Decorative element */}
+        <div className="absolute -bottom-2 -right-2 w-16 h-16 rounded-full bg-primary/5 blur-xl" />
+      </Card>
     </div>
   );
 };
