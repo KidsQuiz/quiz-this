@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { toast } from '@/hooks/use-toast';
 import { PackageWithAssignment, useKidPackages } from '@/hooks/useKidPackages';
 import { PackageIcon } from 'lucide-react';
 
@@ -27,6 +26,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
       try {
         setIsLoading(true);
         const packagesData = await fetchPackagesWithAssignmentStatus();
+        console.log('Loaded packages for kid:', packagesData);
         setPackages(packagesData);
       } catch (error) {
         console.error('Error loading packages:', error);
@@ -35,7 +35,9 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
       }
     };
     
-    loadPackages();
+    if (isOpen && kidId) {
+      loadPackages();
+    }
   }, [isOpen, kidId, fetchPackagesWithAssignmentStatus]);
   
   const handleToggleAssignment = async (packageId: string) => {
@@ -60,6 +62,9 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Assign Question Packages to {kidName}</DialogTitle>
+          <DialogDescription>
+            Select which question packages should be assigned to {kidName}.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">

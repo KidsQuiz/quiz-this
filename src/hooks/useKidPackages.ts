@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,7 +24,7 @@ export const useKidPackages = (kidId?: string) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchKidPackages = async () => {
-    if (!user || !kidId) return;
+    if (!user || !kidId) return [];
     
     try {
       setIsLoading(true);
@@ -36,6 +36,7 @@ export const useKidPackages = (kidId?: string) => {
       if (error) throw error;
       
       setKidPackages(data || []);
+      return data || [];
     } catch (error: any) {
       console.error('Error fetching kid packages:', error.message);
       toast({
@@ -43,16 +44,19 @@ export const useKidPackages = (kidId?: string) => {
         title: "Error",
         description: "Failed to load assigned packages"
       });
+      return [];
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchPackagesWithAssignmentStatus = async (): Promise<PackageWithAssignment[]> => {
+  const fetchPackagesWithAssignmentStatus = useCallback(async (): Promise<PackageWithAssignment[]> => {
     if (!user || !kidId) return [];
     
     try {
-      // First get all packages
+      setIsLoading(true);
+      
+      // First get all packages for this parent
       const { data: allPackages, error: packagesError } = await supabase
         .from('packages')
         .select('id, name, description')
@@ -68,16 +72,23 @@ export const useKidPackages = (kidId?: string) => {
         
       if (assignmentsError) throw assignmentsError;
       
+      console.log('Fetched packages:', allPackages);
+      console.log('Assigned packages:', assignedPackages);
+      
       // Create a Set of assigned package IDs for easy lookup
-      const assignedPackageIds = new Set(assignedPackages.map(ap => ap.package_id));
+      const assignedPackageIds = new Set(assignedPackages?.map(ap => ap.package_id) || []);
       
       // Map the packages with assignment status
-      return (allPackages || []).map(pkg => ({
+      const packagesWithStatus = (allPackages || []).map(pkg => ({
         id: pkg.id,
         name: pkg.name,
         description: pkg.description,
         isAssigned: assignedPackageIds.has(pkg.id)
       }));
+      
+      console.log('Packages with status:', packagesWithStatus);
+      
+      return packagesWithStatus;
     } catch (error: any) {
       console.error('Error fetching packages with assignment status:', error.message);
       toast({
@@ -86,8 +97,10 @@ export const useKidPackages = (kidId?: string) => {
         description: "Failed to load packages information"
       });
       return [];
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [user, kidId]);
 
   const assignPackageToKid = async (packageId: string) => {
     if (!user || !kidId) return;
@@ -147,10 +160,6 @@ export const useKidPackages = (kidId?: string) => {
       });
     }
   };
-
-  useEffect(() => {
-    fetchKidPackages();
-  }, [user, kidId]);
 
   return {
     kidPackages,
