@@ -21,12 +21,14 @@ const ProgressTimer = ({ timeRemaining, timeLimit }: ProgressTimerProps) => {
       : "bg-red-500";
 
   return (
-    <div className="space-y-6">
-      <Progress 
-        value={progressPercent} 
-        className={cn("h-3 rounded-full transition-all", progressColor)} 
-      />
-      <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full float-right">
+    <div className="flex items-center gap-4">
+      <div className="flex-grow">
+        <Progress 
+          value={progressPercent} 
+          className={cn("h-3 rounded-full transition-all", progressColor)} 
+        />
+      </div>
+      <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full flex-shrink-0">
         <Clock className="h-5 w-5 text-primary" />
         <span className="font-bold text-lg text-primary">{timeRemaining}s</span>
       </div>
