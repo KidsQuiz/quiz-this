@@ -46,15 +46,15 @@ const QuestionDisplay = ({
 
   return (
     <>
-      <DialogHeader className="mb-2">
+      <DialogHeader className="mb-4">
         <div className="flex justify-between items-center">
-          <DialogTitle className="text-2xl font-bold">
+          <DialogTitle className="text-3xl font-bold">
             Question {currentQuestionIndex + 1}/{questionsTotal}
           </DialogTitle>
         </div>
       </DialogHeader>
       
-      <div className="py-6 space-y-6">
+      <div className="py-6 space-y-8">
         <ProgressTimer 
           timeRemaining={timeRemaining} 
           timeLimit={currentQuestion.time_limit} 
