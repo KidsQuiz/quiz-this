@@ -57,8 +57,17 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
     }
   };
   
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      // Use setTimeout to allow React to process events properly
+      setTimeout(() => {
+        onClose();
+      }, 0);
+    }
+  };
+  
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Assign Question Packages to {kidName}</DialogTitle>

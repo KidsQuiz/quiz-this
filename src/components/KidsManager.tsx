@@ -31,6 +31,15 @@ const KidsManager = () => {
     setIsPackagesFormOpen(true);
   };
   
+  const handlePackagesFormClose = () => {
+    setIsPackagesFormOpen(false);
+    // Reset focus and ensure state is clean
+    setTimeout(() => {
+      setSelectedKidId(undefined);
+      setSelectedKidName('');
+    }, 100);
+  };
+  
   const onDragEnd = async (result: DropResult) => {
     const { destination, source } = result;
     
@@ -95,7 +104,7 @@ const KidsManager = () => {
       {selectedKidId && (
         <KidPackagesForm
           isOpen={isPackagesFormOpen}
-          onClose={() => setIsPackagesFormOpen(false)}
+          onClose={handlePackagesFormClose}
           kidId={selectedKidId}
           kidName={selectedKidName}
         />
