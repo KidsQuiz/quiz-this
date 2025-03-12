@@ -13,6 +13,7 @@ interface KidsListProps {
   onDeleteKid: (id: string) => void;
   onAddKid: () => void;
   onAssignPackages?: (id: string, name: string) => void;
+  onStartQuestions?: (id: string, name: string) => void;
 }
 
 const KidsList = ({
@@ -22,7 +23,8 @@ const KidsList = ({
   onEditKid,
   onDeleteKid,
   onAddKid,
-  onAssignPackages
+  onAssignPackages,
+  onStartQuestions
 }: KidsListProps) => {
   if (isLoading) {
     return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -45,7 +47,17 @@ const KidsList = ({
           {provided => <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" {...provided.droppableProps} ref={provided.innerRef}>
               {kids.map((kid, index) => <Draggable key={kid.id} draggableId={kid.id} index={index}>
                   {provided => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                      <KidCard id={kid.id} name={kid.name} age={kid.age} avatarUrl={kid.avatar_url} points={kid.points} onEdit={onEditKid} onDelete={onDeleteKid} onAssignPackages={onAssignPackages} />
+                      <KidCard 
+                        id={kid.id} 
+                        name={kid.name} 
+                        age={kid.age} 
+                        avatarUrl={kid.avatar_url} 
+                        points={kid.points} 
+                        onEdit={onEditKid} 
+                        onDelete={onDeleteKid} 
+                        onAssignPackages={onAssignPackages}
+                        onStartQuestions={onStartQuestions}
+                      />
                     </div>}
                 </Draggable>)}
               {provided.placeholder}

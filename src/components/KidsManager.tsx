@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import KidForm from './KidForm';
 import KidsList from './KidsList';
 import KidPackagesForm from './packages/KidPackagesForm';
+import QuestionSession from './questions/QuestionSession';
 import { Button } from '@/components/ui/button';
 import { useKidsData } from '@/hooks/useKidsData';
 import { UserPlus } from 'lucide-react';
@@ -12,6 +13,7 @@ const KidsManager = () => {
   const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid } = useKidsData();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isPackagesFormOpen, setIsPackagesFormOpen] = useState(false);
+  const [isQuestionSessionOpen, setIsQuestionSessionOpen] = useState(false);
   const [selectedKidId, setSelectedKidId] = useState<string | undefined>(undefined);
   const [selectedKidName, setSelectedKidName] = useState<string>('');
   
@@ -20,6 +22,7 @@ const KidsManager = () => {
     return () => {
       setIsFormOpen(false);
       setIsPackagesFormOpen(false);
+      setIsQuestionSessionOpen(false);
       setSelectedKidId(undefined);
       setSelectedKidName('');
     };
@@ -41,6 +44,12 @@ const KidsManager = () => {
     setIsPackagesFormOpen(true);
   };
   
+  const handleStartQuestions = (id: string, name: string) => {
+    setSelectedKidId(id);
+    setSelectedKidName(name);
+    setIsQuestionSessionOpen(true);
+  };
+  
   const handlePackagesFormClose = () => {
     // First, close the modal
     setIsPackagesFormOpen(false);
@@ -48,6 +57,18 @@ const KidsManager = () => {
     // Clear state immediately after closing the modal
     setSelectedKidId(undefined);
     setSelectedKidName('');
+  };
+  
+  const handleQuestionSessionClose = () => {
+    // First, close the session
+    setIsQuestionSessionOpen(false);
+    
+    // Then clear the selected kid
+    setSelectedKidId(undefined);
+    setSelectedKidName('');
+    
+    // Refresh kids data to get updated points
+    fetchKids();
   };
   
   const onDragEnd = async (result: DropResult) => {
@@ -102,6 +123,7 @@ const KidsManager = () => {
         onDeleteKid={deleteKid}
         onAddKid={handleAddKid}
         onAssignPackages={handleAssignPackages}
+        onStartQuestions={handleStartQuestions}
       />
       
       <KidForm
@@ -115,6 +137,15 @@ const KidsManager = () => {
         <KidPackagesForm
           isOpen={isPackagesFormOpen}
           onClose={handlePackagesFormClose}
+          kidId={selectedKidId}
+          kidName={selectedKidName}
+        />
+      )}
+      
+      {isQuestionSessionOpen && selectedKidId && (
+        <QuestionSession
+          isOpen={isQuestionSessionOpen}
+          onClose={handleQuestionSessionClose}
           kidId={selectedKidId}
           kidName={selectedKidName}
         />

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, Edit, Trash2, MoreVertical, Star, Package } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,9 +19,20 @@ interface KidCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onAssignPackages?: (id: string, name: string) => void;
+  onStartQuestions?: (id: string, name: string) => void;
 }
 
-const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete, onAssignPackages }: KidCardProps) => {
+const KidCard = ({ 
+  id, 
+  name, 
+  age, 
+  avatarUrl, 
+  points, 
+  onEdit, 
+  onDelete, 
+  onAssignPackages,
+  onStartQuestions 
+}: KidCardProps) => {
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md">
       <div className="p-6">
@@ -32,6 +43,16 @@ const KidCard = ({ id, name, age, avatarUrl, points, onEdit, onDelete, onAssignP
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                {onStartQuestions && (
+                  <DropdownMenuItem 
+                    onClick={() => onStartQuestions(id, name)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <PlayCircle className="h-4 w-4" />
+                    <span>Start Questions</span>
+                  </DropdownMenuItem>
+                )}
+              
                 {onAssignPackages && (
                   <DropdownMenuItem 
                     onClick={() => onAssignPackages(id, name)}
