@@ -20,12 +20,19 @@ interface QuestionFormProps {
   packageId: string;
 }
 
+// Update the answer interface to make id optional
+interface AnswerFormOption {
+  id?: string;
+  content: string;
+  isCorrect: boolean;
+}
+
 const QuestionForm = ({ isOpen, onClose, onSave, questionId, packageId }: QuestionFormProps) => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [timeLimit, setTimeLimit] = useState('30');
   const [points, setPoints] = useState('10');
-  const [answers, setAnswers] = useState<Array<{id?: string, content: string, isCorrect: boolean}>>([
+  const [answers, setAnswers] = useState<AnswerFormOption[]>([
     { content: '', isCorrect: false },
     { content: '', isCorrect: false },
     { content: '', isCorrect: false },
