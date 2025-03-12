@@ -34,12 +34,18 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     handleSelectAnswer
   } = useQuestionSession(kidId, kidName, onClose);
 
+  // Handle dialog close properly
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Ensure we call onClose to properly clean up state
+      onClose();
+    }
+  };
+
   return (
     <Dialog 
       open={isOpen} 
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto">
         {isConfiguring && (
