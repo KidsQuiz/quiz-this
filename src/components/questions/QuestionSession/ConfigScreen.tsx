@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Package } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ConfigScreenProps {
   questionPackages: { id: string, name: string }[];
@@ -27,18 +28,20 @@ const ConfigScreen = ({
   onStartSession,
   onClose
 }: ConfigScreenProps) => {
+  const { t } = useLanguage();
+  
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Start Question Session</DialogTitle>
+        <DialogTitle>{t('startSession')}</DialogTitle>
         <DialogDescription>
-          Select packages to include for this quiz session.
+          {t('selectQuestionPackages')}
         </DialogDescription>
       </DialogHeader>
       
       <div className="py-6 space-y-4">
         <div className="space-y-2">
-          <Label>Select Question Packages</Label>
+          <Label>{t('selectQuestionPackages')}</Label>
           <div className="flex gap-2 mb-2">
             <Button 
               variant="outline" 
@@ -46,7 +49,7 @@ const ConfigScreen = ({
               onClick={selectAllPackages}
               disabled={isLoading || questionPackages.length === 0}
             >
-              Select All
+              {t('selectAll')}
             </Button>
             <Button 
               variant="outline" 
@@ -54,7 +57,7 @@ const ConfigScreen = ({
               onClick={deselectAllPackages}
               disabled={isLoading || selectedPackageIds.length === 0}
             >
-              Deselect All
+              {t('deselectAll')}
             </Button>
           </div>
           <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
@@ -77,19 +80,19 @@ const ConfigScreen = ({
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Loading packages...</p>
+              <p className="text-sm text-muted-foreground">{t('loading')}</p>
             )}
           </div>
         </div>
       </div>
       
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
+        <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
         <Button 
           onClick={onStartSession} 
           disabled={isLoading || selectedPackageIds.length === 0}
         >
-          Start Session
+          {t('startSession')}
         </Button>
       </DialogFooter>
     </>

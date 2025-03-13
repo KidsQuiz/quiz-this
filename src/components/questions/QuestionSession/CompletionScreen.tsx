@@ -2,6 +2,7 @@
 import React from 'react';
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CompletionScreenProps {
   kidName: string;
@@ -18,26 +19,28 @@ const CompletionScreen = ({
   totalQuestions,
   onClose
 }: CompletionScreenProps) => {
+  const { t } = useLanguage();
+  
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Session Complete!</DialogTitle>
+        <DialogTitle>{t('sessionComplete')}</DialogTitle>
         <DialogDescription>
-          Great job, {kidName}!
+          {t('greatJob')}, {kidName}!
         </DialogDescription>
       </DialogHeader>
       
       <div className="py-6 space-y-4 text-center">
         <div className="text-5xl font-bold text-primary">{totalPoints}</div>
-        <p className="text-lg">Total Points Earned</p>
+        <p className="text-lg">{t('totalPointsEarned')}</p>
         
         <div className="bg-primary/10 p-4 rounded-lg">
-          <p>You answered {correctAnswers} out of {totalQuestions} questions correctly.</p>
+          <p>{t('youAnswered').replace('{correct}', correctAnswers.toString()).replace('{total}', totalQuestions.toString())}</p>
         </div>
       </div>
       
       <DialogFooter>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('close')}</Button>
       </DialogFooter>
     </>
   );

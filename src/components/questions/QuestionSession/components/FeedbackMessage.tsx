@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeedbackMessageProps {
   isCorrect: boolean;
@@ -13,6 +14,8 @@ const FeedbackMessage = ({
   points, 
   answerSubmitted 
 }: FeedbackMessageProps) => {
+  const { t } = useLanguage();
+  
   if (!answerSubmitted) return null;
   
   return (
@@ -26,8 +29,8 @@ const FeedbackMessage = ({
     >
       <p className="font-medium text-lg text-center">
         {isCorrect 
-          ? `Correct! +${points} points 🎉` 
-          : 'Incorrect. The correct answer is highlighted.'}
+          ? t('correctFeedback').replace('{points}', points.toString())
+          : t('incorrectFeedback')}
       </p>
     </div>
   );

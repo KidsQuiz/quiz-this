@@ -1,6 +1,7 @@
 
 import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useSessionStartup = (
   selectedPackageIds: string[],
@@ -9,13 +10,14 @@ export const useSessionStartup = (
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   // Start the session with the selected packages
   const handleStartSession = useCallback(async () => {
     if (selectedPackageIds.length === 0) {
       toast({
-        title: "No packages selected",
-        description: "Please select at least one question package to start.",
+        title: t('noPackagesSelected'),
+        description: t('pleaseSelectPackages'),
         variant: "destructive"
       });
       return;
@@ -24,7 +26,7 @@ export const useSessionStartup = (
     await loadQuestions(selectedPackageIds);
     setIsConfiguring(false);
     setCurrentQuestionIndex(0);
-  }, [loadQuestions, selectedPackageIds, setCurrentQuestionIndex, setIsConfiguring, toast]);
+  }, [loadQuestions, selectedPackageIds, setCurrentQuestionIndex, setIsConfiguring, toast, t]);
 
   return { handleStartSession };
 };
