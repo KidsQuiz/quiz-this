@@ -1,6 +1,6 @@
 
 import React from 'react';
-import KidsManager from './KidsManager';
+import { KidsManager } from './kids';
 import PackagesManager from './packages/PackagesManager';
 
 const Dashboard = ({ activeTab }) => {
