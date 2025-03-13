@@ -48,6 +48,18 @@ export const useKidsData = () => {
     fetchKids();
   }, [user]);
 
+  // Add the reorderKids function to handle drag-and-drop reordering
+  const reorderKids = (sourceIndex: number, destinationIndex: number) => {
+    const reorderedKids = [...kids];
+    const [removed] = reorderedKids.splice(sourceIndex, 1);
+    reorderedKids.splice(destinationIndex, 0, removed);
+    
+    // Update local state immediately for a responsive feel
+    setKids(reorderedKids);
+    
+    return reorderedKids;
+  };
+
   const updateKidsPositions = async (positionUpdates: { id: string; position: number }[]) => {
     try {
       for (const update of positionUpdates) {
@@ -144,6 +156,7 @@ export const useKidsData = () => {
     setKids,
     isLoading,
     fetchKids,
+    reorderKids, // Add the reorderKids function to the return object
     updateKidsPositions,
     deleteKid,
     resetPoints
