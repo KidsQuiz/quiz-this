@@ -92,6 +92,7 @@ export const bg = {
   youAnswered: 'Ти отговори правилно на {correct} от {total} въпроса.',
   noPackagesSelected: 'Няма избрани пакети',
   pleaseSelectPackages: 'Моля, изберете поне един пакет с въпроси, за да започнете.',
+  autoClosingIn: 'Автоматично затваряне след момент',
   
   // Language
   language: 'Език',
@@ -101,4 +102,3 @@ export const bg = {
   // Footer
   designedWithPrecision: 'Проектирано с прецизност'
 };
-
