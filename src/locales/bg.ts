@@ -89,6 +89,10 @@ export const bg = {
   correctAnswerNote: 'correctAnswer трябва да е число (1-4), съответстващо на правилния отговор',
   clickToSelectCSV: 'Кликнете, за да изберете CSV файл',
   onlyCSVSupported: 'Поддържат се само CSV файлове',
+  deleteAll: 'Изтрий всички',
+  deleteAllQuestions: 'Изтрий всички въпроси',
+  deleteAllQuestionsConfirmation: 'Сигурни ли сте, че искате да изтриете ВСИЧКИ въпроси в {package}?',
+  thisActionCannotBeUndone: 'Това действие не може да бъде отменено.',
   
   // Quiz Session
   startSession: 'Започни сесия',

@@ -114,7 +114,8 @@ const QuestionsManager = () => {
                   <AlertDialogHeader>
                     <AlertDialogTitle>{t('deleteAllQuestions')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {t('deleteAllQuestionsConfirmation', { package: packageName })}
+                      {t('deleteAllQuestionsConfirmation').replace('{package}', packageName)}
+                      {' '}
                       {t('thisActionCannotBeUndone')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>

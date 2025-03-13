@@ -89,6 +89,10 @@ export const en = {
   correctAnswerNote: 'correctAnswer should be a number (1-4) corresponding to the correct answer option',
   clickToSelectCSV: 'Click to select a CSV file',
   onlyCSVSupported: 'Only CSV files are supported',
+  deleteAll: 'Delete All',
+  deleteAllQuestions: 'Delete All Questions',
+  deleteAllQuestionsConfirmation: 'Are you sure you want to delete ALL questions in {package}?',
+  thisActionCannotBeUndone: 'This action cannot be undone.',
   
   // Quiz Session
   startSession: 'Start Session',
