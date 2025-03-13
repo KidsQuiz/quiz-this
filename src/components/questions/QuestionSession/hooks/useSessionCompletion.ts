@@ -30,25 +30,33 @@ export const useSessionCompletion = (
         try {
           console.log(`Updating points for kid ${kidId} - adding ${totalPoints} points`);
           
+          // First, get the current points
           const { data: kidData, error: kidError } = await supabase
             .from('kids')
             .select('points')
             .eq('id', kidId)
             .single();
             
-          if (kidError) throw kidError;
+          if (kidError) {
+            console.error('Error fetching kid points:', kidError);
+            throw kidError;
+          }
           
           const currentPoints = kidData?.points || 0;
           const newTotalPoints = currentPoints + totalPoints;
           
           console.log(`Current points: ${currentPoints}, new total: ${newTotalPoints}`);
           
+          // Then update with the new total
           const { error: updateError } = await supabase
             .from('kids')
             .update({ points: newTotalPoints })
             .eq('id', kidId);
             
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error('Error updating points:', updateError);
+            throw updateError;
+          }
           
           toast({
             title: "Points updated!",
@@ -64,6 +72,7 @@ export const useSessionCompletion = (
         }
       };
       
+      // Call the update function immediately when session completes
       updateKidPoints();
     }
   }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, toast, setSessionComplete]);

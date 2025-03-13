@@ -51,6 +51,8 @@ export const useEnhancedAnswerHandling = (
             is_correct: isCorrect,
             points_earned: pointsEarned
           });
+          
+        console.log(`Answer recorded in database for kid ${kidId}`);
       } catch (error) {
         console.error('Error recording answer:', error);
       }

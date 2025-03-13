@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { AnswerOption, Question } from '@/hooks/questionsTypes';
+import { playSound } from '@/utils/soundEffects';
 
 export const useAnswerHandling = (
   answerOptions: AnswerOption[],
@@ -32,6 +33,9 @@ export const useAnswerHandling = (
       const points = currentQuestion.points;
       console.log(`Correct answer! Adding ${points} points to session total`);
       
+      // Play correct sound effect
+      playSound('correct');
+      
       setCorrectAnswers(prev => prev + 1);
       setTotalPoints(prev => prev + points);
       setShowWowEffect(true);
@@ -44,6 +48,9 @@ export const useAnswerHandling = (
         setIsModalOpen(true);
       }, 1500);
     } else {
+      // Play incorrect sound effect
+      playSound('incorrect');
+      
       // For incorrect answers, move to next question after a shorter delay
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
