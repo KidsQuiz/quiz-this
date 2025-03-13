@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -93,6 +92,12 @@ export const en = {
   deleteAllQuestions: 'Delete All Questions',
   deleteAllQuestionsConfirmation: 'Are you sure you want to delete ALL questions in {package}?',
   thisActionCannotBeUndone: 'This action cannot be undone.',
+  selectAllQuestions: 'Select All',
+  deselectAllQuestions: 'Deselect All',
+  deleteSelected: 'Delete Selected',
+  deleteSelectedQuestions: 'Delete Selected Questions',
+  deleteSelectedQuestionsConfirmation: 'Are you sure you want to delete the selected questions?',
+  noQuestionsSelected: 'No questions selected',
   
   // Quiz Session
   startSession: 'Start Session',

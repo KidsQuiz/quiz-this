@@ -1,4 +1,3 @@
-
 export const bg = {
   // General
   appName: 'Детска Викторина',
@@ -93,6 +92,12 @@ export const bg = {
   deleteAllQuestions: 'Изтрий всички въпроси',
   deleteAllQuestionsConfirmation: 'Сигурни ли сте, че искате да изтриете ВСИЧКИ въпроси в {package}?',
   thisActionCannotBeUndone: 'Това действие не може да бъде отменено.',
+  selectAllQuestions: 'Избери всички',
+  deselectAllQuestions: 'Отмаркирай всички',
+  deleteSelected: 'Изтрий избраните',
+  deleteSelectedQuestions: 'Изтрий избраните въпроси',
+  deleteSelectedQuestionsConfirmation: 'Сигурни ли сте, че искате да изтриете избраните въпроси?',
+  noQuestionsSelected: 'Няма избрани въпроси',
   
   // Quiz Session
   startSession: 'Започни сесия',

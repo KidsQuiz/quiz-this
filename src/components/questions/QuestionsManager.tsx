@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import QuestionsList from './QuestionsList';
 import QuestionForm from './QuestionForm';
 import ImportQuestionsDialog from './ImportQuestionsDialog';
 import { useQuestionsData } from '@/hooks/useQuestionsData';
-import { MessageCircleQuestion, ArrowLeft, Upload, Plus, Trash2 } from 'lucide-react';
+import { MessageCircleQuestion, ArrowLeft, Upload, Plus, Trash2, CheckCheck, CheckSquare } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -32,6 +31,7 @@ const QuestionsManager = () => {
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | undefined>(undefined);
   const [packageName, setPackageName] = useState<string>('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set());
   
   useEffect(() => {
     const getPackageName = async () => {
@@ -71,9 +71,40 @@ const QuestionsManager = () => {
     setIsImportDialogOpen(true);
   };
 
-  const handleDeleteAllQuestions = async () => {
-    if (await deleteAllQuestions()) {
+  const handleSelectQuestion = (id: string, isSelected: boolean) => {
+    const newSelected = new Set(selectedQuestions);
+    if (isSelected) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedQuestions(newSelected);
+  };
+
+  const handleSelectAllQuestions = () => {
+    if (selectedQuestions.size === questions.length) {
+      setSelectedQuestions(new Set());
+    } else {
+      const allQuestionIds = questions.map(q => q.id);
+      setSelectedQuestions(new Set(allQuestionIds));
+    }
+  };
+
+  const handleDeleteSelectedQuestions = async () => {
+    if (selectedQuestions.size === 0) return;
+    
+    let success = true;
+    for (const id of selectedQuestions) {
+      const result = await deleteQuestion(id, false);
+      if (!result) {
+        success = false;
+      }
+    }
+    
+    if (success) {
+      setSelectedQuestions(new Set());
       setIsDeleteDialogOpen(false);
+      fetchQuestions();
     }
   };
   
@@ -100,36 +131,50 @@ const QuestionsManager = () => {
           </h3>
           <div className="flex gap-2">
             {questions.length > 0 && (
-              <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span>{t('deleteAll')}</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t('deleteAllQuestions')}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t('deleteAllQuestionsConfirmation').replace('{package}', packageName)}
-                      {' '}
-                      {t('thisActionCannotBeUndone')}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleDeleteAllQuestions}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {t('deleteAll')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleSelectAllQuestions}
+                  className="flex items-center gap-2"
+                >
+                  <CheckSquare className="h-4 w-4" />
+                  <span>
+                    {selectedQuestions.size === questions.length ? t('deselectAllQuestions') : t('selectAllQuestions')}
+                  </span>
+                </Button>
+                {selectedQuestions.size > 0 && (
+                  <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span>{t('deleteSelected')} ({selectedQuestions.size})</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('deleteSelectedQuestions')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('deleteSelectedQuestionsConfirmation')}
+                          {' '}
+                          {t('thisActionCannotBeUndone')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleDeleteSelectedQuestions}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t('deleteSelected')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </>
             )}
             <Button 
               variant="outline" 
@@ -154,6 +199,8 @@ const QuestionsManager = () => {
         onDeleteQuestion={deleteQuestion}
         onAddQuestion={handleAddQuestion}
         packageName={packageName}
+        selectedQuestions={selectedQuestions}
+        onSelectQuestion={handleSelectQuestion}
       />
       
       <QuestionForm

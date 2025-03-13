@@ -2,17 +2,20 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Question } from '@/hooks/useQuestionsData';
-import { Edit, Trash2, Timer, Star, Plus, MessageCircleQuestion } from 'lucide-react';
+import { Edit, Trash2, Timer, Star, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuestionsListProps {
   questions: Question[];
   isLoading: boolean;
   onEditQuestion: (id: string) => void;
-  onDeleteQuestion: (id: string) => void;
+  onDeleteQuestion: (id: string, showConfirm?: boolean) => void;
   onAddQuestion: () => void;
   packageName?: string;
+  selectedQuestions?: Set<string>;
+  onSelectQuestion?: (id: string, isSelected: boolean) => void;
 }
 
 const QuestionsList = ({ 
@@ -21,7 +24,9 @@ const QuestionsList = ({
   onEditQuestion, 
   onDeleteQuestion, 
   onAddQuestion,
-  packageName
+  packageName,
+  selectedQuestions = new Set(),
+  onSelectQuestion
 }: QuestionsListProps) => {
   const { t } = useLanguage();
 
@@ -60,7 +65,18 @@ const QuestionsList = ({
       {questions.map((question) => (
         <Card key={question.id} className="overflow-hidden transition-colors hover:shadow-md">
           <div className="p-4">
-            <div className="flex items-start justify-between">
+            <div className="flex items-start">
+              {onSelectQuestion && (
+                <div className="mt-1 mr-3">
+                  <Checkbox 
+                    id={`select-${question.id}`}
+                    checked={selectedQuestions.has(question.id)}
+                    onCheckedChange={(checked) => {
+                      onSelectQuestion(question.id, checked === true);
+                    }}
+                  />
+                </div>
+              )}
               <div className="flex-1">
                 <h3 className="font-medium text-base line-clamp-2">{question.content}</h3>
                 
@@ -89,7 +105,7 @@ const QuestionsList = ({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={() => onDeleteQuestion(question.id)}
+                  onClick={() => onDeleteQuestion(question.id, true)}
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />

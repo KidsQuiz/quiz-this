@@ -4,8 +4,8 @@ import { toast } from '@/hooks/use-toast';
 import { Question } from '../questionsTypes';
 
 export const useQuestionsManagement = () => {
-  const deleteQuestion = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) return false;
+  const deleteQuestion = async (id: string, showConfirm = true) => {
+    if (showConfirm && !confirm('Are you sure you want to delete this question?')) return false;
     
     try {
       const { error } = await supabase
@@ -15,10 +15,12 @@ export const useQuestionsManagement = () => {
         
       if (error) throw error;
       
-      toast({
-        title: "Success",
-        description: "Question deleted successfully"
-      });
+      if (showConfirm) {
+        toast({
+          title: "Success",
+          description: "Question deleted successfully"
+        });
+      }
       
       return true;
     } catch (error: any) {
