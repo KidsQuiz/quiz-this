@@ -67,6 +67,7 @@ export const bg = {
   deselectAll: 'Отмаркирай всички',
   selectQuestionPackages: 'Избери пакети с въпроси',
   assignPackages: 'Задай пакети',
+  assignPackagesFirst: 'Моля, първо задайте пакети на това дете',
   questionOrder: 'Ред на въпросите',
   sequential: 'Последователно',
   shuffle: 'Разбъркано',

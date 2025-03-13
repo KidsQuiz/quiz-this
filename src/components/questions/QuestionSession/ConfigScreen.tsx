@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -29,6 +29,15 @@ const ConfigScreen = ({
   onClose
 }: ConfigScreenProps) => {
   const { t } = useLanguage();
+  
+  const noPackagesAvailable = questionPackages.length === 0 && !isLoading;
+  
+  // Automatically select all packages when component mounts
+  useEffect(() => {
+    if (!isLoading && questionPackages.length > 0) {
+      selectAllPackages();
+    }
+  }, [isLoading, questionPackages, selectAllPackages]);
   
   return (
     <>
@@ -61,7 +70,17 @@ const ConfigScreen = ({
             </Button>
           </div>
           <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
-            {questionPackages.length > 0 ? (
+            {isLoading ? (
+              <p className="text-sm text-muted-foreground">{t('loading')}</p>
+            ) : noPackagesAvailable ? (
+              <div className="text-center py-4">
+                <Package className="h-10 w-10 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-sm text-muted-foreground">{t('noPackages')}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('assignPackagesFirst')}
+                </p>
+              </div>
+            ) : (
               questionPackages.map(pkg => (
                 <div key={pkg.id} className="flex items-center space-x-2">
                   <Checkbox 
@@ -79,8 +98,6 @@ const ConfigScreen = ({
                   </label>
                 </div>
               ))
-            ) : (
-              <p className="text-sm text-muted-foreground">{t('loading')}</p>
             )}
           </div>
         </div>
@@ -90,7 +107,7 @@ const ConfigScreen = ({
         <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
         <Button 
           onClick={onStartSession} 
-          disabled={isLoading || selectedPackageIds.length === 0}
+          disabled={isLoading || selectedPackageIds.length === 0 || noPackagesAvailable}
         >
           {t('startSession')}
         </Button>

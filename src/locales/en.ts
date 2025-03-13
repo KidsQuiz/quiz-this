@@ -67,6 +67,7 @@ export const en = {
   deselectAll: 'Deselect All',
   selectQuestionPackages: 'Select Question Packages',
   assignPackages: 'Assign Packages',
+  assignPackagesFirst: 'Please assign packages to this kid first',
   questionOrder: 'Question Order',
   sequential: 'Sequential',
   shuffle: 'Shuffle',

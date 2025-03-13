@@ -1,6 +1,5 @@
-
 import React from 'react';
-import KidCard from './KidCard';
+import KidCard from './kid-card';
 import { Button } from '@/components/ui/button';
 import { Kid } from '@/hooks/useKidsData';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
