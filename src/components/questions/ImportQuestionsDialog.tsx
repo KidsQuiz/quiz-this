@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuestionImport } from '@/hooks/questions/useQuestionImport';
-import { FileUpload, Upload } from 'lucide-react';
+import { Upload, File } from 'lucide-react';
 
 interface ImportQuestionsDialogProps {
   isOpen: boolean;
@@ -69,7 +69,7 @@ const ImportQuestionsDialog = ({ isOpen, onClose, onSuccess, packageId }: Import
               className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 border-gray-300 p-4"
               onClick={handleSelectFile}
             >
-              <FileUpload className="w-8 h-8 text-gray-500" />
+              <File className="w-8 h-8 text-gray-500" />
               <p className="mb-2 text-sm text-gray-500">
                 {selectedFile ? selectedFile.name : t('clickToSelectCSV')}
               </p>
