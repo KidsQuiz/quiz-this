@@ -17,20 +17,22 @@ export const useMilestonesData = (kidId?: string) => {
     try {
       setIsLoading(true);
       
-      let query = supabase
-        .from('milestones')
+      // Type assertion for the from() method since milestones isn't in the types
+      const query = supabase
+        .from('milestones' as any)
         .select('*')
         .order('points_required', { ascending: true });
       
       if (kidId) {
-        query = query.eq('kid_id', kidId);
+        query.eq('kid_id', kidId);
       }
         
       const { data, error } = await query;
         
       if (error) throw error;
       
-      setMilestones(data || []);
+      // Cast the result to Milestone[] type
+      setMilestones(data as unknown as Milestone[]);
     } catch (error: any) {
       console.error('Error fetching milestones:', error.message);
       toast({
@@ -47,8 +49,9 @@ export const useMilestonesData = (kidId?: string) => {
     if (!user) return null;
     
     try {
+      // Type assertion for the from() method
       const { data, error } = await supabase
-        .from('milestones')
+        .from('milestones' as any)
         .insert({
           name: milestone.name,
           image_url: milestone.image_url,
@@ -60,14 +63,15 @@ export const useMilestonesData = (kidId?: string) => {
         
       if (error) throw error;
       
-      setMilestones(prev => [...prev, data]);
+      // Cast the result to Milestone type
+      setMilestones(prev => [...prev, data as unknown as Milestone]);
       
       toast({
         title: "Success",
         description: "Milestone added successfully"
       });
       
-      return data;
+      return data as unknown as Milestone;
     } catch (error: any) {
       console.error('Error adding milestone:', error.message);
       toast({
@@ -81,8 +85,9 @@ export const useMilestonesData = (kidId?: string) => {
 
   const updateMilestone = async (id: string, updates: Partial<Omit<Milestone, 'id' | 'created_at' | 'updated_at'>>) => {
     try {
+      // Type assertion for the from() method
       const { data, error } = await supabase
-        .from('milestones')
+        .from('milestones' as any)
         .update(updates)
         .eq('id', id)
         .select()
@@ -90,14 +95,15 @@ export const useMilestonesData = (kidId?: string) => {
         
       if (error) throw error;
       
-      setMilestones(prev => prev.map(m => m.id === id ? data : m));
+      // Cast the result and update state with type assertion
+      setMilestones(prev => prev.map(m => m.id === id ? (data as unknown as Milestone) : m));
       
       toast({
         title: "Success",
         description: "Milestone updated successfully"
       });
       
-      return data;
+      return data as unknown as Milestone;
     } catch (error: any) {
       console.error('Error updating milestone:', error.message);
       toast({
@@ -111,8 +117,9 @@ export const useMilestonesData = (kidId?: string) => {
 
   const deleteMilestone = async (id: string) => {
     try {
+      // Type assertion for the from() method
       const { error } = await supabase
-        .from('milestones')
+        .from('milestones' as any)
         .delete()
         .eq('id', id);
         

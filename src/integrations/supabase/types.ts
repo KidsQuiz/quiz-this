@@ -162,6 +162,44 @@ export type Database = {
         }
         Relationships: []
       }
+      milestones: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          kid_id: string
+          name: string
+          points_required: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kid_id: string
+          name: string
+          points_required: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kid_id?: string
+          name?: string
+          points_required?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestones_kid_id_fkey"
+            columns: ["kid_id"]
+            isOneToOne: false
+            referencedRelation: "kids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       packages: {
         Row: {
           created_at: string
