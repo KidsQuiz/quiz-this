@@ -34,7 +34,8 @@ export const useQuestionLoading = () => {
           // Default to shuffle if there's an error
           packagePresentationOrders[packageId] = 'shuffle';
         } else if (packageData) {
-          packagePresentationOrders[packageId] = packageData.presentation_order || 'shuffle';
+          // Make sure we cast the presentation_order to the correct type
+          packagePresentationOrders[packageId] = (packageData.presentation_order as 'sequential' | 'shuffle') || 'shuffle';
         }
       }
       

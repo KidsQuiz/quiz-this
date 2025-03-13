@@ -46,7 +46,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         if (data) {
           setName(data.name);
           setDescription(data.description || '');
-          setPresentationOrder(data.presentation_order || 'shuffle');
+          setPresentationOrder((data.presentation_order as 'sequential' | 'shuffle') || 'shuffle');
         }
       } catch (error: any) {
         console.error('Error fetching package:', error.message);

@@ -42,6 +42,9 @@ export const usePackagesData = () => {
       // Then, get question counts for each package individually
       const packagesWithCounts = await Promise.all(
         packagesData.map(async (pkg) => {
+          // Cast presentation_order to the correct type
+          const typedPresentationOrder = (pkg.presentation_order || 'shuffle') as 'sequential' | 'shuffle';
+          
           // Count questions for this package
           const { count, error: countError } = await supabase
             .from('questions')
@@ -50,10 +53,18 @@ export const usePackagesData = () => {
           
           if (countError) {
             console.error('Error counting questions:', countError.message);
-            return { ...pkg, question_count: 0 };
+            return { 
+              ...pkg, 
+              question_count: 0,
+              presentation_order: typedPresentationOrder
+            };
           }
           
-          return { ...pkg, question_count: count || 0 };
+          return { 
+            ...pkg, 
+            question_count: count || 0,
+            presentation_order: typedPresentationOrder
+          };
         })
       );
       

@@ -1,3 +1,4 @@
+
 export const bg = {
   // General
   appName: 'Детска Викторина',
@@ -67,6 +68,9 @@ export const bg = {
   deselectAll: 'Отмаркирай всички',
   selectQuestionPackages: 'Избери пакети с въпроси',
   assignPackages: 'Задай пакети',
+  questionOrder: 'Ред на въпросите',
+  sequential: 'Последователно',
+  shuffle: 'Разбъркано',
   
   // Questions
   questions: 'Въпроси',
