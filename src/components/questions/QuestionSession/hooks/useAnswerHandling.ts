@@ -51,11 +51,12 @@ export const useAnswerHandling = (
       // Play incorrect sound effect
       playSound('incorrect');
       
-      // For incorrect answers, move to next question after a shorter delay
+      // For incorrect answers, wait 5 seconds before moving to next question
+      // to give the kid time to see the correct answer
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
         setIsModalOpen(true);
-      }, 1000);
+      }, 5000); // Changed from 1000 to 5000 (5 seconds)
     }
     
     return wasCorrect;
