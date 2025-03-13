@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, User, Users, Package } from 'lucide-react';
@@ -7,10 +8,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocation } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+
 interface HeaderProps {
   activeTab: string;
   onTabChange: (value: string) => void;
 }
+
 const Header = ({
   activeTab,
   onTabChange
@@ -23,6 +27,7 @@ const Header = ({
   const {
     t
   } = useLanguage();
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -38,24 +43,37 @@ const Header = ({
       });
     }
   };
+
   return <header className="w-full bg-card shadow-sm border-b">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <User className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-medium">{t('dashboard')}</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            <h1 className="text-lg font-medium">{t('dashboard')}</h1>
+          </div>
           
-          {!isQuestionsPage && <Tabs value={activeTab} onValueChange={onTabChange} className="ml-6">
-              <TabsList className="grid grid-cols-2 w-64 h-12 px-0 py-0 my-0 mx-0">
-                <TabsTrigger value="kids" className="flex items-center gap-2 text-base py-3">
+          {!isQuestionsPage && 
+            <div className="ml-2 bg-muted rounded-lg p-1">
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => onTabChange('kids')}
+                  variant={activeTab === 'kids' ? 'default' : 'ghost'}
+                  className={`rounded-md px-5 py-2 h-auto flex items-center gap-2 transition-all ${activeTab === 'kids' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
                   <Users className="h-5 w-5" />
-                  <span>{t('myKids')}</span>
-                </TabsTrigger>
-                <TabsTrigger value="packages" className="flex items-center gap-2 text-base py-3">
+                  <span className="font-medium">{t('myKids')}</span>
+                </Button>
+                <Button
+                  onClick={() => onTabChange('packages')}
+                  variant={activeTab === 'packages' ? 'default' : 'ghost'}
+                  className={`rounded-md px-5 py-2 h-auto flex items-center gap-2 transition-all ${activeTab === 'packages' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
                   <Package className="h-5 w-5" />
-                  <span>{t('packages')}</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>}
+                  <span className="font-medium">{t('packages')}</span>
+                </Button>
+              </div>
+            </div>
+          }
         </div>
         
         <div className="flex items-center gap-3">
@@ -68,4 +86,5 @@ const Header = ({
       </div>
     </header>;
 };
+
 export default Header;
