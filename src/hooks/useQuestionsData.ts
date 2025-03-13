@@ -22,11 +22,12 @@ export const useQuestionsData = (packageId?: string) => {
     loadQuestions();
   }, [user, packageId]);
 
-  const deleteQuestion = async (id: string) => {
-    const success = await deleteQuestionAction(id);
+  const deleteQuestion = async (id: string, showConfirm = true) => {
+    const success = await deleteQuestionAction(id, showConfirm);
     if (success) {
       setQuestions(questions.filter(question => question.id !== id));
     }
+    return success;
   };
 
   const deleteAllQuestions = async () => {
