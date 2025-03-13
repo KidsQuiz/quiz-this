@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
 import ConfigScreen from './ConfigScreen';
 import QuestionDisplay from './QuestionDisplay';
@@ -30,7 +30,8 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     selectAllPackages,
     deselectAllPackages,
     handleStartSession,
-    handleSelectAnswer
+    handleSelectAnswer,
+    handleDialogClose
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Clean up effect for when component unmounts
@@ -47,13 +48,8 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Handle dialog close with proper cleanup
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      // Remove any applied styles before closing
-      document.body.style.removeProperty('pointer-events');
-      
-      // If we're closing because the session is complete, call the parent's onClose
-      if (sessionComplete) {
-        onClose();
-      }
+      // When dialog is closing, call our custom close handler
+      handleDialogClose();
     }
   };
 
@@ -66,7 +62,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
         className="sm:max-w-[95vw] md:max-w-[92vw] lg:max-w-[1100px] h-[92vh] max-h-[800px] p-4 flex flex-col overflow-hidden"
         // Don't trap the focus inside the dialog when it's closing
         onEscapeKeyDown={() => {
-          document.body.style.removeProperty('pointer-events');
+          handleDialogClose();
         }}
         onInteractOutside={() => {
           document.body.style.removeProperty('pointer-events');

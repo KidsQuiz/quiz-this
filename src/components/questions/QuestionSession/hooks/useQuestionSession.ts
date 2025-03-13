@@ -61,7 +61,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTimerActive,
     setCurrentQuestionIndex,
     setTimeRemaining,
-    handleTimeUp
+    handleTimeUp,
+    handleTerminateSession
   } = useQuestionNavigation();
 
   // Handle answer submission and scoring
@@ -137,6 +138,18 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers
   );
 
+  // Handle dialog close and terminate the session
+  const handleDialogClose = () => {
+    // Clean up any styles applied to the body
+    document.body.style.removeProperty('pointer-events');
+    
+    // Use the navigation hook's terminate session method
+    handleTerminateSession(onClose);
+    
+    // Additionally, ensure we reset the modal state
+    setIsModalOpen(false);
+  };
+
   // Monitor time remaining and close the question dialog when time elapses
   useEffect(() => {
     if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
@@ -192,6 +205,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     selectAllPackages,
     deselectAllPackages,
     handleStartSession,
-    handleSelectAnswer
+    handleSelectAnswer,
+    handleDialogClose
   };
 };

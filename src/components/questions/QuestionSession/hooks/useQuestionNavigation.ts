@@ -39,6 +39,15 @@ export const useQuestionNavigation = () => {
     return true; // Time up event processed
   };
 
+  // Handle user-initiated termination of the quiz session
+  const handleTerminateSession = (onClose: () => void) => {
+    // Stop the timer immediately
+    setTimerActive(false);
+    
+    // Call the onClose callback to close the dialog
+    onClose();
+  };
+
   return {
     currentQuestionIndex,
     timeRemaining,
@@ -46,6 +55,7 @@ export const useQuestionNavigation = () => {
     setCurrentQuestionIndex,
     setTimeRemaining,
     setTimerActive,
-    handleTimeUp
+    handleTimeUp,
+    handleTerminateSession
   };
 };
