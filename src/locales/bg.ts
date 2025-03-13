@@ -25,6 +25,22 @@ export const bg = {
   resetPassword: 'Промяна на парола',
   emailAddress: 'Имейл адрес',
   password: 'Парола',
+  email: 'Имейл',
+  
+  // Auth messages
+  accountCreated: 'Акаунтът е създаден',
+  checkEmail: 'Моля, проверете имейла си, за да потвърдите акаунта си.',
+  welcomeBack: 'Добре дошли обратно',
+  loginSuccess: 'Успешно влязохте в системата.',
+  authFailed: 'Неуспешна автентикация',
+  somethingWentWrong: 'Нещо се обърка. Моля, опитайте отново.',
+  redirecting: 'Пренасочване...',
+  createAccount: 'Създайте акаунт',
+  signUpToStart: 'Регистрирайте се, за да започнете',
+  signInToAccount: 'Влезте в акаунта си',
+  alreadyHaveAccount: 'Вече имате акаунт? Влезте',
+  dontHaveAccount: 'Нямате акаунт? Регистрирайте се',
+  processing: 'Обработка...',
   
   // Dashboard
   dashboard: 'Табло',
@@ -35,6 +51,7 @@ export const bg = {
   name: 'Име',
   age: 'Възраст',
   avatar: 'Аватар',
+  avatarPreview: 'Преглед на аватар',
   
   // Packages
   packages: 'Пакети',
@@ -79,5 +96,9 @@ export const bg = {
   // Language
   language: 'Език',
   english: 'Английски',
-  bulgarian: 'Български'
+  bulgarian: 'Български',
+  
+  // Footer
+  designedWithPrecision: 'Проектирано с прецизност'
 };
+
