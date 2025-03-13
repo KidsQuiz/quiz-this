@@ -12,10 +12,15 @@ export const bg = {
   submit: 'Изпрати',
   close: 'Затвори',
   confirm: 'Потвърди',
+  user: 'Потребител',
+  error: 'Грешка',
   
   // Auth
   signIn: 'Вход',
   signUp: 'Регистрация',
+  signOut: 'Изход',
+  signOutSuccess: 'Успешно излязохте от системата.',
+  signOutError: 'Грешка при излизане. Опитайте отново.',
   forgotPassword: 'Забравена парола',
   resetPassword: 'Промяна на парола',
   emailAddress: 'Имейл адрес',

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { en } from '../locales/en';
 import { bg } from '../locales/bg';
 
@@ -55,11 +55,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   };
 
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(getSavedLanguage);
-  const [languagePack, setLanguagePack] = useState<LanguagePack>(languagePacks[currentLanguage]);
+  
+  // Use useMemo to prevent unnecessary re-renders
+  const languagePack = useMemo(() => languagePacks[currentLanguage], [currentLanguage]);
 
   const changeLanguage = (lang: SupportedLanguage) => {
     setCurrentLanguage(lang);
-    setLanguagePack(languagePacks[lang]);
     localStorage.setItem('preferredLanguage', lang);
     document.documentElement.lang = lang;
   };
@@ -74,8 +75,16 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     return languagePack[key] || key.toString();
   };
 
+  // Create a memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    currentLanguage,
+    languagePack,
+    changeLanguage,
+    t
+  }), [currentLanguage, languagePack]);
+
   return (
-    <LanguageContext.Provider value={{ currentLanguage, languagePack, changeLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

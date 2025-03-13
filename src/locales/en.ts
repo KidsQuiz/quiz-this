@@ -12,10 +12,15 @@ export const en = {
   submit: 'Submit',
   close: 'Close',
   confirm: 'Confirm',
+  user: 'User',
+  error: 'Error',
   
   // Auth
   signIn: 'Sign In',
   signUp: 'Sign Up',
+  signOut: 'Sign Out',
+  signOutSuccess: 'You have been successfully logged out.',
+  signOutError: 'Failed to log out. Please try again.',
   forgotPassword: 'Forgot Password',
   resetPassword: 'Reset Password',
   emailAddress: 'Email Address',
