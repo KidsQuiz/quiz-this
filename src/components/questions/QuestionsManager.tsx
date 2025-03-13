@@ -14,7 +14,13 @@ import { useDeleteQuestions } from '@/hooks/questions/useDeleteQuestions';
 const QuestionsManager = () => {
   const { packageId } = useParams<{ packageId: string }>();
   const { t } = useLanguage();
-  const { questions, isLoading, fetchQuestions, deleteQuestion } = useQuestionsData(packageId);
+  const { 
+    questions, 
+    isLoading, 
+    fetchQuestions, 
+    deleteQuestion,
+    cloneQuestion 
+  } = useQuestionsData(packageId);
   const { packageName } = usePackageData(packageId);
   const { selectedQuestions, handleSelectQuestion, handleSelectAllQuestions, clearSelections } = useQuestionSelection(questions);
   const { handleDeleteSelectedQuestions, isDeleting } = useDeleteQuestions(deleteQuestion, fetchQuestions);
@@ -32,6 +38,10 @@ const QuestionsManager = () => {
   const handleEditQuestion = (id: string) => {
     setSelectedQuestionId(id);
     setIsFormOpen(true);
+  };
+  
+  const handleCloneQuestion = async (id: string) => {
+    await cloneQuestion(id);
   };
   
   const handleOpenImportDialog = () => {
@@ -70,6 +80,7 @@ const QuestionsManager = () => {
         isLoading={isLoading}
         onEditQuestion={handleEditQuestion}
         onDeleteQuestion={deleteQuestion}
+        onCloneQuestion={handleCloneQuestion}
         onAddQuestion={handleAddQuestion}
         packageName={packageName}
         selectedQuestions={selectedQuestions}

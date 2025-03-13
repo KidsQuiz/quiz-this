@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Question } from '@/hooks/useQuestionsData';
-import { Edit, Trash2, Timer, Star, Plus } from 'lucide-react';
+import { Edit, Trash2, Timer, Star, Plus, Copy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuestionsListProps {
@@ -12,6 +12,7 @@ interface QuestionsListProps {
   isLoading: boolean;
   onEditQuestion: (id: string) => void;
   onDeleteQuestion: (id: string, showConfirm?: boolean) => void;
+  onCloneQuestion?: (id: string) => void;
   onAddQuestion: () => void;
   packageName?: string;
   selectedQuestions?: Set<string>;
@@ -22,7 +23,8 @@ const QuestionsList = ({
   questions, 
   isLoading, 
   onEditQuestion, 
-  onDeleteQuestion, 
+  onDeleteQuestion,
+  onCloneQuestion,
   onAddQuestion,
   packageName,
   selectedQuestions = new Set(),
@@ -98,15 +100,29 @@ const QuestionsList = ({
                   size="sm" 
                   onClick={() => onEditQuestion(question.id)}
                   className="h-8 w-8 p-0"
+                  title={t('edit')}
                 >
                   <Edit className="h-4 w-4" />
                   <span className="sr-only">{t('edit')}</span>
                 </Button>
+                {onCloneQuestion && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onCloneQuestion(question.id)}
+                    className="h-8 w-8 p-0"
+                    title={t('clone')}
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span className="sr-only">{t('clone')}</span>
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => onDeleteQuestion(question.id, true)}
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  title={t('delete')}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">{t('delete')}</span>

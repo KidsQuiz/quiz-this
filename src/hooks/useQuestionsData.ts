@@ -11,7 +11,11 @@ export const useQuestionsData = (packageId?: string) => {
   const { user } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const { isLoading, fetchQuestions, fetchAnswerOptions } = useQuestionsFetch(packageId);
-  const { deleteQuestion: deleteQuestionAction, deleteAllQuestions: deleteAllQuestionsAction } = useQuestionsManagement();
+  const { 
+    deleteQuestion: deleteQuestionAction, 
+    deleteAllQuestions: deleteAllQuestionsAction,
+    cloneQuestion: cloneQuestionAction 
+  } = useQuestionsManagement();
   
   const loadQuestions = async () => {
     const data = await fetchQuestions(user?.id);
@@ -39,6 +43,14 @@ export const useQuestionsData = (packageId?: string) => {
     }
     return success;
   };
+  
+  const cloneQuestion = async (id: string) => {
+    const newQuestion = await cloneQuestionAction(id);
+    if (newQuestion) {
+      await loadQuestions(); // Reload all questions to ensure correct order
+    }
+    return !!newQuestion;
+  };
 
   return {
     questions,
@@ -46,6 +58,7 @@ export const useQuestionsData = (packageId?: string) => {
     fetchQuestions: loadQuestions,
     fetchAnswerOptions,
     deleteQuestion,
-    deleteAllQuestions
+    deleteAllQuestions,
+    cloneQuestion
   };
 };

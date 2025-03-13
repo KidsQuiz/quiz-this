@@ -13,6 +13,7 @@ export const bg = {
   confirm: 'Потвърди',
   user: 'Потребител',
   error: 'Грешка',
+  clone: 'Клонирай',
   
   // Auth
   signIn: 'Вход',
@@ -99,6 +100,8 @@ export const bg = {
   deleteSelectedQuestionsConfirmation: 'Сигурни ли сте, че искате да изтриете избраните въпроси?',
   noQuestionsSelected: 'Няма избрани въпроси',
   deletingQuestions: 'Изтриване на въпроси...',
+  cloneQuestion: 'Клонирай въпрос',
+  questionCloned: 'Въпросът е клониран успешно',
   
   // Quiz Session
   startSession: 'Започни сесия',

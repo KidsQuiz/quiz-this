@@ -13,6 +13,7 @@ export const en = {
   confirm: 'Confirm',
   user: 'User',
   error: 'Error',
+  clone: 'Clone',
   
   // Auth
   signIn: 'Sign In',
@@ -99,6 +100,8 @@ export const en = {
   deleteSelectedQuestionsConfirmation: 'Are you sure you want to delete the selected questions?',
   noQuestionsSelected: 'No questions selected',
   deletingQuestions: 'Deleting questions...',
+  cloneQuestion: 'Clone Question',
+  questionCloned: 'Question cloned successfully',
   
   // Quiz Session
   startSession: 'Start Session',
