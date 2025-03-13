@@ -11,6 +11,7 @@ export interface Package {
   created_at: string;
   updated_at: string;
   question_count?: number;
+  presentation_order?: 'sequential' | 'shuffle';
 }
 
 export const usePackagesData = () => {

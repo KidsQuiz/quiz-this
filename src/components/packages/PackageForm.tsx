@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ListOrdered, Shuffle } from 'lucide-react';
 
 interface PackageFormProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
   const { t } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [presentationOrder, setPresentationOrder] = useState<'sequential' | 'shuffle'>('shuffle');
   const [isLoading, setIsLoading] = useState(false);
   
   const isEditMode = !!packageId;
@@ -34,7 +37,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         setIsLoading(true);
         const { data, error } = await supabase
           .from('packages')
-          .select('name, description')
+          .select('name, description, presentation_order')
           .eq('id', packageId)
           .single();
           
@@ -43,6 +46,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         if (data) {
           setName(data.name);
           setDescription(data.description || '');
+          setPresentationOrder(data.presentation_order || 'shuffle');
         }
       } catch (error: any) {
         console.error('Error fetching package:', error.message);
@@ -62,6 +66,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
       // Reset form when opening in add mode
       setName('');
       setDescription('');
+      setPresentationOrder('shuffle');
     }
   }, [isOpen, packageId, isEditMode, t]);
   
@@ -95,6 +100,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
           .update({
             name,
             description: description || null,
+            presentation_order: presentationOrder,
             updated_at: new Date().toISOString()
           })
           .eq('id', packageId);
@@ -111,7 +117,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
           .insert({
             parent_id: user.id,
             name,
-            description: description || null
+            description: description || null,
+            presentation_order: presentationOrder
           });
           
         if (error) throw error;
@@ -166,6 +173,31 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
               disabled={isLoading}
               rows={3}
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>{t('questionOrder')}</Label>
+            <RadioGroup 
+              value={presentationOrder} 
+              onValueChange={(value) => setPresentationOrder(value as 'sequential' | 'shuffle')}
+              className="flex space-x-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="sequential" id="sequential" />
+                <Label htmlFor="sequential" className="flex items-center space-x-1 cursor-pointer">
+                  <ListOrdered className="h-4 w-4" />
+                  <span>{t('sequential')}</span>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="shuffle" id="shuffle" />
+                <Label htmlFor="shuffle" className="flex items-center space-x-1 cursor-pointer">
+                  <Shuffle className="h-4 w-4" />
+                  <span>{t('shuffle')}</span>
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
           
           <DialogFooter className="pt-4">

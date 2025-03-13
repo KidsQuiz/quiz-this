@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -67,6 +68,9 @@ export const en = {
   deselectAll: 'Deselect All',
   selectQuestionPackages: 'Select Question Packages',
   assignPackages: 'Assign Packages',
+  questionOrder: 'Question Order',
+  sequential: 'Sequential',
+  shuffle: 'Shuffle',
   
   // Questions
   questions: 'Questions',

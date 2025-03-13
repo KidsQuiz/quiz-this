@@ -19,6 +19,24 @@ export const useQuestionLoading = () => {
       setIsLoading(true);
       
       let allQuestions: Question[] = [];
+      let packagePresentationOrders: Record<string, 'sequential' | 'shuffle'> = {};
+      
+      // First, get the presentation_order for all selected packages
+      for (const packageId of selectedPackageIds) {
+        const { data: packageData, error: packageError } = await supabase
+          .from('packages')
+          .select('id, presentation_order')
+          .eq('id', packageId)
+          .single();
+          
+        if (packageError) {
+          console.error('Error fetching package presentation order:', packageError.message);
+          // Default to shuffle if there's an error
+          packagePresentationOrders[packageId] = 'shuffle';
+        } else if (packageData) {
+          packagePresentationOrders[packageId] = packageData.presentation_order || 'shuffle';
+        }
+      }
       
       // Get questions for all selected packages
       for (const packageId of selectedPackageIds) {
@@ -31,7 +49,15 @@ export const useQuestionLoading = () => {
         if (error) throw error;
         
         if (data && data.length > 0) {
-          allQuestions = [...allQuestions, ...data];
+          // Apply the correct ordering based on package configuration
+          let packageQuestions = [...data];
+          
+          // If this package is set to shuffle, randomize its questions
+          if (packagePresentationOrders[packageId] === 'shuffle') {
+            packageQuestions = packageQuestions.sort(() => Math.random() - 0.5);
+          }
+          
+          allQuestions = [...allQuestions, ...packageQuestions];
         }
       }
       
@@ -52,11 +78,15 @@ export const useQuestionLoading = () => {
         }
       });
       
-      // Convert back to array and randomize the order
+      // Convert back to array
       const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
-      const shuffledQuestions = [...uniqueQuestions].sort(() => Math.random() - 0.5);
       
-      setQuestions(shuffledQuestions);
+      // Always shuffle questions across different packages
+      // This ensures that questions from different packages are mixed
+      // but the order within each package respects its configuration
+      const finalQuestions = [...uniqueQuestions].sort(() => Math.random() - 0.5);
+      
+      setQuestions(finalQuestions);
       
     } catch (error: any) {
       console.error('Error loading questions:', error.message);
