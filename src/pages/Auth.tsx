@@ -3,16 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -48,19 +49,14 @@ const AuthPage = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email,
-          password,
-          options: {
-            data: {
-              username: username || email.split('@')[0],
-            },
-          },
+          password
         });
 
         if (error) throw error;
         
         toast({
-          title: "Account created",
-          description: "Please check your email to confirm your account.",
+          title: t("accountCreated"),
+          description: t("checkEmail"),
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -71,23 +67,21 @@ const AuthPage = () => {
         if (error) throw error;
         
         toast({
-          title: "Welcome back!",
-          description: "You have successfully logged in.",
+          title: t("welcomeBack"),
+          description: t("loginSuccess"),
         });
         
         navigate('/');
       }
     } catch (error: any) {
-      // Log the error to get more details for debugging
       console.error("Authentication error:", error);
       
-      // Set a more user-friendly error message
-      setErrorMessage(error.message || "Something went wrong. Please try again.");
+      setErrorMessage(error.message || t("somethingWentWrong"));
       
       toast({
         variant: "destructive",
-        title: "Authentication failed",
-        description: error.message || "Something went wrong. Please try again.",
+        title: t("authFailed"),
+        description: error.message || t("somethingWentWrong"),
       });
     } finally {
       setIsLoading(false);
@@ -95,7 +89,7 @@ const AuthPage = () => {
   };
 
   if (isAuthenticated) {
-    return <div className="text-center py-8">Redirecting...</div>;
+    return <div className="text-center py-8">{t("redirecting")}</div>;
   }
 
   return (
@@ -103,9 +97,9 @@ const AuthPage = () => {
       <main className="flex-1 flex flex-col items-center justify-center py-12 px-4">
         <div className="w-full max-w-md space-y-8 glassmorphism p-8 rounded-xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold">{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
+            <h2 className="text-3xl font-bold">{isSignUp ? t("createAccount") : t("welcomeBack")}</h2>
             <p className="text-muted-foreground mt-2">
-              {isSignUp ? 'Sign up to start your journey' : 'Sign in to your account'}
+              {isSignUp ? t("signUpToStart") : t("signInToAccount")}
             </p>
           </div>
           
@@ -117,25 +111,9 @@ const AuthPage = () => {
           
           <form onSubmit={handleSubmit} className="space-y-6 mt-8">
             <div className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <label htmlFor="username" className="text-sm font-medium">
-                    Username (optional)
-                  </label>
-                  <input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full bg-background border border-input rounded-md p-3 text-sm focus:ring-2 focus:ring-primary/50 focus:outline-none"
-                    placeholder="Choose a username"
-                  />
-                </div>
-              )}
-              
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  {t("email")}
                 </label>
                 <input
                   id="email"
@@ -150,7 +128,7 @@ const AuthPage = () => {
               
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
-                  Password
+                  {t("password")}
                 </label>
                 <input
                   id="password"
@@ -172,9 +150,9 @@ const AuthPage = () => {
               disabled={isLoading}
             >
               {isLoading ? (
-                <span className="animate-pulse">Processing...</span>
+                <span className="animate-pulse">{t("processing")}</span>
               ) : (
-                <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                <span>{isSignUp ? t("createAccount") : t("signIn")}</span>
               )}
             </button>
           </form>
@@ -185,14 +163,14 @@ const AuthPage = () => {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-sm text-primary hover:underline"
             >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              {isSignUp ? t("alreadyHaveAccount") : t("dontHaveAccount")}
             </button>
           </div>
         </div>
       </main>
       
       <footer className="py-6 text-center text-sm text-muted-foreground">
-        <p>Designed with precision and simplicity.</p>
+        <p>{t("designedWithPrecision")}</p>
       </footer>
     </div>
   );

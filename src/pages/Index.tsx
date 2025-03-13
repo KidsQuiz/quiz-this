@@ -29,7 +29,7 @@ const Index = () => {
       </main>
       
       <footer className="py-6 text-center text-sm text-muted-foreground">
-        <p>Designed with precision and simplicity.</p>
+        <p>{t("designedWithPrecision")}</p>
       </footer>
     </div>
   );

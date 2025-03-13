@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AvatarUploaderProps {
   avatarUrl: string | null;
@@ -11,6 +12,7 @@ interface AvatarUploaderProps {
 
 const AvatarUploader = ({ avatarUrl, isLoading, onFileChange }: AvatarUploaderProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -32,7 +34,7 @@ const AvatarUploader = ({ avatarUrl, isLoading, onFileChange }: AvatarUploaderPr
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="avatar">Avatar</Label>
+      <Label htmlFor="avatar">{t('avatar')}</Label>
       <Input
         id="avatar"
         type="file"
@@ -46,7 +48,7 @@ const AvatarUploader = ({ avatarUrl, isLoading, onFileChange }: AvatarUploaderPr
         <div className="mt-2 flex justify-center">
           <img 
             src={previewUrl || avatarUrl || ''} 
-            alt="Avatar preview" 
+            alt={t('avatarPreview')} 
             className="h-24 w-24 rounded-full object-cover border" 
           />
         </div>
