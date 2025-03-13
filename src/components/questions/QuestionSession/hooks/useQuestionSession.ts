@@ -84,7 +84,10 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTotalPoints,
     setShowWowEffect,
     setCurrentQuestionIndex,
-    setIsModalOpen
+    setIsModalOpen,
+    questions,
+    setShowBoomEffect,
+    setSessionComplete
   );
 
   // Handle session startup
@@ -131,7 +134,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     totalPoints,
     correctAnswers,
     setSessionComplete,
-    setShowBoomEffect
+    setShowBoomEffect,
+    setIsModalOpen
   );
 
   // Enhanced answer handling with database recording
@@ -143,16 +147,10 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers
   );
 
-  // Handle dialog closing - customized to check for perfect score when closing
+  // Handle dialog closing
   const handleDialogClose = () => {
     // Clean up any styles applied to the body
     document.body.style.removeProperty('pointer-events');
-    
-    // Check if this was a perfect score when closing the dialog
-    if (sessionComplete && questions.length > 0 && correctAnswers === questions.length) {
-      console.log("PERFECT SCORE detected when closing dialog! Showing boom effect");
-      setShowBoomEffect(true);
-    }
     
     // Close the dialog and call the onClose callback
     setIsModalOpen(false);

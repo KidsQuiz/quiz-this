@@ -10,7 +10,10 @@ export const useAnswerHandling = (
   setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
   setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  questions: Question[],
+  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
@@ -36,21 +39,41 @@ export const useAnswerHandling = (
       // Play correct sound effect
       playSound('correct');
       
+      // Update correct answers count
+      let newCorrectAnswers = 0;
       setCorrectAnswers(prev => {
-        const newValue = prev + 1;
-        console.log(`Updated correctAnswers: ${prev} -> ${newValue}`);
-        return newValue;
+        newCorrectAnswers = prev + 1;
+        console.log(`Updated correctAnswers: ${prev} -> ${newCorrectAnswers}`);
+        return newCorrectAnswers;
       });
       
       setTotalPoints(prev => prev + points);
       setShowWowEffect(true);
       
+      // Check if this was the last question AND if all answers were correct
+      const isLastQuestion = currentQuestionIndex => currentQuestionIndex + 1 >= questions.length;
+      
       // Show celebration effect for a short duration
       setTimeout(() => {
         setShowWowEffect(false);
-        // Move to next question immediately after celebration
-        setCurrentQuestionIndex(prev => prev + 1);
-        setIsModalOpen(true);
+        
+        if (isLastQuestion(currentQuestionIndex => currentQuestionIndex)) {
+          // If perfect score (all questions answered correctly)
+          if (newCorrectAnswers === questions.length) {
+            console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
+            setSessionComplete(true);
+            setShowBoomEffect(true);
+            // Dialog will close automatically in useSessionCompletion
+          } else {
+            // Move to completion screen if not perfect score
+            setCurrentQuestionIndex(prev => prev + 1);
+            setIsModalOpen(true);
+          }
+        } else {
+          // Not the last question, move to next
+          setCurrentQuestionIndex(prev => prev + 1);
+          setIsModalOpen(true);
+        }
       }, 1500);
     } else {
       // Play incorrect sound effect

@@ -13,21 +13,24 @@ export const useSessionCompletion = (
   totalPoints: number,
   correctAnswers: number,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
-  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>
+  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const { toast } = useToast();
 
   // Handle session completion
   useEffect(() => {
-    if (sessionComplete) return;
-    
-    // Check if we've reached the end of questions
-    if (currentQuestionIndex >= questions.length && questions.length > 0) {
-      console.log(`Session complete: correctAnswers=${correctAnswers}, totalQuestions=${questions.length}`);
-      setSessionComplete(true);
-      
-      // We'll trigger the boom effect in the useQuestionSession component when dialog closes
-      // instead of here, so we can ensure it appears after the dialog is closed
+    if (sessionComplete) {
+      // If all questions were answered correctly, automatically close the dialog
+      const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
+      if (isPerfectScore) {
+        console.log("Perfect score detected, auto-closing dialog after point update");
+        
+        // Close the dialog with a short delay to allow points to update first
+        setTimeout(() => {
+          setIsModalOpen(false);
+        }, 800);
+      }
       
       // Update kid's points in the database
       const updateKidPoints = async () => {
@@ -80,6 +83,13 @@ export const useSessionCompletion = (
       
       // Call the update function immediately when session completes
       updateKidPoints();
+      return;
     }
-  }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, correctAnswers, toast, setSessionComplete, setShowBoomEffect]);
+    
+    // Check if we've reached the end of questions and it's not a perfect score
+    if (currentQuestionIndex >= questions.length && questions.length > 0 && !sessionComplete) {
+      console.log(`Session complete: correctAnswers=${correctAnswers}, totalQuestions=${questions.length}`);
+      setSessionComplete(true);
+    }
+  }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, correctAnswers, toast, setSessionComplete, setShowBoomEffect, setIsModalOpen]);
 };
