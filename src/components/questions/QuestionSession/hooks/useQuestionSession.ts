@@ -28,6 +28,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTotalPoints,
     showWowEffect,
     setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
     isModalOpen,
     setIsModalOpen,
     kidAnswers,
@@ -127,7 +129,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     currentQuestionIndex,
     questions,
     totalPoints,
-    setSessionComplete
+    correctAnswers,
+    setSessionComplete,
+    setShowBoomEffect
   );
 
   // Enhanced answer handling with database recording
@@ -173,6 +177,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
     isModalOpen,
     kidAnswers,
     togglePackageSelection,

@@ -15,6 +15,7 @@ export const useSessionState = () => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [showWowEffect, setShowWowEffect] = useState(false);
+  const [showBoomEffect, setShowBoomEffect] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [kidAnswers, setKidAnswers] = useState<KidAnswer[]>([]);
 
@@ -29,6 +30,8 @@ export const useSessionState = () => {
     setTotalPoints,
     showWowEffect,
     setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
     isModalOpen,
     setIsModalOpen,
     kidAnswers,

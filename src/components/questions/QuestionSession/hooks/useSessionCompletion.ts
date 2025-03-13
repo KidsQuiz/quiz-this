@@ -11,7 +11,9 @@ export const useSessionCompletion = (
   currentQuestionIndex: number,
   questions: Question[],
   totalPoints: number,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
+  correctAnswers: number,
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const { toast } = useToast();
 
@@ -22,6 +24,12 @@ export const useSessionCompletion = (
     // Check if we've reached the end of questions
     if (currentQuestionIndex >= questions.length && questions.length > 0) {
       setSessionComplete(true);
+      
+      // Check if the kid answered all questions correctly
+      const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
+      if (isPerfectScore) {
+        setShowBoomEffect(true);
+      }
       
       // Update kid's points in the database
       const updateKidPoints = async () => {
@@ -75,5 +83,5 @@ export const useSessionCompletion = (
       // Call the update function immediately when session completes
       updateKidPoints();
     }
-  }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, toast, setSessionComplete]);
+  }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, correctAnswers, toast, setSessionComplete, setShowBoomEffect]);
 };
