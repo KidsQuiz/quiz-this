@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
 import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle, RotateCcw } from 'lucide-react';
@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 
 interface KidCardProps {
   id: string;
@@ -39,12 +41,55 @@ const KidCard = ({
   onResetPoints 
 }: KidCardProps) => {
   const { t } = useLanguage();
+  const [packageCount, setPackageCount] = useState<number>(0);
+  
+  // Fetch assigned package count when component mounts
+  useEffect(() => {
+    const fetchPackageCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('kid_packages')
+          .select('*', { count: 'exact', head: true })
+          .eq('kid_id', id);
+          
+        if (error) throw error;
+        setPackageCount(count || 0);
+      } catch (error) {
+        console.error('Error fetching package count:', error);
+        setPackageCount(0);
+      }
+    };
+    
+    fetchPackageCount();
+  }, [id]);
   
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="self-stretch flex justify-end items-center mb-4 gap-2">
+            {/* Package Selection Button */}
+            {onAssignPackages && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 p-0 rounded-full bg-background hover:bg-accent flex items-center justify-center relative"
+                onClick={() => onAssignPackages(id, name)}
+                title={t('assignPackages')}
+              >
+                <Package className="h-4 w-4 text-primary" />
+                {packageCount > 0 && (
+                  <Badge 
+                    variant="default" 
+                    className="absolute -top-2 -right-2 h-4 min-w-4 flex items-center justify-center text-[10px] px-1 py-0"
+                  >
+                    {packageCount}
+                  </Badge>
+                )}
+                <span className="sr-only">{t('assignPackages')}</span>
+              </Button>
+            )}
+            
             {/* Start Questions Mini Button */}
             {onStartQuestions && (
               <Button
@@ -64,16 +109,6 @@ const KidCard = ({
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {onAssignPackages && (
-                  <DropdownMenuItem 
-                    onClick={() => onAssignPackages(id, name)}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <Package className="h-4 w-4" />
-                    <span>{t('selectQuestionPackages')}</span>
-                  </DropdownMenuItem>
-                )}
-                
                 <DropdownMenuItem 
                   onClick={() => onEdit(id)}
                   className="flex items-center gap-2 cursor-pointer"

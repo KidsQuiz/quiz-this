@@ -13,9 +13,16 @@ interface KidPackagesFormProps {
   onClose: () => void;
   kidId: string;
   kidName: string;
+  onAssignmentChange?: () => void;
 }
 
-const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormProps) => {
+const KidPackagesForm = ({ 
+  isOpen, 
+  onClose, 
+  kidId, 
+  kidName, 
+  onAssignmentChange 
+}: KidPackagesFormProps) => {
   const { fetchPackagesWithAssignmentStatus, assignPackageToKid } = useKidPackages(kidId);
   const [packages, setPackages] = useState<PackageWithAssignment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,14 +61,42 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
           ? { ...pkg, isAssigned: !pkg.isAssigned } 
           : pkg
       ));
+      
+      // Notify parent component about the assignment change
+      if (onAssignmentChange) {
+        onAssignmentChange();
+      }
     } catch (error) {
       console.error('Error toggling package assignment:', error);
     }
   };
   
+  const handleSelectAll = () => {
+    const unassignedPackages = packages.filter(pkg => !pkg.isAssigned);
+    if (unassignedPackages.length === 0) return;
+    
+    unassignedPackages.forEach(async (pkg) => {
+      await handleToggleAssignment(pkg.id);
+    });
+  };
+  
+  const handleDeselectAll = () => {
+    const assignedPackages = packages.filter(pkg => pkg.isAssigned);
+    if (assignedPackages.length === 0) return;
+    
+    assignedPackages.forEach(async (pkg) => {
+      await handleToggleAssignment(pkg.id);
+    });
+  };
+  
   const handleDialogClose = () => {
     // Call the onClose prop directly
     onClose();
+    
+    // Notify parent component about potential assignment changes
+    if (onAssignmentChange) {
+      onAssignmentChange();
+    }
   };
   
   return (
@@ -77,6 +112,27 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
         </DialogHeader>
         
         <div className="py-4">
+          {packages.length > 0 && (
+            <div className="flex justify-between mb-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSelectAll}
+                className="text-xs"
+              >
+                {t('selectAll')}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDeselectAll}
+                className="text-xs"
+              >
+                {t('deselectAll')}
+              </Button>
+            </div>
+          )}
+          
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
@@ -87,7 +143,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
             <div className="text-center py-6">
               <p className="text-muted-foreground">{t('noPackages')}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                {t('createFirstPackage')} {kidName}.
+                {t('createFirstPackage')}.
               </p>
             </div>
           ) : (

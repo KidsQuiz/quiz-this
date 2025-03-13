@@ -2,33 +2,89 @@
 import React, { useState, useEffect } from 'react';
 import KidForm from './KidForm';
 import KidsList from './KidsList';
+import { useKidsData, Kid } from '@/hooks/useKidsData';
+import { Button } from '@/components/ui/button';
+import { Plus, AlertCircle } from 'lucide-react';
+import { DropResult } from 'react-beautiful-dnd';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import KidPackagesForm from './packages/KidPackagesForm';
 import QuestionSession from './questions/QuestionSession';
-import { Button } from '@/components/ui/button';
-import { useKidsData } from '@/hooks/useKidsData';
-import { UserPlus } from 'lucide-react';
-import { DropResult } from 'react-beautiful-dnd';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const KidsManager = () => {
-  const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid, resetPoints } = useKidsData();
+  const { kids, isLoading, fetchKids, deleteKid, reorderKids } = useKidsData();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isPackagesFormOpen, setIsPackagesFormOpen] = useState(false);
-  const [isQuestionSessionOpen, setIsQuestionSessionOpen] = useState(false);
   const [selectedKidId, setSelectedKidId] = useState<string | undefined>(undefined);
-  const [selectedKidName, setSelectedKidName] = useState<string>('');
   const { t } = useLanguage();
   
-  // Reset form open state on component unmount
+  // Package assignment state
+  const [isPackageFormOpen, setIsPackageFormOpen] = useState(false);
+  const [selectedKidForPackages, setSelectedKidForPackages] = useState<{id: string, name: string} | null>(null);
+  
+  // Question session state
+  const [isQuestionSessionOpen, setIsQuestionSessionOpen] = useState(false);
+  const [selectedKidForQuestions, setSelectedKidForQuestions] = useState<{id: string, name: string} | null>(null);
+  
+  // Reset points confirmation state
+  const [isResetPointsDialogOpen, setIsResetPointsDialogOpen] = useState(false);
+  const [kidToResetPoints, setKidToResetPoints] = useState<{id: string, name: string} | null>(null);
+  
+  // Force refresh state to update the package count badge
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
   useEffect(() => {
-    return () => {
-      setIsFormOpen(false);
-      setIsPackagesFormOpen(false);
-      setIsQuestionSessionOpen(false);
-      setSelectedKidId(undefined);
-      setSelectedKidName('');
-    };
-  }, []);
+    fetchKids();
+  }, [refreshTrigger]);
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+    
+    if (sourceIndex === destinationIndex) return;
+    
+    // First update the local state
+    const reorderedKids = reorderKids(sourceIndex, destinationIndex);
+    
+    // Then update the positions in the database
+    try {
+      const updates = reorderedKids.map((kid, index) => ({
+        id: kid.id,
+        position: index
+      }));
+      
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('kids')
+          .update({ position: update.position })
+          .eq('id', update.id);
+          
+        if (error) throw error;
+      }
+    } catch (error: any) {
+      console.error('Error updating kid positions:', error.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update kid order"
+      });
+      
+      // Refresh kids to get the original order
+      fetchKids();
+    }
+  };
   
   const handleAddKid = () => {
     setSelectedKidId(undefined);
@@ -40,83 +96,79 @@ const KidsManager = () => {
     setIsFormOpen(true);
   };
   
+  const handleFormClose = () => {
+    setIsFormOpen(false);
+    setSelectedKidId(undefined);
+  };
+  
   const handleAssignPackages = (id: string, name: string) => {
-    setSelectedKidId(id);
-    setSelectedKidName(name);
-    setIsPackagesFormOpen(true);
+    setSelectedKidForPackages({ id, name });
+    setIsPackageFormOpen(true);
+  };
+  
+  const handlePackageFormClose = () => {
+    setIsPackageFormOpen(false);
+    setSelectedKidForPackages(null);
+    
+    // Trigger a refresh to update the package count badge
+    setRefreshTrigger(prev => prev + 1);
   };
   
   const handleStartQuestions = (id: string, name: string) => {
-    setSelectedKidId(id);
-    setSelectedKidName(name);
+    setSelectedKidForQuestions({ id, name });
     setIsQuestionSessionOpen(true);
   };
   
-  const handleResetPoints = (id: string, name: string) => {
-    resetPoints(id, name);
-  };
-  
-  const handlePackagesFormClose = () => {
-    // First, close the modal
-    setIsPackagesFormOpen(false);
-    
-    // Clear state immediately after closing the modal
-    setSelectedKidId(undefined);
-    setSelectedKidName('');
-  };
-  
   const handleQuestionSessionClose = () => {
-    // First, close the session
     setIsQuestionSessionOpen(false);
+    setSelectedKidForQuestions(null);
     
-    // Then clear the selected kid
-    setSelectedKidId(undefined);
-    setSelectedKidName('');
-    
-    // Refresh kids data to get updated points
+    // Refresh kids to update points
     fetchKids();
   };
   
-  const onDragEnd = async (result: DropResult) => {
-    const { destination, source } = result;
+  const handleResetPoints = (id: string, name: string) => {
+    setKidToResetPoints({ id, name });
+    setIsResetPointsDialogOpen(true);
+  };
+  
+  const confirmResetPoints = async () => {
+    if (!kidToResetPoints) return;
     
-    // If dropped outside the list or no movement
-    if (!destination || 
-        (destination.droppableId === source.droppableId && 
-         destination.index === source.index)) {
-      return;
+    try {
+      const { error } = await supabase
+        .from('kids')
+        .update({ points: 0 })
+        .eq('id', kidToResetPoints.id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: `${kidToResetPoints.name}'s points have been reset to 0`
+      });
+      
+      // Refresh kids to update points
+      fetchKids();
+    } catch (error: any) {
+      console.error('Error resetting points:', error.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to reset points"
+      });
+    } finally {
+      setIsResetPointsDialogOpen(false);
+      setKidToResetPoints(null);
     }
-    
-    // Reorder the kids array
-    const reorderedKids = Array.from(kids);
-    const [removed] = reorderedKids.splice(source.index, 1);
-    reorderedKids.splice(destination.index, 0, removed);
-    
-    // Update the position property on each kid
-    const updatedKids = reorderedKids.map((kid, index) => ({
-      ...kid,
-      position: index
-    }));
-    
-    // Update the UI state immediately
-    setKids(updatedKids);
-    
-    // Prepare position updates for the database
-    const positionUpdates = updatedKids.map(kid => ({
-      id: kid.id,
-      position: kid.position
-    }));
-    
-    // Update positions in the database
-    await updateKidsPositions(positionUpdates);
   };
   
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex justify-between items-center">
         <h3 className="text-lg font-medium">{t('myKids')}</h3>
         <Button onClick={handleAddKid} className="flex items-center gap-2">
-          <UserPlus size={16} />
+          <Plus className="h-4 w-4" />
           <span>{t('addKid')}</span>
         </Button>
       </div>
@@ -124,7 +176,7 @@ const KidsManager = () => {
       <KidsList 
         kids={kids}
         isLoading={isLoading}
-        onDragEnd={onDragEnd}
+        onDragEnd={handleDragEnd}
         onEditKid={handleEditKid}
         onDeleteKid={deleteKid}
         onAddKid={handleAddKid}
@@ -133,30 +185,46 @@ const KidsManager = () => {
         onResetPoints={handleResetPoints}
       />
       
-      <KidForm
+      <KidForm 
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={handleFormClose}
         onSave={fetchKids}
         kidId={selectedKidId}
       />
       
-      {isPackagesFormOpen && selectedKidId && (
+      {selectedKidForPackages && (
         <KidPackagesForm
-          isOpen={isPackagesFormOpen}
-          onClose={handlePackagesFormClose}
-          kidId={selectedKidId}
-          kidName={selectedKidName}
+          isOpen={isPackageFormOpen}
+          onClose={handlePackageFormClose}
+          kidId={selectedKidForPackages.id}
+          kidName={selectedKidForPackages.name}
+          onAssignmentChange={() => setRefreshTrigger(prev => prev + 1)}
         />
       )}
       
-      {isQuestionSessionOpen && selectedKidId && (
+      {selectedKidForQuestions && (
         <QuestionSession
           isOpen={isQuestionSessionOpen}
           onClose={handleQuestionSessionClose}
-          kidId={selectedKidId}
-          kidName={selectedKidName}
+          kidId={selectedKidForQuestions.id}
+          kidName={selectedKidForQuestions.name}
         />
       )}
+      
+      <AlertDialog open={isResetPointsDialogOpen} onOpenChange={setIsResetPointsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('resetPoints')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {kidToResetPoints?.name}'s points will be reset to 0. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmResetPoints}>{t('confirm')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
