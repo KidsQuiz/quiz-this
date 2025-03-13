@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useKidsData } from '@/hooks/useKidsData';
 import { UserPlus } from 'lucide-react';
 import { DropResult } from 'react-beautiful-dnd';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const KidsManager = () => {
   const { kids, setKids, isLoading, fetchKids, updateKidsPositions, deleteKid, resetPoints } = useKidsData();
@@ -16,6 +17,7 @@ const KidsManager = () => {
   const [isQuestionSessionOpen, setIsQuestionSessionOpen] = useState(false);
   const [selectedKidId, setSelectedKidId] = useState<string | undefined>(undefined);
   const [selectedKidName, setSelectedKidName] = useState<string>('');
+  const { t } = useLanguage();
   
   // Reset form open state on component unmount
   useEffect(() => {
@@ -112,10 +114,10 @@ const KidsManager = () => {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-medium">Your Kids</h3>
+        <h3 className="text-lg font-medium">{t('myKids')}</h3>
         <Button onClick={handleAddKid} className="flex items-center gap-2">
           <UserPlus size={16} />
-          <span>Add Kid</span>
+          <span>{t('addKid')}</span>
         </Button>
       </div>
       

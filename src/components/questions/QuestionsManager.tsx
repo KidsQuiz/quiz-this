@@ -54,7 +54,7 @@ const QuestionsManager = () => {
   };
   
   if (!packageId) {
-    return <div>Package ID is required</div>;
+    return <div>{t('somethingWentWrong')}</div>;
   }
   
   return (

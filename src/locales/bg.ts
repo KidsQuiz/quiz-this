@@ -52,6 +52,7 @@ export const bg = {
   age: 'Възраст',
   avatar: 'Аватар',
   avatarPreview: 'Преглед на аватар',
+  resetPoints: 'Нулиране на точки',
   
   // Packages
   packages: 'Пакети',
@@ -65,6 +66,7 @@ export const bg = {
   selectAll: 'Избери всички',
   deselectAll: 'Отмаркирай всички',
   selectQuestionPackages: 'Избери пакети с въпроси',
+  assignPackages: 'Задай пакети',
   
   // Questions
   questions: 'Въпроси',

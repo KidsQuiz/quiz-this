@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidCardProps {
   id: string;
@@ -37,6 +38,8 @@ const KidCard = ({
   onStartQuestions,
   onResetPoints 
 }: KidCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
       <div className="p-6">
@@ -49,10 +52,10 @@ const KidCard = ({
                 variant="outline"
                 className="h-8 w-8 p-0 rounded-full bg-background text-primary hover:bg-accent flex items-center justify-center"
                 onClick={() => onStartQuestions(id, name)}
-                title="Start Questions"
+                title={t('startSession')}
               >
                 <PlayCircle className="h-4 w-4" />
-                <span className="sr-only">Start Questions</span>
+                <span className="sr-only">{t('startSession')}</span>
               </Button>
             )}
             
@@ -67,7 +70,7 @@ const KidCard = ({
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <Package className="h-4 w-4" />
-                    <span>Assign Packages</span>
+                    <span>{t('selectQuestionPackages')}</span>
                   </DropdownMenuItem>
                 )}
                 
@@ -76,7 +79,7 @@ const KidCard = ({
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   <Edit className="h-4 w-4" />
-                  <span>Edit</span>
+                  <span>{t('edit')}</span>
                 </DropdownMenuItem>
                 
                 {onResetPoints && (
@@ -85,7 +88,7 @@ const KidCard = ({
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <RotateCcw className="h-4 w-4" />
-                    <span>Reset Points</span>
+                    <span>{t('resetPoints')}</span>
                   </DropdownMenuItem>
                 )}
                 
@@ -96,7 +99,7 @@ const KidCard = ({
                   className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
-                  <span>Remove</span>
+                  <span>{t('delete')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -118,11 +121,11 @@ const KidCard = ({
           
           <div>
             <h3 className="text-lg font-medium">{name}</h3>
-            <p className="text-sm text-muted-foreground">{age} years old</p>
+            <p className="text-sm text-muted-foreground">{age} {t('age')}</p>
             
             <div className="mt-4 bg-primary/10 rounded-full py-2 px-4 inline-flex items-center justify-center gap-1.5 transform transition-all hover:scale-105">
               <Star className="h-5 w-5 fill-primary text-primary" />
-              <span className="font-semibold text-primary">{points} points</span>
+              <span className="font-semibold text-primary">{points} {t('points')}</span>
             </div>
           </div>
         </div>

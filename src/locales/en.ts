@@ -52,6 +52,7 @@ export const en = {
   age: 'Age',
   avatar: 'Avatar',
   avatarPreview: 'Avatar Preview',
+  resetPoints: 'Reset Points',
   
   // Packages
   packages: 'Packages',
@@ -65,6 +66,7 @@ export const en = {
   selectAll: 'Select All',
   deselectAll: 'Deselect All',
   selectQuestionPackages: 'Select Question Packages',
+  assignPackages: 'Assign Packages',
   
   // Questions
   questions: 'Questions',
@@ -102,4 +104,3 @@ export const en = {
   // Footer
   designedWithPrecision: 'Designed with precision'
 };
-
