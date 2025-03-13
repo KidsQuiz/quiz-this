@@ -45,13 +45,13 @@ const Header = ({ activeTab, onTabChange }: HeaderProps) => {
           
           {!isQuestionsPage && (
             <Tabs value={activeTab} onValueChange={onTabChange} className="ml-6">
-              <TabsList className="grid grid-cols-2 w-48">
-                <TabsTrigger value="kids" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
+              <TabsList className="grid grid-cols-2 w-64 h-12">
+                <TabsTrigger value="kids" className="flex items-center gap-2 text-base py-3">
+                  <Users className="h-5 w-5" />
                   <span>{t('myKids')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="packages" className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
+                <TabsTrigger value="packages" className="flex items-center gap-2 text-base py-3">
+                  <Package className="h-5 w-5" />
                   <span>{t('packages')}</span>
                 </TabsTrigger>
               </TabsList>
