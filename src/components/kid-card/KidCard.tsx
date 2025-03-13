@@ -83,15 +83,6 @@ const KidCard = ({
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
-          {/* Start Questions Button - Display prominently if packages are assigned */}
-          {onStartQuestions && packageCount > 0 && (
-            <StartQuestionButton 
-              id={id} 
-              name={name}
-              onStartQuestions={onStartQuestions}
-            />
-          )}
-          
           <div className="flex justify-between items-center w-full">
             <KidToolbar 
               id={id}
@@ -125,6 +116,15 @@ const KidCard = ({
               nextMilestone={nextMilestone}
               points={points}
               progressPercentage={progressPercentage}
+            />
+          )}
+          
+          {/* Start Questions Button - Moved to the bottom of the card */}
+          {onStartQuestions && packageCount > 0 && (
+            <StartQuestionButton 
+              id={id} 
+              name={name}
+              onStartQuestions={onStartQuestions}
             />
           )}
         </div>
