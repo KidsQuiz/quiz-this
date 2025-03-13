@@ -13,8 +13,9 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
   
   useEffect(() => {
     if (isVisible) {
+      console.log("🎉 BoomEffect is visible! Generating particles...");
       // Generate confetti particles
-      const newParticles = Array.from({ length: 50 }).map((_, i) => {
+      const newParticles = Array.from({ length: 100 }).map((_, i) => {
         const colors = ['bg-amber-500', 'bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500'];
         const sizes = ['h-3 w-3', 'h-4 w-4', 'h-5 w-5'];
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -44,8 +45,11 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
       
       // Call onComplete after animation ends
       const timer = setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 3000);
+        if (onComplete) {
+          console.log("🎉 BoomEffect animation complete, calling onComplete");
+          onComplete();
+        }
+      }, 5000); // Increased from 3000 to 5000 for longer visibility
       
       return () => clearTimeout(timer);
     }
@@ -66,7 +70,7 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
               opacity: 1;
             }
             100% {
-              transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 300}px) scale(1) rotate(${Math.random() * 360}deg);
+              transform: translate(${Math.random() * 300 - 150}px, ${Math.random() * 300 - 400}px) scale(1) rotate(${Math.random() * 360}deg);
               opacity: 0;
             }
           }
@@ -84,25 +88,25 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
         `
       }} />
       
-      {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-fade-in" />
+      {/* Background overlay with increased opacity */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fade-in" />
       
       {/* Particles */}
       {particles}
       
       {/* Center content */}
       <div className="relative flex flex-col items-center animate-[boom-scale_0.5s_forwards]">
-        <div className="text-4xl md:text-6xl font-bold text-center mb-4 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-transparent bg-clip-text">
+        <div className="text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-transparent bg-clip-text drop-shadow-lg">
           FANTASTIC!
         </div>
         
-        <div className="flex gap-4 justify-center animate-[boom-rotate_2s_linear_infinite]">
-          <Trophy className="h-10 w-10 text-amber-500" />
-          <PartyPopper className="h-10 w-10 text-pink-500" />
-          <Sparkles className="h-10 w-10 text-purple-500" />
+        <div className="flex gap-6 justify-center animate-[boom-rotate_2s_linear_infinite]">
+          <Trophy className="h-12 w-12 text-amber-500" />
+          <PartyPopper className="h-12 w-12 text-pink-500" />
+          <Sparkles className="h-12 w-12 text-purple-500" />
         </div>
         
-        <div className="mt-4 text-xl font-medium text-white text-center">
+        <div className="mt-6 text-2xl font-medium text-white text-center drop-shadow-md">
           You answered all questions correctly!
         </div>
       </div>

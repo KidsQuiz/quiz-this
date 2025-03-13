@@ -36,7 +36,12 @@ export const useAnswerHandling = (
       // Play correct sound effect
       playSound('correct');
       
-      setCorrectAnswers(prev => prev + 1);
+      setCorrectAnswers(prev => {
+        const newValue = prev + 1;
+        console.log(`Updated correctAnswers: ${prev} -> ${newValue}`);
+        return newValue;
+      });
+      
       setTotalPoints(prev => prev + points);
       setShowWowEffect(true);
       

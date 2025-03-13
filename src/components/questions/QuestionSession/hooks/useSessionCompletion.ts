@@ -23,11 +23,15 @@ export const useSessionCompletion = (
     
     // Check if we've reached the end of questions
     if (currentQuestionIndex >= questions.length && questions.length > 0) {
+      console.log(`Session complete: correctAnswers=${correctAnswers}, totalQuestions=${questions.length}`);
       setSessionComplete(true);
       
       // Check if the kid answered all questions correctly
       const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
+      console.log(`Perfect score check: ${isPerfectScore} (${correctAnswers}/${questions.length})`);
+      
       if (isPerfectScore) {
+        console.log("🎉🎉🎉 PERFECT SCORE! Showing boom effect");
         setShowBoomEffect(true);
       }
       
