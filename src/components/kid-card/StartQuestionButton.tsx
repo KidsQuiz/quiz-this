@@ -25,19 +25,13 @@ const StartQuestionButton = ({
     <div className="w-full mt-4">
       <Button
         size="default"
-        variant={isDisabled ? "outline" : "default"}
-        className={`w-full ${isDisabled 
-          ? "text-muted-foreground border-muted cursor-not-allowed" 
-          : "text-primary-foreground bg-primary hover:bg-primary/90"}`}
+        variant="default"
+        className="w-full text-primary-foreground bg-primary hover:bg-primary/90"
         onClick={() => !isDisabled && onStartQuestions(id, name)}
         disabled={isDisabled}
       >
-        {isDisabled ? (
-          <Package className="h-5 w-5 mr-1" />
-        ) : (
-          <PlayCircle className="h-5 w-5 mr-1" />
-        )}
-        {isDisabled ? t('assignPackagesFirst') : t('startSession')}
+        <PlayCircle className="h-5 w-5 mr-1" />
+        {t('startSession')}
       </Button>
     </div>
   );
