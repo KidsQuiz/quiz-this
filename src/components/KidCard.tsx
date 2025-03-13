@@ -94,8 +94,8 @@ const KidCard = ({
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="self-stretch flex justify-end items-center mb-4 gap-2">
-            {/* Start Questions Mini Button - Now first position */}
-            {onStartQuestions && (
+            {/* Start Questions Mini Button - Only show if packages assigned */}
+            {onStartQuestions && packageCount > 0 && (
               <Button
                 size="icon"
                 variant="outline"
