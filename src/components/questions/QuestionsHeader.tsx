@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageCircleQuestion, Plus, Upload, Trash2, CheckSquare } from 'lucide-react';
+import { ArrowLeft, MessageCircleQuestion, Plus, Upload, Trash2, CheckSquare, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Question } from '@/hooks/questionsTypes';
@@ -27,6 +27,7 @@ interface QuestionsHeaderProps {
   onOpenImportDialog: () => void;
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isDeleting: boolean;
 }
 
 const QuestionsHeader = ({
@@ -38,7 +39,8 @@ const QuestionsHeader = ({
   onAddQuestion,
   onOpenImportDialog,
   isDeleteDialogOpen,
-  setIsDeleteDialogOpen
+  setIsDeleteDialogOpen,
+  isDeleting
 }: QuestionsHeaderProps) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -66,6 +68,7 @@ const QuestionsHeader = ({
                 variant="outline" 
                 onClick={onSelectAllQuestions}
                 className="flex items-center gap-2"
+                disabled={isDeleting}
               >
                 <CheckSquare className="h-4 w-4" />
                 <span>
@@ -78,9 +81,19 @@ const QuestionsHeader = ({
                     <Button 
                       variant="outline" 
                       className="flex items-center gap-2 text-destructive hover:text-destructive"
+                      disabled={isDeleting}
                     >
-                      <Trash2 className="h-4 w-4" />
-                      <span>{t('deleteSelected')} ({selectedQuestions.size})</span>
+                      {isDeleting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                      <span>
+                        {isDeleting 
+                          ? t('deletingQuestions') || 'Deleting...' 
+                          : `${t('deleteSelected')} (${selectedQuestions.size})`
+                        }
+                      </span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -97,7 +110,11 @@ const QuestionsHeader = ({
                       <AlertDialogAction 
                         onClick={onDeleteSelected}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        disabled={isDeleting}
                       >
+                        {isDeleting ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : null}
                         {t('deleteSelected')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -110,11 +127,16 @@ const QuestionsHeader = ({
             variant="outline" 
             onClick={onOpenImportDialog} 
             className="flex items-center gap-2"
+            disabled={isDeleting}
           >
             <Upload className="h-4 w-4" />
             <span>{t('import')}</span>
           </Button>
-          <Button onClick={onAddQuestion} className="flex items-center gap-2">
+          <Button 
+            onClick={onAddQuestion} 
+            className="flex items-center gap-2"
+            disabled={isDeleting}
+          >
             <Plus className="h-4 w-4" />
             <span>{t('addQuestion')}</span>
           </Button>

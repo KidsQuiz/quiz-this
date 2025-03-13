@@ -17,7 +17,7 @@ const QuestionsManager = () => {
   const { questions, isLoading, fetchQuestions, deleteQuestion } = useQuestionsData(packageId);
   const { packageName } = usePackageData(packageId);
   const { selectedQuestions, handleSelectQuestion, handleSelectAllQuestions, clearSelections } = useQuestionSelection(questions);
-  const { handleDeleteSelectedQuestions } = useDeleteQuestions(deleteQuestion, fetchQuestions);
+  const { handleDeleteSelectedQuestions, isDeleting } = useDeleteQuestions(deleteQuestion, fetchQuestions);
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -62,6 +62,7 @@ const QuestionsManager = () => {
         onOpenImportDialog={handleOpenImportDialog}
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isDeleting={isDeleting}
       />
       
       <QuestionsList 
