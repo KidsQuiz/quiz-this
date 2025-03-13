@@ -98,6 +98,7 @@ export const bg = {
   deleteSelectedQuestions: 'Изтрий избраните въпроси',
   deleteSelectedQuestionsConfirmation: 'Сигурни ли сте, че искате да изтриете избраните въпроси?',
   noQuestionsSelected: 'Няма избрани въпроси',
+  deletingQuestions: 'Изтриване на въпроси...',
   
   // Quiz Session
   startSession: 'Започни сесия',

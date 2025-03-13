@@ -98,6 +98,7 @@ export const en = {
   deleteSelectedQuestions: 'Delete Selected Questions',
   deleteSelectedQuestionsConfirmation: 'Are you sure you want to delete the selected questions?',
   noQuestionsSelected: 'No questions selected',
+  deletingQuestions: 'Deleting questions...',
   
   // Quiz Session
   startSession: 'Start Session',
