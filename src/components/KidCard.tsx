@@ -93,22 +93,23 @@ const KidCard = ({
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="self-stretch flex justify-end items-center mb-4 gap-2">
-            {/* Start Questions Mini Button - Only show if packages assigned */}
-            {onStartQuestions && packageCount > 0 && (
+          {/* Start Questions Button - Display prominently if packages are assigned */}
+          {onStartQuestions && packageCount > 0 && (
+            <div className="w-full mb-4">
               <Button
-                size="icon"
-                variant="outline"
-                className="h-8 w-8 p-0 rounded-full bg-background text-primary hover:bg-accent flex items-center justify-center"
+                size="default"
+                variant="default"
+                className="w-full bg-primary text-white hover:bg-primary/90 shadow-md transition-all hover:shadow-lg animate-pulse"
                 onClick={() => onStartQuestions(id, name)}
-                title={t('startSession')}
               >
-                <PlayCircle className="h-4 w-4" />
-                <span className="sr-only">{t('startSession')}</span>
+                <PlayCircle className="h-5 w-5 mr-1" />
+                {t('startSession')}
               </Button>
-            )}
-            
-            {/* Package Selection Button - Now second position */}
+            </div>
+          )}
+          
+          <div className="self-stretch flex justify-end items-center mb-4 gap-2">
+            {/* Package Selection Button */}
             {onAssignPackages && (
               <Button
                 size="icon"
