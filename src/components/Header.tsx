@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocation } from 'react-router-dom';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface ProfileData {
   username: string | null;
@@ -91,6 +92,8 @@ const Header = ({ activeTab, onTabChange }: HeaderProps) => {
         
         {!isLoading && profile && (
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            
             <div className="hidden sm:flex items-center gap-2">
               <span className="text-sm font-medium">{profile.username || "User"}</span>
             </div>
