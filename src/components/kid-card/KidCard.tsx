@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,7 +48,6 @@ const KidCard = ({
   const [nextMilestone, setNextMilestone] = useState<any>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
-  // Fetch assigned package count when component mounts
   useEffect(() => {
     const fetchPackageCount = async () => {
       try {
@@ -70,7 +68,6 @@ const KidCard = ({
     fetchMilestones();
   }, [id]);
   
-  // Update milestone information when milestones or points change
   useEffect(() => {
     if (milestones.length > 0) {
       setCurrentMilestone(getCurrentMilestone(points));
@@ -109,7 +106,6 @@ const KidCard = ({
             points={points}
           />
           
-          {/* Milestone Section */}
           {currentMilestone && (
             <KidMilestone
               currentMilestone={currentMilestone}
@@ -119,11 +115,11 @@ const KidCard = ({
             />
           )}
           
-          {/* Start Questions Button - Moved to the bottom of the card */}
-          {onStartQuestions && packageCount > 0 && (
+          {onStartQuestions && (
             <StartQuestionButton 
               id={id} 
               name={name}
+              packageCount={packageCount}
               onStartQuestions={onStartQuestions}
             />
           )}
