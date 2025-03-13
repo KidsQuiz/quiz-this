@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import Avatar from './Avatar';
-import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle, RotateCcw } from 'lucide-react';
+import { Baby, Edit, Trash2, MoreVertical, Star, Package, PlayCircle, RotateCcw, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,6 +14,9 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
+import { useMilestonesData } from '@/hooks/useMilestonesData';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface KidCardProps {
   id: string;
@@ -26,6 +29,7 @@ interface KidCardProps {
   onAssignPackages?: (id: string, name: string) => void;
   onStartQuestions?: (id: string, name: string) => void;
   onResetPoints?: (id: string, name: string) => void;
+  onManageMilestones?: (id: string, name: string, points: number) => void;
 }
 
 const KidCard = ({ 
@@ -38,10 +42,22 @@ const KidCard = ({
   onDelete, 
   onAssignPackages,
   onStartQuestions,
-  onResetPoints 
+  onResetPoints,
+  onManageMilestones
 }: KidCardProps) => {
   const { t } = useLanguage();
   const [packageCount, setPackageCount] = useState<number>(0);
+  const { 
+    milestones, 
+    getCurrentMilestone, 
+    getNextMilestone, 
+    getMilestoneProgress, 
+    fetchMilestones 
+  } = useMilestonesData(id);
+  
+  const [currentMilestone, setCurrentMilestone] = useState<any>(null);
+  const [nextMilestone, setNextMilestone] = useState<any>(null);
+  const [progressPercentage, setProgressPercentage] = useState(0);
   
   // Fetch assigned package count when component mounts
   useEffect(() => {
@@ -61,7 +77,17 @@ const KidCard = ({
     };
     
     fetchPackageCount();
+    fetchMilestones();
   }, [id]);
+  
+  // Update milestone information when milestones or points change
+  useEffect(() => {
+    if (milestones.length > 0) {
+      setCurrentMilestone(getCurrentMilestone(points));
+      setNextMilestone(getNextMilestone(points));
+      setProgressPercentage(getMilestoneProgress(points));
+    }
+  }, [milestones, points]);
   
   return (
     <Card className="overflow-hidden transition-colors hover:shadow-md relative">
@@ -101,6 +127,20 @@ const KidCard = ({
                   </Badge>
                 )}
                 <span className="sr-only">{t('assignPackages')}</span>
+              </Button>
+            )}
+            
+            {/* Milestones Button */}
+            {onManageMilestones && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 p-0 rounded-full bg-background hover:bg-accent flex items-center justify-center"
+                onClick={() => onManageMilestones(id, name, points)}
+                title={t('manageMilestones')}
+              >
+                <Trophy className="h-4 w-4 text-primary" />
+                <span className="sr-only">{t('manageMilestones')}</span>
               </Button>
             )}
             
@@ -162,6 +202,38 @@ const KidCard = ({
               <Star className="h-5 w-5 fill-primary text-primary" />
               <span className="font-semibold text-primary">{points} {t('points')}</span>
             </div>
+            
+            {/* Milestone Section */}
+            {currentMilestone && (
+              <div className="mt-4">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center justify-center gap-1 cursor-help">
+                        <Trophy className="h-4 w-4 text-amber-500" />
+                        <span className="text-sm font-medium">{currentMilestone.name}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('currentMilestone')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                {nextMilestone && (
+                  <div className="mt-2 space-y-1 px-4">
+                    <div className="flex justify-between text-xs">
+                      <span>{points}</span>
+                      <span>{nextMilestone.points_required}</span>
+                    </div>
+                    <Progress value={progressPercentage} className="h-1.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {nextMilestone.points_required - points} {t('pointsToNextMilestone')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

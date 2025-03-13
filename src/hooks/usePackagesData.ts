@@ -1,6 +1,6 @@
 
 import { usePackagesData } from './packages/usePackagesData';
-import { Package } from './packages/types';
+import { Package, Milestone } from './packages/types';
 
-export type { Package };
+export type { Package, Milestone };
 export { usePackagesData };

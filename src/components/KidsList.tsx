@@ -16,6 +16,7 @@ interface KidsListProps {
   onAssignPackages?: (id: string, name: string) => void;
   onStartQuestions?: (id: string, name: string) => void;
   onResetPoints?: (id: string, name: string) => void;
+  onManageMilestones?: (id: string, name: string, points: number) => void;
 }
 
 const KidsList = ({
@@ -27,7 +28,8 @@ const KidsList = ({
   onAddKid,
   onAssignPackages,
   onStartQuestions,
-  onResetPoints
+  onResetPoints,
+  onManageMilestones
 }: KidsListProps) => {
   const { t } = useLanguage();
   
@@ -63,6 +65,7 @@ const KidsList = ({
                         onAssignPackages={onAssignPackages}
                         onStartQuestions={onStartQuestions}
                         onResetPoints={onResetPoints}
+                        onManageMilestones={onManageMilestones}
                       />
                     </div>}
                 </Draggable>)}

@@ -7,10 +7,15 @@ import { useKidsDialogs } from '@/hooks/useKidsDialogs';
 import { useKidsDragDrop } from '@/hooks/useKidsDragDrop';
 import KidsHeader from './kids/KidsHeader';
 import KidsDialogs from './kids/KidsDialogs';
+import MilestonesDialog from './milestones/MilestonesDialog';
 
 const KidsManager = () => {
   const { kids, isLoading, fetchKids, deleteKid, reorderKids } = useKidsData();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Milestone dialog state
+  const [isMilestoneDialogOpen, setIsMilestoneDialogOpen] = useState(false);
+  const [selectedKidForMilestones, setSelectedKidForMilestones] = useState<{ id: string; name: string; points: number } | null>(null);
   
   const {
     // Kid form
@@ -61,6 +66,19 @@ const KidsManager = () => {
     fetchKids();
   };
   
+  // Milestone management functions
+  const openMilestoneDialog = (id: string, name: string, points: number) => {
+    setSelectedKidForMilestones({ id, name, points });
+    setIsMilestoneDialogOpen(true);
+  };
+  
+  const closeMilestoneDialog = () => {
+    setIsMilestoneDialogOpen(false);
+    setSelectedKidForMilestones(null);
+    // Refresh kids to update milestones on the card
+    fetchKids();
+  };
+  
   return (
     <div className="w-full max-w-4xl mx-auto">
       <KidsHeader onAddKid={openAddKidForm} />
@@ -75,6 +93,7 @@ const KidsManager = () => {
         onAssignPackages={openPackageForm}
         onStartQuestions={openQuestionSession}
         onResetPoints={openResetPointsDialog}
+        onManageMilestones={openMilestoneDialog}
       />
       
       <KidsDialogs
@@ -102,6 +121,17 @@ const KidsManager = () => {
         closeResetPointsDialog={closeResetPointsDialog}
         onPointsReset={fetchKids}
       />
+      
+      {/* Milestones Dialog */}
+      {selectedKidForMilestones && (
+        <MilestonesDialog
+          isOpen={isMilestoneDialogOpen}
+          onClose={closeMilestoneDialog}
+          kidId={selectedKidForMilestones.id}
+          kidName={selectedKidForMilestones.name}
+          kidPoints={selectedKidForMilestones.points}
+        />
+      )}
     </div>
   );
 };
