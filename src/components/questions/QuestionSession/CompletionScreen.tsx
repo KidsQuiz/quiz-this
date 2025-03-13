@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,16 +21,6 @@ const CompletionScreen = ({
 }: CompletionScreenProps) => {
   const { t } = useLanguage();
   
-  // Set up auto-close timer (5 seconds)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
-    
-    // Clean up the timer if component unmounts
-    return () => clearTimeout(timer);
-  }, [onClose]);
-  
   return (
     <>
       <DialogHeader>
@@ -46,10 +36,6 @@ const CompletionScreen = ({
         
         <div className="bg-primary/10 p-4 rounded-lg">
           <p>{t('youAnswered').replace('{correct}', correctAnswers.toString()).replace('{total}', totalQuestions.toString())}</p>
-        </div>
-        
-        <div className="text-sm text-muted-foreground animate-pulse">
-          {t('autoClosingIn')}...
         </div>
       </div>
       
