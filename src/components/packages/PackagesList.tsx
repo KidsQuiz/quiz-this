@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Package } from '@/hooks/usePackagesData';
-import { Edit, Trash2, Package as PackageIcon, Plus, MessageCircleQuestion } from 'lucide-react';
+import { Edit, Trash2, Package as PackageIcon, Plus, MessageCircleQuestion, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ interface PackagesListProps {
   isLoading: boolean;
   onEditPackage: (id: string) => void;
   onDeletePackage: (id: string) => void;
+  onClonePackage?: (id: string) => void;
   onAddPackage: () => void;
   alwaysShowAddCard?: boolean;
 }
@@ -21,7 +22,8 @@ const PackagesList = ({
   packages, 
   isLoading, 
   onEditPackage, 
-  onDeletePackage, 
+  onDeletePackage,
+  onClonePackage,
   onAddPackage,
   alwaysShowAddCard = false
 }: PackagesListProps) => {
@@ -86,15 +88,29 @@ const PackagesList = ({
                   size="sm" 
                   onClick={() => onEditPackage(pkg.id)}
                   className="h-8 w-8 p-0"
+                  title={t('edit')}
                 >
                   <Edit className="h-4 w-4" />
                   <span className="sr-only">{t('edit')}</span>
                 </Button>
+                {onClonePackage && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onClonePackage(pkg.id)}
+                    className="h-8 w-8 p-0"
+                    title={t('clone')}
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span className="sr-only">{t('clone')}</span>
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => onDeletePackage(pkg.id)}
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  title={t('delete')}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">{t('delete')}</span>

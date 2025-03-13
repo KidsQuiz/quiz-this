@@ -9,7 +9,7 @@ export const usePackagesData = () => {
   const { user } = useAuth();
   const [packages, setPackages] = useState<Package[]>([]);
   const { isLoading, fetchPackages } = usePackagesFetch();
-  const { deletePackage: deletePackageAction } = usePackagesManagement();
+  const { deletePackage: deletePackageAction, clonePackage: clonePackageAction } = usePackagesManagement();
 
   const loadPackages = async () => {
     if (!user) return;
@@ -28,11 +28,20 @@ export const usePackagesData = () => {
     }
     return success;
   };
+  
+  const clonePackage = async (id: string) => {
+    const newPackage = await clonePackageAction(id);
+    if (newPackage) {
+      await loadPackages(); // Reload all packages to get updated list
+    }
+    return !!newPackage;
+  };
 
   return {
     packages,
     isLoading,
     fetchPackages: loadPackages,
-    deletePackage
+    deletePackage,
+    clonePackage
   };
 };

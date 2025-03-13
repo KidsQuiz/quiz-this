@@ -7,7 +7,7 @@ import { Package as PackageIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const PackagesManager = () => {
-  const { packages, isLoading, fetchPackages, deletePackage } = usePackagesData();
+  const { packages, isLoading, fetchPackages, deletePackage, clonePackage } = usePackagesData();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>(undefined);
   const { t } = useLanguage();
@@ -36,6 +36,7 @@ const PackagesManager = () => {
         isLoading={isLoading}
         onEditPackage={handleEditPackage}
         onDeletePackage={deletePackage}
+        onClonePackage={clonePackage}
         onAddPackage={handleAddPackage}
         alwaysShowAddCard={true}
       />
