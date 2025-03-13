@@ -10,11 +10,13 @@ import { useCurrentQuestion } from './useCurrentQuestion';
 import { useSessionCompletion } from './useSessionCompletion';
 import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
 import { useTimeoutHandling } from './useTimeoutHandling';
-import { useSessionDialog } from './useSessionDialog';
+import { useDialogManagement } from './useDialogManagement';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   // Use session state hook for state management
   const {
@@ -148,14 +150,14 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   );
 
   // Handle dialog closing
-  const handleDialogClose = () => {
-    // Clean up any styles applied to the body
-    document.body.style.removeProperty('pointer-events');
-    
-    // Close the dialog and call the onClose callback
-    setIsModalOpen(false);
-    onClose();
-  };
+  const { handleDialogClose } = useDialogManagement(
+    setIsModalOpen,
+    onClose,
+    showBoomEffect,
+    sessionComplete,
+    correctAnswers,
+    questions
+  );
 
   // Handle timeouts
   useTimeoutHandling(
