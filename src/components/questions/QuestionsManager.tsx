@@ -1,61 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuestionsData } from '@/hooks/useQuestionsData';
+import { useLanguage } from '@/contexts/LanguageContext';
 import QuestionsList from './QuestionsList';
 import QuestionForm from './QuestionForm';
 import ImportQuestionsDialog from './ImportQuestionsDialog';
-import { useQuestionsData } from '@/hooks/useQuestionsData';
-import { MessageCircleQuestion, ArrowLeft, Upload, Plus, Trash2, CheckCheck, CheckSquare } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import QuestionsHeader from './QuestionsHeader';
+import { usePackageData } from '@/hooks/questions/usePackageData';
+import { useQuestionSelection } from '@/hooks/questions/useQuestionSelection';
+import { useDeleteQuestions } from '@/hooks/questions/useDeleteQuestions';
 
 const QuestionsManager = () => {
   const { packageId } = useParams<{ packageId: string }>();
-  const navigate = useNavigate();
-  const { questions, isLoading, fetchQuestions, deleteQuestion, deleteAllQuestions } = useQuestionsData(packageId);
   const { t } = useLanguage();
+  const { questions, isLoading, fetchQuestions, deleteQuestion } = useQuestionsData(packageId);
+  const { packageName } = usePackageData(packageId);
+  const { selectedQuestions, handleSelectQuestion, handleSelectAllQuestions, clearSelections } = useQuestionSelection(questions);
+  const { handleDeleteSelectedQuestions } = useDeleteQuestions(deleteQuestion, fetchQuestions);
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | undefined>(undefined);
-  const [packageName, setPackageName] = useState<string>('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set());
-  
-  useEffect(() => {
-    const getPackageName = async () => {
-      if (!packageId) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('packages')
-          .select('name')
-          .eq('id', packageId)
-          .single();
-          
-        if (error) throw error;
-        
-        if (data) {
-          setPackageName(data.name);
-        }
-      } catch (error) {
-        console.error('Error fetching package name:', error);
-      }
-    };
-    
-    getPackageName();
-  }, [packageId]);
   
   const handleAddQuestion = () => {
     setSelectedQuestionId(undefined);
@@ -71,40 +38,11 @@ const QuestionsManager = () => {
     setIsImportDialogOpen(true);
   };
 
-  const handleSelectQuestion = (id: string, isSelected: boolean) => {
-    const newSelected = new Set(selectedQuestions);
-    if (isSelected) {
-      newSelected.add(id);
-    } else {
-      newSelected.delete(id);
-    }
-    setSelectedQuestions(newSelected);
-  };
-
-  const handleSelectAllQuestions = () => {
-    if (selectedQuestions.size === questions.length) {
-      setSelectedQuestions(new Set());
-    } else {
-      const allQuestionIds = questions.map(q => q.id);
-      setSelectedQuestions(new Set(allQuestionIds));
-    }
-  };
-
-  const handleDeleteSelectedQuestions = async () => {
-    if (selectedQuestions.size === 0) return;
-    
-    let success = true;
-    for (const id of selectedQuestions) {
-      const result = await deleteQuestion(id, false);
-      if (!result) {
-        success = false;
-      }
-    }
-    
+  const handleDeleteSelected = async () => {
+    const success = await handleDeleteSelectedQuestions(selectedQuestions);
     if (success) {
-      setSelectedQuestions(new Set());
+      clearSelections();
       setIsDeleteDialogOpen(false);
-      fetchQuestions();
     }
   };
   
@@ -114,83 +52,17 @@ const QuestionsManager = () => {
   
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          className="mb-2 px-0"
-          onClick={() => navigate('/packages')}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {t('packages')}
-        </Button>
-        
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium flex items-center gap-2">
-            <MessageCircleQuestion className="h-5 w-5" />
-            <span>{t('questions')} {packageName}</span>
-          </h3>
-          <div className="flex gap-2">
-            {questions.length > 0 && (
-              <>
-                <Button 
-                  variant="outline" 
-                  onClick={handleSelectAllQuestions}
-                  className="flex items-center gap-2"
-                >
-                  <CheckSquare className="h-4 w-4" />
-                  <span>
-                    {selectedQuestions.size === questions.length ? t('deselectAllQuestions') : t('selectAllQuestions')}
-                  </span>
-                </Button>
-                {selectedQuestions.size > 0 && (
-                  <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        className="flex items-center gap-2 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span>{t('deleteSelected')} ({selectedQuestions.size})</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t('deleteSelectedQuestions')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t('deleteSelectedQuestionsConfirmation')}
-                          {' '}
-                          {t('thisActionCannotBeUndone')}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={handleDeleteSelectedQuestions}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {t('deleteSelected')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </>
-            )}
-            <Button 
-              variant="outline" 
-              onClick={handleOpenImportDialog} 
-              className="flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              <span>{t('import')}</span>
-            </Button>
-            <Button onClick={handleAddQuestion} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              <span>{t('addQuestion')}</span>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <QuestionsHeader 
+        packageName={packageName}
+        questions={questions}
+        selectedQuestions={selectedQuestions}
+        onSelectAllQuestions={handleSelectAllQuestions}
+        onDeleteSelected={handleDeleteSelected}
+        onAddQuestion={handleAddQuestion}
+        onOpenImportDialog={handleOpenImportDialog}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+      />
       
       <QuestionsList 
         questions={questions}
