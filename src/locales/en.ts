@@ -92,6 +92,7 @@ export const en = {
   youAnswered: 'You answered {correct} out of {total} questions correctly.',
   noPackagesSelected: 'No packages selected',
   pleaseSelectPackages: 'Please select at least one question package to start.',
+  autoClosingIn: 'Auto-closing in a moment',
   
   // Language
   language: 'Language',
