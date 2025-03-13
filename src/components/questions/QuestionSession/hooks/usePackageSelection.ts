@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const usePackageSelection = (
@@ -65,7 +65,7 @@ export const usePackageSelection = (
   }, [kidId, kidName, onClose, toast]);
 
   // Handle package selection
-  const togglePackageSelection = (packageId: string) => {
+  const togglePackageSelection = useCallback((packageId: string) => {
     setSelectedPackageIds(prev => {
       if (prev.includes(packageId)) {
         return prev.filter(id => id !== packageId);
@@ -73,17 +73,17 @@ export const usePackageSelection = (
         return [...prev, packageId];
       }
     });
-  };
+  }, []);
 
   // Select all packages
-  const selectAllPackages = () => {
+  const selectAllPackages = useCallback(() => {
     setSelectedPackageIds(questionPackages.map(pkg => pkg.id));
-  };
+  }, [questionPackages]);
 
   // Deselect all packages
-  const deselectAllPackages = () => {
+  const deselectAllPackages = useCallback(() => {
     setSelectedPackageIds([]);
-  };
+  }, []);
 
   return {
     questionPackages,
