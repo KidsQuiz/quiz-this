@@ -12,6 +12,7 @@ import AnswerOptionsList from './components/AnswerOptionsList';
 import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
 import { Card, CardContent } from '@/components/ui/card';
+import { Clock } from 'lucide-react';
 
 interface QuestionDisplayProps {
   currentQuestion: Question;
@@ -38,12 +39,20 @@ const QuestionDisplay = ({
   showWowEffect,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
-  // Play sound effect when answer is submitted
+  // Play sound effect when answer is submitted or time runs out
   useEffect(() => {
     if (answerSubmitted) {
-      playSound(isCorrect ? 'correct' : 'incorrect');
+      // If time ran out (no selection made) play the incorrect sound
+      if (selectedAnswerId === null && timeRemaining === 0) {
+        playSound('incorrect');
+      } else if (selectedAnswerId !== null) {
+        playSound(isCorrect ? 'correct' : 'incorrect');
+      }
     }
-  }, [answerSubmitted, isCorrect]);
+  }, [answerSubmitted, isCorrect, selectedAnswerId, timeRemaining]);
+
+  // Check if time ran out
+  const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -74,11 +83,18 @@ const QuestionDisplay = ({
                 
                 {answerSubmitted && (
                   <div className="mt-4">
-                    <FeedbackMessage 
-                      isCorrect={isCorrect}
-                      points={currentQuestion.points}
-                      answerSubmitted={answerSubmitted}
-                    />
+                    {timeRanOut ? (
+                      <div className="bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-red-500" />
+                        <p className="text-red-700 dark:text-red-400 font-medium">Time's up! Moving to next question...</p>
+                      </div>
+                    ) : (
+                      <FeedbackMessage 
+                        isCorrect={isCorrect}
+                        points={currentQuestion.points}
+                        answerSubmitted={answerSubmitted}
+                      />
+                    )}
                   </div>
                 )}
               </div>

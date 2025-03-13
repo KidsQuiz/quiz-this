@@ -25,13 +25,14 @@ export const useQuestionNavigation = () => {
   }, [timerActive, timeRemaining]);
 
   // Handle when time is up
-  const handleTimeUp = (answerSubmitted: boolean, timeBetweenQuestions: number) => {
+  const handleTimeUp = (answerSubmitted: boolean, timeBetweenQuestions: number, onClose: () => void) => {
     if (answerSubmitted) return;
     
     setTimerActive(false);
     
-    // Wait for the time between questions before moving to next
+    // Wait for the time between questions before moving to next or closing
     setTimeout(() => {
+      // Check if this was the last question
       setCurrentQuestionIndex(prev => prev + 1);
     }, timeBetweenQuestions * 1000);
     

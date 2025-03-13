@@ -10,6 +10,7 @@ import { useCurrentQuestion } from './useCurrentQuestion';
 import { useSessionCompletion } from './useSessionCompletion';
 import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
@@ -135,6 +136,38 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     originalHandleSelectAnswer,
     setKidAnswers
   );
+
+  // Monitor time remaining and close the question dialog when time elapses
+  useEffect(() => {
+    if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
+    
+    if (timeRemaining === 0) {
+      // Mark as submitted with no selection
+      setAnswerSubmitted(true);
+      
+      // Wait 2 seconds to show the timeout state, then move to next question
+      setTimeout(() => {
+        if (currentQuestionIndex >= questions.length - 1) {
+          // Last question, will complete the session
+          setSessionComplete(true);
+        } else {
+          // Close current question dialog to trigger opening the next one
+          setIsModalOpen(false);
+        }
+      }, 2000);
+    }
+  }, [
+    timeRemaining, 
+    currentQuestion, 
+    isConfiguring, 
+    sessionComplete, 
+    answerSubmitted, 
+    setAnswerSubmitted, 
+    currentQuestionIndex, 
+    questions.length, 
+    setSessionComplete,
+    setIsModalOpen
+  ]);
 
   return {
     isConfiguring,
