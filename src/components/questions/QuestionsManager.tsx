@@ -7,11 +7,13 @@ import { useQuestionsData } from '@/hooks/useQuestionsData';
 import { MessageCircleQuestion, ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const QuestionsManager = () => {
   const { packageId } = useParams<{ packageId: string }>();
   const navigate = useNavigate();
   const { questions, isLoading, fetchQuestions, deleteQuestion } = useQuestionsData(packageId);
+  const { t } = useLanguage();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | undefined>(undefined);
@@ -64,16 +66,16 @@ const QuestionsManager = () => {
           onClick={() => navigate('/packages')}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Packages
+          {t('packages')}
         </Button>
         
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium flex items-center gap-2">
             <MessageCircleQuestion className="h-5 w-5" />
-            <span>Questions in {packageName}</span>
+            <span>{t('questions')} {packageName}</span>
           </h3>
           <Button onClick={handleAddQuestion} className="flex items-center gap-2">
-            <span>Add Question</span>
+            <span>{t('addQuestion')}</span>
           </Button>
         </div>
       </div>

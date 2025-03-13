@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import AnswerOptionItem from './AnswerOptionItem';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface AnswerFormOption {
   id: string;  // Added id field to make it required
@@ -20,9 +21,11 @@ const AnswerOptionsList = ({
   isLoading, 
   onAnswerChange 
 }: AnswerOptionsListProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="space-y-4">
-      <Label>Answer Options</Label>
+      <Label>{t('answerOptions')}</Label>
       
       {answers.map((answer, index) => (
         <AnswerOptionItem 
@@ -36,7 +39,7 @@ const AnswerOptionsList = ({
       ))}
       
       <p className="text-xs text-muted-foreground">
-        Check the box next to each correct answer. At least one answer must be marked as correct.
+        {t('answerOptions')}
       </p>
     </div>
   );

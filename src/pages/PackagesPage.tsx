@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Dashboard from '@/components/Dashboard';
-import { Users, Package } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const PackagesPage = () => {
   const [activeTab, setActiveTab] = useState('packages');
+  const { t } = useLanguage();
 
   const handleTabChange = (value) => {
     setActiveTab(value);

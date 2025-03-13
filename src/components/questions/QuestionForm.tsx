@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import QuestionMetadataFields from './QuestionMetadataFields';
 import AnswerOptionsList from './AnswerOptionsList';
 import { useQuestionForm } from '@/hooks/useQuestionForm';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuestionFormProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface QuestionFormProps {
 
 const QuestionForm = ({ isOpen, onClose, onSave, questionId, packageId }: QuestionFormProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   
   const {
     content,
@@ -38,17 +40,17 @@ const QuestionForm = ({ isOpen, onClose, onSave, questionId, packageId }: Questi
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Question' : 'Create Question'}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('editQuestion') : t('addQuestion')}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={(e) => handleSubmit(e, user?.id)} className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="content">Question</Label>
+            <Label htmlFor="content">{t('question')}</Label>
             <Textarea
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Enter your question"
+              placeholder={t('questionText')}
               disabled={isLoading}
               required
               className="min-h-20"
@@ -76,13 +78,13 @@ const QuestionForm = ({ isOpen, onClose, onSave, questionId, packageId }: Questi
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button 
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
+              {isLoading ? t('loading') : (isEditMode ? t('update') : t('create'))}
             </Button>
           </DialogFooter>
         </form>

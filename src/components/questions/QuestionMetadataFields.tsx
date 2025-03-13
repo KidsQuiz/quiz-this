@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Clock, Star } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuestionMetadataFieldsProps {
   timeLimit: string;
@@ -19,12 +20,14 @@ const QuestionMetadataFields = ({
   onTimeLimitChange,
   onPointsChange
 }: QuestionMetadataFieldsProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
         <Label htmlFor="timeLimit" className="flex items-center gap-1">
           <Clock className="h-4 w-4" />
-          <span>Time Limit (seconds)</span>
+          <span>{t('questionTimeLimit')}</span>
         </Label>
         <Input
           id="timeLimit"
@@ -41,7 +44,7 @@ const QuestionMetadataFields = ({
       <div className="space-y-2">
         <Label htmlFor="points" className="flex items-center gap-1">
           <Star className="h-4 w-4" />
-          <span>Points</span>
+          <span>{t('questionPoints')}</span>
         </Label>
         <Input
           id="points"

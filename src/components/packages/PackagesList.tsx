@@ -6,6 +6,7 @@ import { Package } from '@/hooks/usePackagesData';
 import { Edit, Trash2, Package as PackageIcon, Plus, MessageCircleQuestion } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PackagesListProps {
   packages: Package[];
@@ -25,6 +26,7 @@ const PackagesList = ({
   alwaysShowAddCard = false
 }: PackagesListProps) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   if (isLoading) {
     return (
@@ -39,13 +41,13 @@ const PackagesList = ({
   if (packages.length === 0 && !alwaysShowAddCard) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">No packages created yet.</p>
+        <p className="text-muted-foreground">{t('noPackages')}</p>
         <Button 
           variant="outline" 
           onClick={onAddPackage} 
           className="mt-4"
         >
-          Create your first package
+          {t('createFirstPackage')}
         </Button>
       </div>
     );
@@ -62,8 +64,8 @@ const PackagesList = ({
             <Plus className="h-6 w-6 text-primary" />
           </div>
         </div>
-        <h3 className="font-medium">Add New Package</h3>
-        <p className="text-sm text-muted-foreground mt-1">Create a new collection of questions</p>
+        <h3 className="font-medium">{t('addPackage')}</h3>
+        <p className="text-sm text-muted-foreground mt-1">{t('createFirstPackage')}</p>
       </div>
     </Card>
   );
@@ -86,7 +88,7 @@ const PackagesList = ({
                   className="h-8 w-8 p-0"
                 >
                   <Edit className="h-4 w-4" />
-                  <span className="sr-only">Edit</span>
+                  <span className="sr-only">{t('edit')}</span>
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -95,7 +97,7 @@ const PackagesList = ({
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  <span className="sr-only">{t('delete')}</span>
                 </Button>
               </div>
             </div>
@@ -107,7 +109,7 @@ const PackagesList = ({
             <div className="flex items-center justify-between mt-4">
               <Badge variant="outline" className="flex items-center gap-1">
                 <MessageCircleQuestion className="h-3 w-3" />
-                <span>{pkg.question_count || 0} Questions</span>
+                <span>{pkg.question_count || 0} {t('questions')}</span>
               </Badge>
               
               <Button
@@ -117,7 +119,7 @@ const PackagesList = ({
                 className="flex items-center gap-1"
               >
                 <MessageCircleQuestion className="h-4 w-4" />
-                <span>Manage Questions</span>
+                <span>{t('questions')}</span>
               </Button>
             </div>
           </div>

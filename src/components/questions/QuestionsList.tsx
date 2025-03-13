@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Question } from '@/hooks/useQuestionsData';
 import { Edit, Trash2, Timer, Star, Plus, MessageCircleQuestion } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuestionsListProps {
   questions: Question[];
@@ -22,6 +23,8 @@ const QuestionsList = ({
   onAddQuestion,
   packageName
 }: QuestionsListProps) => {
+  const { t } = useLanguage();
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4">
@@ -37,8 +40,8 @@ const QuestionsList = ({
       <div className="text-center py-12">
         <p className="text-muted-foreground">
           {packageName 
-            ? `No questions in ${packageName} package yet.` 
-            : "No questions created yet."
+            ? `${t('noPackages')} ${packageName} ${t('package')}` 
+            : t('noPackages')
           }
         </p>
         <Button 
@@ -46,7 +49,7 @@ const QuestionsList = ({
           onClick={onAddQuestion} 
           className="mt-4"
         >
-          Create your first question
+          {t('createFirstPackage')}
         </Button>
       </div>
     );
@@ -68,7 +71,7 @@ const QuestionsList = ({
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Star className="h-4 w-4" />
-                    <span>{question.points} pts</span>
+                    <span>{question.points} {t('points')}</span>
                   </div>
                 </div>
               </div>
@@ -81,7 +84,7 @@ const QuestionsList = ({
                   className="h-8 w-8 p-0"
                 >
                   <Edit className="h-4 w-4" />
-                  <span className="sr-only">Edit</span>
+                  <span className="sr-only">{t('edit')}</span>
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -90,7 +93,7 @@ const QuestionsList = ({
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  <span className="sr-only">{t('delete')}</span>
                 </Button>
               </div>
             </div>
@@ -104,7 +107,7 @@ const QuestionsList = ({
         className="w-full py-6 border-dashed flex items-center justify-center gap-2"
       >
         <Plus className="h-4 w-4" />
-        <span>Add New Question</span>
+        <span>{t('addQuestion')}</span>
       </Button>
     </div>
   );

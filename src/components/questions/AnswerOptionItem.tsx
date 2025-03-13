@@ -2,6 +2,7 @@
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AnswerOptionItemProps {
   content: string;
@@ -18,6 +19,8 @@ const AnswerOptionItem = ({
   disabled, 
   onChange 
 }: AnswerOptionItemProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex items-start gap-2">
       <Checkbox
@@ -33,7 +36,7 @@ const AnswerOptionItem = ({
           id={`answer-${index}`}
           value={content}
           onChange={(e) => onChange(index, 'content', e.target.value)}
-          placeholder={`Answer option ${index + 1}`}
+          placeholder={`${t('answerOptions')} ${index + 1}`}
           disabled={disabled}
           className={isCorrect ? "border-green-500" : ""}
         />
