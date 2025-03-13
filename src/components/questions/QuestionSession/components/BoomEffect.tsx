@@ -55,32 +55,34 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <style jsx global>{`
-        @keyframes boom-particle {
-          0% {
-            transform: translate(0, 0) scale(0);
-            opacity: 0;
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes boom-particle {
+            0% {
+              transform: translate(0, 0) scale(0);
+              opacity: 0;
+            }
+            10% {
+              opacity: 1;
+            }
+            100% {
+              transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 300}px) scale(1) rotate(${Math.random() * 360}deg);
+              opacity: 0;
+            }
           }
-          10% {
-            opacity: 1;
+          
+          @keyframes boom-scale {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
           }
-          100% {
-            transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 300}px) scale(1) rotate(${Math.random() * 360}deg);
-            opacity: 0;
+          
+          @keyframes boom-rotate {
+            0% { transform: rotate(0deg) scale(0.8); }
+            100% { transform: rotate(360deg) scale(1); }
           }
-        }
-        
-        @keyframes boom-scale {
-          0% { transform: scale(0.5); opacity: 0; }
-          50% { transform: scale(1.2); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes boom-rotate {
-          0% { transform: rotate(0deg) scale(0.8); }
-          100% { transform: rotate(360deg) scale(1); }
-        }
-      `}</style>
+        `
+      }} />
       
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-fade-in" />
