@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PackageFormProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface PackageFormProps {
 
 const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +48,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         console.error('Error fetching package:', error.message);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to load package information"
+          title: t("error"),
+          description: t("somethingWentWrong")
         });
       } finally {
         setIsLoading(false);
@@ -61,7 +63,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
       setName('');
       setDescription('');
     }
-  }, [isOpen, packageId, isEditMode]);
+  }, [isOpen, packageId, isEditMode, t]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +71,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
     if (!user) {
       toast({
         variant: "destructive",
-        title: "Authentication Error",
-        description: "You must be logged in to add or edit packages."
+        title: t("error"),
+        description: t("somethingWentWrong")
       });
       return;
     }
@@ -78,8 +80,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
     if (!name) {
       toast({
         variant: "destructive",
-        title: "Missing Information",
-        description: "Please provide a package name."
+        title: t("error"),
+        description: t("somethingWentWrong")
       });
       return;
     }
@@ -100,8 +102,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Package updated successfully"
+          title: t("update"),
+          description: t("somethingWentWrong")
         });
       } else {
         const { error } = await supabase
@@ -115,8 +117,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Package created successfully"
+          title: t("create"),
+          description: t("somethingWentWrong")
         });
       }
       
@@ -126,8 +128,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
       console.error('Error saving package:', error.message);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to save package information."
+        title: t("error"),
+        description: error.message || t("somethingWentWrong")
       });
     } finally {
       setIsLoading(false);
@@ -138,29 +140,29 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Package' : 'Create Package'}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('editPackage') : t('addPackage')}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Package Name</Label>
+            <Label htmlFor="name">{t('packageName')}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter package name"
+              placeholder={t('packageName')}
               disabled={isLoading}
               required
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">{t('packageDescription')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter package description"
+              placeholder={t('packageDescription')}
               disabled={isLoading}
               rows={3}
             />
@@ -173,13 +175,13 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button 
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
+              {isLoading ? t('loading') : (isEditMode ? t('update') : t('create'))}
             </Button>
           </DialogFooter>
         </form>

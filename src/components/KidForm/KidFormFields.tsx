@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidFormFieldsProps {
   name: string;
@@ -22,28 +23,30 @@ const KidFormFields = ({
   onAgeChange, 
   onPointsChange 
 }: KidFormFieldsProps) => {
+  const { t } = useLanguage();
+  
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t('name')}</Label>
         <Input
           id="name"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder="Child's name"
+          placeholder={t('name')}
           disabled={isLoading}
           required
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="age">Age</Label>
+        <Label htmlFor="age">{t('age')}</Label>
         <Input
           id="age"
           type="number"
           value={age}
           onChange={(e) => onAgeChange(e.target.value)}
-          placeholder="Child's age"
+          placeholder={t('age')}
           min="0"
           max="18"
           disabled={isLoading}
@@ -52,13 +55,13 @@ const KidFormFields = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="points">Points</Label>
+        <Label htmlFor="points">{t('points')}</Label>
         <Input
           id="points"
           type="number"
           value={points}
           onChange={(e) => onPointsChange(e.target.value)}
-          placeholder="Points"
+          placeholder={t('points')}
           min="0"
           disabled={isLoading}
           required

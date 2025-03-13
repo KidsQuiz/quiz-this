@@ -4,6 +4,7 @@ import KidCard from './KidCard';
 import { Button } from '@/components/ui/button';
 import { Kid } from '@/hooks/useKidsData';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidsListProps {
   kids: Kid[];
@@ -28,6 +29,8 @@ const KidsList = ({
   onStartQuestions,
   onResetPoints
 }: KidsListProps) => {
+  const { t } = useLanguage();
+  
   if (isLoading) {
     return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {[1, 2, 3].map(i => <div key={i} className="h-56 rounded-lg bg-muted animate-pulse"></div>)}
@@ -36,9 +39,9 @@ const KidsList = ({
   
   if (kids.length === 0) {
     return <div className="text-center py-12">
-        <p className="text-muted-foreground">No kids added yet.</p>
+        <p className="text-muted-foreground">{t('noPackages')}</p>
         <Button variant="outline" onClick={onAddKid} className="mt-4">
-          Add your first kid
+          {t('addKid')}
         </Button>
       </div>;
   }

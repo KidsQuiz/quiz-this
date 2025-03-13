@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { PackageWithAssignment, useKidPackages } from '@/hooks/useKidPackages';
 import { PackageIcon } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidPackagesFormProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
   const { fetchPackagesWithAssignmentStatus, assignPackageToKid } = useKidPackages(kidId);
   const [packages, setPackages] = useState<PackageWithAssignment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
   
   useEffect(() => {
     const loadPackages = async () => {
@@ -68,9 +70,9 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
     }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Assign Question Packages to {kidName}</DialogTitle>
+          <DialogTitle>{t('selectQuestionPackages')} {kidName}</DialogTitle>
           <DialogDescription>
-            Select which question packages should be assigned to {kidName}.
+            {t('selectQuestionPackages')} {kidName}.
           </DialogDescription>
         </DialogHeader>
         
@@ -83,9 +85,9 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
             </div>
           ) : packages.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-muted-foreground">No question packages available.</p>
+              <p className="text-muted-foreground">{t('noPackages')}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Create packages first to assign them to {kidName}.
+                {t('createFirstPackage')} {kidName}.
               </p>
             </div>
           ) : (
@@ -104,7 +106,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
                   
                   <div className="flex items-center gap-2">
                     <Label htmlFor={`package-${pkg.id}`} className="sr-only">
-                      Assign package
+                      {t('package')}
                     </Label>
                     <Switch
                       id={`package-${pkg.id}`}
@@ -119,7 +121,7 @@ const KidPackagesForm = ({ isOpen, onClose, kidId, kidName }: KidPackagesFormPro
         </div>
         
         <DialogFooter>
-          <Button onClick={handleDialogClose}>Done</Button>
+          <Button onClick={handleDialogClose}>{t('close')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

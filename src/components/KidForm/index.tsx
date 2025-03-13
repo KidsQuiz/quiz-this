@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import KidFormFields from './KidFormFields';
 import AvatarUploader from './AvatarUploader';
 import { uploadAvatar, getMaxPosition, fetchKidData } from './kidFormUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidFormProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface KidFormProps {
 
 const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [age, setAge] = useState<string>('');
   const [points, setPoints] = useState<string>('0');
@@ -59,8 +61,8 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     if (!user) {
       toast({
         variant: "destructive",
-        title: "Authentication Error",
-        description: "You must be logged in to add or edit kids."
+        title: t("error"),
+        description: t("somethingWentWrong")
       });
       return;
     }
@@ -68,8 +70,8 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     if (!name || !age) {
       toast({
         variant: "destructive",
-        title: "Missing Information",
-        description: "Please provide both name and age."
+        title: t("error"),
+        description: t("somethingWentWrong")
       });
       return;
     }
@@ -94,8 +96,8 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Kid updated successfully!"
+          title: t("update"),
+          description: t("somethingWentWrong")
         });
       } else {
         // Get the next position for the new kid
@@ -115,8 +117,8 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
         if (error) throw error;
         
         toast({
-          title: "Success",
-          description: "Kid added successfully!"
+          title: t("create"),
+          description: t("somethingWentWrong")
         });
       }
       
@@ -126,8 +128,8 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
       console.error('Error saving kid:', error.message);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to save kid information."
+        title: t("error"),
+        description: error.message || t("somethingWentWrong")
       });
     } finally {
       setIsLoading(false);
@@ -138,7 +140,7 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Kid' : 'Add Kid'}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('edit') : t('addKid')}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -165,13 +167,13 @@ const KidForm = ({ isOpen, onClose, onSave, kidId }: KidFormProps) => {
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button 
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : (isEditMode ? 'Update' : 'Add')}
+              {isLoading ? t('loading') : (isEditMode ? t('update') : t('create'))}
             </Button>
           </DialogFooter>
         </form>

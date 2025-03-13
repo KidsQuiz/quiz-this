@@ -22,7 +22,7 @@ const NotFound = () => {
         <h1 className="text-6xl font-bold mb-4">404</h1>
         <p className="text-xl text-muted-foreground mb-6">{t('error')}</p>
         <p className="mb-6 text-muted-foreground">
-          The page you are looking for doesn't exist or has been moved.
+          {t('somethingWentWrong')}
         </p>
         <div className="flex justify-center gap-4">
           <Button asChild>
