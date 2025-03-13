@@ -13,8 +13,7 @@ const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="px-2">
           <Globe className="h-5 w-5 mr-2" />
-          <span className="hidden sm:inline">{t('language')}</span>
-          <span className="uppercase ml-1">{currentLanguage}</span>
+          <span className="uppercase">{currentLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
