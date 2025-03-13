@@ -1,21 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import PackageFormContent from './PackageFormContent';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface PackageFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  packageId?: string;
-}
-
-const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) => {
+export const usePackageForm = (packageId?: string, onSave?: () => void, onClose?: () => void) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [name, setName] = useState('');
@@ -56,7 +46,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
       }
     };
     
-    if (isOpen && isEditMode) {
+    if (packageId) {
       loadPackageData();
     } else {
       // Reset form when opening in add mode
@@ -64,7 +54,7 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
       setDescription('');
       setPresentationOrder('shuffle');
     }
-  }, [isOpen, packageId, isEditMode, t]);
+  }, [packageId, t]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,8 +115,8 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
         });
       }
       
-      onSave();
-      onClose();
+      if (onSave) onSave();
+      if (onClose) onClose();
     } catch (error: any) {
       console.error('Error saving package:', error.message);
       toast({
@@ -139,44 +129,15 @@ const PackageForm = ({ isOpen, onClose, onSave, packageId }: PackageFormProps) =
     }
   };
   
-  return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? t('editPackage') : t('addPackage')}</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <PackageFormContent 
-            name={name}
-            setName={setName}
-            description={description}
-            setDescription={setDescription}
-            presentationOrder={presentationOrder}
-            setPresentationOrder={setPresentationOrder}
-            isLoading={isLoading}
-          />
-          
-          <DialogFooter className="pt-4">
-            <Button 
-              variant="outline" 
-              type="button" 
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              {t('cancel')}
-            </Button>
-            <Button 
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? t('loading') : (isEditMode ? t('update') : t('create'))}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+  return {
+    name,
+    setName,
+    description,
+    setDescription,
+    presentationOrder,
+    setPresentationOrder,
+    isLoading,
+    isEditMode,
+    handleSubmit
+  };
 };
-
-export default PackageForm;
