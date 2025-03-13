@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -31,6 +31,13 @@ const ConfigScreen = ({
   const { t } = useLanguage();
   
   const noPackagesAvailable = questionPackages.length === 0 && !isLoading;
+  
+  // Automatically select all packages when component mounts
+  useEffect(() => {
+    if (!isLoading && questionPackages.length > 0) {
+      selectAllPackages();
+    }
+  }, [isLoading, questionPackages, selectAllPackages]);
   
   return (
     <>
