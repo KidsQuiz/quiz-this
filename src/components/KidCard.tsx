@@ -68,7 +68,21 @@ const KidCard = ({
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="self-stretch flex justify-end items-center mb-4 gap-2">
-            {/* Package Selection Button */}
+            {/* Start Questions Mini Button - Now first position */}
+            {onStartQuestions && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 p-0 rounded-full bg-background text-primary hover:bg-accent flex items-center justify-center"
+                onClick={() => onStartQuestions(id, name)}
+                title={t('startSession')}
+              >
+                <PlayCircle className="h-4 w-4" />
+                <span className="sr-only">{t('startSession')}</span>
+              </Button>
+            )}
+            
+            {/* Package Selection Button - Now second position */}
             {onAssignPackages && (
               <Button
                 size="icon"
@@ -87,20 +101,6 @@ const KidCard = ({
                   </Badge>
                 )}
                 <span className="sr-only">{t('assignPackages')}</span>
-              </Button>
-            )}
-            
-            {/* Start Questions Mini Button */}
-            {onStartQuestions && (
-              <Button
-                size="icon"
-                variant="outline"
-                className="h-8 w-8 p-0 rounded-full bg-background text-primary hover:bg-accent flex items-center justify-center"
-                onClick={() => onStartQuestions(id, name)}
-                title={t('startSession')}
-              >
-                <PlayCircle className="h-4 w-4" />
-                <span className="sr-only">{t('startSession')}</span>
               </Button>
             )}
             
