@@ -55,19 +55,16 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Determine effective open state as a combination of parent control and internal state
   const effectiveOpenState = isOpen && isModalOpen;
 
-  // Handle dialog close with proper cleanup
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      // When dialog is closing, call our custom close handler
-      handleDialogClose();
-    }
-  };
-
   return (
     <>
       <Dialog 
         open={effectiveOpenState} 
-        onOpenChange={handleOpenChange}
+        onOpenChange={(open) => {
+          if (!open) {
+            // When dialog is closing, call our custom close handler
+            handleDialogClose();
+          }
+        }}
       >
         <DialogContent 
           className="sm:max-w-[95vw] md:max-w-[92vw] lg:max-w-[1100px] h-[92vh] max-h-[800px] p-4 flex flex-col overflow-hidden"
@@ -118,7 +115,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
               totalPoints={totalPoints}
               correctAnswers={correctAnswers}
               totalQuestions={questions.length}
-              onClose={onClose}
+              onClose={handleDialogClose}
             />
           )}
         </DialogContent>

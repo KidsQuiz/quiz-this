@@ -26,14 +26,8 @@ export const useSessionCompletion = (
       console.log(`Session complete: correctAnswers=${correctAnswers}, totalQuestions=${questions.length}`);
       setSessionComplete(true);
       
-      // Check if the kid answered all questions correctly
-      const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
-      console.log(`Perfect score check: ${isPerfectScore} (${correctAnswers}/${questions.length})`);
-      
-      if (isPerfectScore) {
-        console.log("🎉🎉🎉 PERFECT SCORE! Showing boom effect");
-        setShowBoomEffect(true);
-      }
+      // We'll trigger the boom effect in the useQuestionSession component when dialog closes
+      // instead of here, so we can ensure it appears after the dialog is closed
       
       // Update kid's points in the database
       const updateKidPoints = async () => {

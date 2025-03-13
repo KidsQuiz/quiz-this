@@ -5,6 +5,9 @@ export const useSessionDialog = (
   onClose: () => void,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  // This hook is now deprecated as we're handling dialog closing 
+  // directly in useQuestionSession to check for perfect scores
+  
   // Handle dialog close and terminate the session
   const handleDialogClose = () => {
     // Clean up any styles applied to the body
