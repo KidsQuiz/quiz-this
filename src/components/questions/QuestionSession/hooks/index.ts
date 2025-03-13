@@ -10,3 +10,5 @@ export { useModalTransition } from './useModalTransition';
 export { useCurrentQuestion } from './useCurrentQuestion';
 export { useSessionCompletion } from './useSessionCompletion';
 export { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
+export { useTimeoutHandling } from './useTimeoutHandling';
+export { useSessionDialog } from './useSessionDialog';
