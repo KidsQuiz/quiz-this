@@ -80,6 +80,15 @@ export const en = {
   answerOptions: 'Answer Options',
   correctAnswer: 'Correct Answer',
   incorrectAnswer: 'Incorrect Answer',
+  import: 'Import',
+  importing: 'Importing...',
+  importQuestions: 'Import Questions',
+  importQuestionsInstructions: 'Import questions from a CSV file with the following structure:',
+  csvMustContain: 'CSV must contain columns: question, answer1, answer2, answer3, answer4, correctAnswer, points, timelimit (optional)',
+  csvExample: 'Example: correctAnswer should be 1, 2, 3, or 4 to indicate which answer is correct',
+  correctAnswerNote: 'correctAnswer should be a number (1-4) corresponding to the correct answer option',
+  clickToSelectCSV: 'Click to select a CSV file',
+  onlyCSVSupported: 'Only CSV files are supported',
   
   // Quiz Session
   startSession: 'Start Session',

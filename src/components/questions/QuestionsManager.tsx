@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import QuestionsList from './QuestionsList';
 import QuestionForm from './QuestionForm';
+import ImportQuestionsDialog from './ImportQuestionsDialog';
 import { useQuestionsData } from '@/hooks/useQuestionsData';
-import { MessageCircleQuestion, ArrowLeft } from 'lucide-react';
+import { MessageCircleQuestion, ArrowLeft, Upload, Plus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +17,7 @@ const QuestionsManager = () => {
   const { t } = useLanguage();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | undefined>(undefined);
   const [packageName, setPackageName] = useState<string>('');
   
@@ -53,6 +55,10 @@ const QuestionsManager = () => {
     setIsFormOpen(true);
   };
   
+  const handleOpenImportDialog = () => {
+    setIsImportDialogOpen(true);
+  };
+  
   if (!packageId) {
     return <div>{t('somethingWentWrong')}</div>;
   }
@@ -74,9 +80,20 @@ const QuestionsManager = () => {
             <MessageCircleQuestion className="h-5 w-5" />
             <span>{t('questions')} {packageName}</span>
           </h3>
-          <Button onClick={handleAddQuestion} className="flex items-center gap-2">
-            <span>{t('addQuestion')}</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleOpenImportDialog} 
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              <span>{t('import')}</span>
+            </Button>
+            <Button onClick={handleAddQuestion} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              <span>{t('addQuestion')}</span>
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -94,6 +111,13 @@ const QuestionsManager = () => {
         onClose={() => setIsFormOpen(false)}
         onSave={fetchQuestions}
         questionId={selectedQuestionId}
+        packageId={packageId}
+      />
+      
+      <ImportQuestionsDialog
+        isOpen={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
+        onSuccess={fetchQuestions}
         packageId={packageId}
       />
     </div>
