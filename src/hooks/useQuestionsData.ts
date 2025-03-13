@@ -11,7 +11,7 @@ export const useQuestionsData = (packageId?: string) => {
   const { user } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const { isLoading, fetchQuestions, fetchAnswerOptions } = useQuestionsFetch(packageId);
-  const { deleteQuestion: deleteQuestionAction } = useQuestionsManagement();
+  const { deleteQuestion: deleteQuestionAction, deleteAllQuestions: deleteAllQuestionsAction } = useQuestionsManagement();
   
   const loadQuestions = async () => {
     const data = await fetchQuestions(user?.id);
@@ -29,11 +29,22 @@ export const useQuestionsData = (packageId?: string) => {
     }
   };
 
+  const deleteAllQuestions = async () => {
+    if (!packageId) return false;
+    
+    const success = await deleteAllQuestionsAction(packageId);
+    if (success) {
+      setQuestions([]);
+    }
+    return success;
+  };
+
   return {
     questions,
     isLoading,
     fetchQuestions: loadQuestions,
     fetchAnswerOptions,
-    deleteQuestion
+    deleteQuestion,
+    deleteAllQuestions
   };
 };

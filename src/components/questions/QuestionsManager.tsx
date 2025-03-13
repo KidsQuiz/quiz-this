@@ -5,21 +5,33 @@ import QuestionsList from './QuestionsList';
 import QuestionForm from './QuestionForm';
 import ImportQuestionsDialog from './ImportQuestionsDialog';
 import { useQuestionsData } from '@/hooks/useQuestionsData';
-import { MessageCircleQuestion, ArrowLeft, Upload, Plus } from 'lucide-react';
+import { MessageCircleQuestion, ArrowLeft, Upload, Plus, Trash2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const QuestionsManager = () => {
   const { packageId } = useParams<{ packageId: string }>();
   const navigate = useNavigate();
-  const { questions, isLoading, fetchQuestions, deleteQuestion } = useQuestionsData(packageId);
+  const { questions, isLoading, fetchQuestions, deleteQuestion, deleteAllQuestions } = useQuestionsData(packageId);
   const { t } = useLanguage();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | undefined>(undefined);
   const [packageName, setPackageName] = useState<string>('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   useEffect(() => {
     const getPackageName = async () => {
@@ -58,6 +70,12 @@ const QuestionsManager = () => {
   const handleOpenImportDialog = () => {
     setIsImportDialogOpen(true);
   };
+
+  const handleDeleteAllQuestions = async () => {
+    if (await deleteAllQuestions()) {
+      setIsDeleteDialogOpen(false);
+    }
+  };
   
   if (!packageId) {
     return <div>{t('somethingWentWrong')}</div>;
@@ -81,6 +99,37 @@ const QuestionsManager = () => {
             <span>{t('questions')} {packageName}</span>
           </h3>
           <div className="flex gap-2">
+            {questions.length > 0 && (
+              <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>{t('deleteAll')}</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('deleteAllQuestions')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t('deleteAllQuestionsConfirmation', { package: packageName })}
+                      {t('thisActionCannotBeUndone')}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDeleteAllQuestions}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {t('deleteAll')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             <Button 
               variant="outline" 
               onClick={handleOpenImportDialog} 

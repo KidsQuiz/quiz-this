@@ -32,7 +32,36 @@ export const useQuestionsManagement = () => {
     }
   };
 
+  const deleteAllQuestions = async (packageId: string) => {
+    if (!confirm('Are you sure you want to delete ALL questions in this package? This action cannot be undone.')) return false;
+    
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .delete()
+        .eq('package_id', packageId);
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "All questions deleted successfully"
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error deleting all questions:', error.message);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete questions"
+      });
+      return false;
+    }
+  };
+
   return {
-    deleteQuestion
+    deleteQuestion,
+    deleteAllQuestions
   };
 };
