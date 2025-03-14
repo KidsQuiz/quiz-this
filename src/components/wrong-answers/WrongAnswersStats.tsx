@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WrongAnswer } from './types';
 
@@ -31,12 +31,14 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
         acc[key] = { 
           question: key, 
           count: 0,
-          correctAnswer: answer.correct_answer_content
+          correctAnswer: answer.correct_answer_content,
+          // Create a shortened version of the question for the pie chart
+          shortQuestion: key.length > 20 ? key.substring(0, 20) + '...' : key
         };
       }
       acc[key].count += 1;
       return acc;
-    }, {} as Record<string, { question: string; count: number; correctAnswer: string }>);
+    }, {} as Record<string, { question: string; shortQuestion: string; count: number; correctAnswer: string }>);
 
     return Object.values(questionCounts)
       .sort((a, b) => b.count - a.count)
@@ -91,6 +93,27 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
   // Debug output
   console.log("Most frequent wrong answers:", mostFrequentWrongAnswers);
   console.log("Wrong answers by month:", wrongAnswersByMonth);
+
+  // Custom render for pie chart labels
+  const renderCustomizedLabel = (props: any) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index } = props;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#fff" 
+        textAnchor="middle" 
+        dominantBaseline="central"
+        fontSize={12}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
 
   if (!wrongAnswers || wrongAnswers.length === 0) {
     return (
@@ -182,11 +205,11 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${Math.round(percent * 100)}%`}
+                      label={renderCustomizedLabel}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
-                      nameKey="question"
+                      nameKey="shortQuestion"
                     >
                       {mostFrequentWrongAnswers.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -195,6 +218,12 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
                     <Tooltip
                       formatter={(value, name, props) => [value, t('wrongCount')]}
                       labelFormatter={(label) => `${label}`}
+                    />
+                    <Legend 
+                      formatter={(value, entry, index) => {
+                        const item = mostFrequentWrongAnswers[index];
+                        return `${item?.shortQuestion} (${item?.count})`;
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
