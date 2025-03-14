@@ -29,8 +29,8 @@ const StartQuestionButton = ({
       disabled={isDisabled}
     >
       <PlayCircle className="h-4 w-4" />
-      {t('startQuestions')}
-      {isDisabled && <span className="text-xs ml-2">({t('noPackagesAssigned')})</span>}
+      {t('startSession')}
+      {isDisabled && <span className="text-xs ml-2">({t('assignPackagesFirst')})</span>}
     </Button>
   );
 };

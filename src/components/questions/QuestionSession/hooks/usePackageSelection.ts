@@ -34,8 +34,8 @@ export const usePackageSelection = (
         
         if (!assignedPackages || assignedPackages.length === 0) {
           toast({
-            title: t("noPackagesAssigned"),
-            description: t("pleaseAssignPackages"),
+            title: t("noPackages"),
+            description: t("assignPackagesFirst"),
             variant: "destructive"
           });
           onClose();
@@ -57,7 +57,7 @@ export const usePackageSelection = (
         toast({
           variant: "destructive",
           title: t("error"),
-          description: t("failedToLoadPackages")
+          description: t("somethingWentWrong")
         });
         onClose();
       } finally {
