@@ -58,7 +58,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
         toast({
           variant: "destructive",
           title: t('error'),
-          description: t('error') // Using the 'error' key instead of 'errorFetchingData'
+          description: t('error')
         });
         throw error;
       }
@@ -108,7 +108,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
           </DialogTitle>
           <DialogDescription>
             {hasWrongAnswers 
-              ? t('noWrongAnswers') // Using an existing key instead of 'wrongAnswersIntro'
+              ? t('wrongAnswersDescription', {count: wrongAnswers.length}) 
               : t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
