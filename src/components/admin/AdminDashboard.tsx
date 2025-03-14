@@ -152,18 +152,16 @@ const AdminDashboard = () => {
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <ChartTooltipContent
-                            content={
-                              <div className="flex flex-col gap-0.5">
-                                <span className="text-xs text-muted-foreground">
-                                  {formatMonthYear(payload[0].payload.month)}
-                                </span>
-                                <span className="font-bold">
-                                  {payload[0].payload.count} {t('users')}
-                                </span>
-                              </div>
-                            }
-                          />
+                          <ChartTooltipContent>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs text-muted-foreground">
+                                {formatMonthYear(payload[0].payload.month)}
+                              </span>
+                              <span className="font-bold">
+                                {payload[0].payload.count} {t('users')}
+                              </span>
+                            </div>
+                          </ChartTooltipContent>
                         );
                       }
                       return null;

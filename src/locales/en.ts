@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -170,8 +171,8 @@ export const en = {
   adminDashboard: 'Admin Dashboard',
   registeredUsers: 'Registered Users',
   totalRegisteredUsers: 'Total number of registered users',
-  error: 'Error',
   userRegistrationTimeline: 'User Registration Timeline',
   registrationsByMonth: 'Cumulative user registrations by month',
   users: 'users',
+  admin: 'Admin',
 };

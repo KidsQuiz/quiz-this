@@ -1,3 +1,4 @@
+
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -154,8 +155,12 @@ export const bg = {
   notEnoughData: "Недостатъчно данни за показване на статистика",
   occurrences: "Брой срещания",
   
+  // Admin translations
   adminDashboard: 'Административен Панел',
+  registeredUsers: 'Регистрирани Потребители',
+  totalRegisteredUsers: 'Общ брой регистрирани потребители',
   userRegistrationTimeline: 'График на регистрациите',
   registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
-  users: 'потребители'
-}
+  users: 'потребители',
+  admin: 'Админ'
+};
