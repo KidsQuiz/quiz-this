@@ -86,7 +86,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
           <DialogDescription>
-            {t('wrongAnswersDescription')}
+            {t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
 
