@@ -167,8 +167,11 @@ export const en = {
   occurrences: "Occurrences",
   
   // Admin translations
-  admin: 'Admin',
   adminDashboard: 'Admin Dashboard',
   registeredUsers: 'Registered Users',
   totalRegisteredUsers: 'Total number of registered users',
+  error: 'Error',
+  userRegistrationTimeline: 'User Registration Timeline',
+  registrationsByMonth: 'Cumulative user registrations by month',
+  users: 'users',
 };
