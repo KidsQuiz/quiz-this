@@ -164,5 +164,18 @@ export const en = {
   wrongAnswersByTime: "Wrong Answers Over Time",
   topWrongAnswersDistribution: "Wrong Answers Distribution",
   wrongCount: "Wrong Count",
-  notEnoughData: "Not enough data to display statistics"
+  notEnoughData: "Not enough data to display statistics",
+  occurrences: "Occurrences",
+  
+  // Admin translations
+  adminDashboard: 'Admin Dashboard',
+  registeredUsers: 'Registered Users',
+  totalRegisteredUsers: 'Total number of registered users',
+  userRegistrationTimeline: 'User Registration Timeline',
+  registrationsByMonth: 'Cumulative user registrations by month',
+  users: 'users',
+  admin: 'Admin',
+  activeUsers: 'Active Users',
+  usersWithActiveKids: 'Users with active kids (answered questions)',
+  ofAllUsers: 'of all users',
 };

@@ -1,6 +1,5 @@
 
 export const bg = {
-  // General
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
   save: 'Запази',
@@ -16,7 +15,6 @@ export const bg = {
   error: 'Грешка',
   clone: 'Клонирай',
   
-  // Auth
   signIn: 'Вход',
   signUp: 'Регистрация',
   signOut: 'Изход',
@@ -28,7 +26,6 @@ export const bg = {
   password: 'Парола',
   email: 'Имейл',
   
-  // Auth messages
   accountCreated: 'Акаунтът е създаден',
   checkEmail: 'Моля, проверете имейла си, за да потвърдите акаунта си.',
   welcomeBack: 'Добре дошли обратно',
@@ -43,20 +40,17 @@ export const bg = {
   dontHaveAccount: 'Нямате акаунт? Регистрирайте се',
   processing: 'Обработка...',
   
-  // Dashboard
   dashboard: 'Табло',
   myKids: 'Моите деца',
   addKid: 'Добави дете',
   noKids: 'Все още няма добавени деца',
   
-  // Kids
   name: 'Име',
   age: 'Възраст',
   avatar: 'Аватар',
   avatarPreview: 'Преглед на аватар',
   resetPoints: 'Нулиране на точки',
   
-  // Packages
   packages: 'Пакети',
   package: 'Пакет',
   addPackage: 'Добави пакет',
@@ -74,7 +68,6 @@ export const bg = {
   sequential: 'Последователно',
   shuffle: 'Разбъркано',
   
-  // Questions
   questions: 'Въпроси',
   question: 'Въпрос',
   addQuestion: 'Добави въпрос',
@@ -109,7 +102,6 @@ export const bg = {
   cloneQuestion: 'Клонирай въпрос',
   questionCloned: 'Въпросът е клониран успешно',
   
-  // Quiz Session
   startSession: 'Започни сесия',
   sessionComplete: 'Сесията завърши!',
   greatJob: 'Браво',
@@ -124,15 +116,12 @@ export const bg = {
   pleaseSelectPackages: 'Моля, изберете поне един пакет с въпроси, за да започнете.',
   autoClosingIn: 'Автоматично затваряне след момент',
   
-  // Language
   language: 'Език',
   english: 'Английски',
   bulgarian: 'Български',
   
-  // Footer
   designedWithPrecision: 'Проектирано с прецизност',
   
-  // Milestone related translations
   milestones: "Етапи",
   milestonesDescription: "Създайте етапи, за да възнаградите напредъка на детето си",
   currentStatus: "Текущ статус",
@@ -150,7 +139,6 @@ export const bg = {
   confirmDeleteMilestone: "Сигурни ли сте, че искате да изтриете този етап?",
   manageMilestones: "Управление на етапи",
   
-  // Wrong Answers Dashboard
   wrongAnswersDashboard: "Табло с грешни отговори",
   viewWrongAnswers: "Преглед на грешни отговори",
   wrongAnswersList: "Списък с грешни отговори",
@@ -164,5 +152,18 @@ export const bg = {
   wrongAnswersByTime: "Грешни отговори във времето",
   topWrongAnswersDistribution: "Разпределение на грешните отговори",
   wrongCount: "Брой грешки",
-  notEnoughData: "Недостатъчно данни за показване на статистика"
-}
+  notEnoughData: "Недостатъчно данни за показване на статистика",
+  occurrences: "Брой срещания",
+  
+  // Admin translations
+  adminDashboard: 'Административен Панел',
+  registeredUsers: 'Регистрирани Потребители',
+  totalRegisteredUsers: 'Общ брой регистрирани потребители',
+  userRegistrationTimeline: 'График на регистрациите',
+  registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
+  users: 'потребители',
+  admin: 'Админ',
+  activeUsers: 'Активни Потребители',
+  usersWithActiveKids: 'Потребители с активни деца (отговорили на въпроси)',
+  ofAllUsers: 'от всички потребители',
+};
