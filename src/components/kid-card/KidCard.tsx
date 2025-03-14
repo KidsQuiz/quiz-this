@@ -145,6 +145,7 @@ const KidCard = ({
               name={name}
               packageCount={packageCount}
               onStartQuestions={onStartQuestions}
+              onAssignPackages={onAssignPackages}
             />
           )}
         </div>

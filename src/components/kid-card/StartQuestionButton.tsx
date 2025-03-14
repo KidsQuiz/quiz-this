@@ -9,13 +9,15 @@ interface StartQuestionButtonProps {
   name: string;
   packageCount: number;
   onStartQuestions: (id: string, name: string) => void;
+  onAssignPackages?: (id: string, name: string) => void;
 }
 
 const StartQuestionButton = ({ 
   id, 
   name, 
   packageCount, 
-  onStartQuestions 
+  onStartQuestions,
+  onAssignPackages
 }: StartQuestionButtonProps) => {
   const { t } = useLanguage();
   const isDisabled = packageCount === 0;
@@ -27,7 +29,7 @@ const StartQuestionButton = ({
       <Button
         className="mt-4 w-full gap-2"
         variant="outline"
-        disabled
+        onClick={() => onAssignPackages && onAssignPackages(id, name)}
       >
         <Package className="h-4 w-4" />
         {t('assignPackages')}
