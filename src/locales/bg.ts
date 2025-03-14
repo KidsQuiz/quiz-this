@@ -164,5 +164,6 @@ export const bg = {
   wrongAnswersByTime: "Грешни отговори във времето",
   topWrongAnswersDistribution: "Разпределение на грешните отговори",
   wrongCount: "Брой грешки",
-  notEnoughData: "Недостатъчно данни за показване на статистика"
+  notEnoughData: "Недостатъчно данни за показване на статистика",
+  occurrences: "Брой срещания"
 }

@@ -164,5 +164,6 @@ export const en = {
   wrongAnswersByTime: "Wrong Answers Over Time",
   topWrongAnswersDistribution: "Wrong Answers Distribution",
   wrongCount: "Wrong Count",
-  notEnoughData: "Not enough data to display statistics"
+  notEnoughData: "Not enough data to display statistics",
+  occurrences: "Occurrences"
 };
