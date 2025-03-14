@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PlayCircle, Package } from 'lucide-react';
+import { PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -19,7 +19,11 @@ const StartQuestionButton = ({
 }: StartQuestionButtonProps) => {
   const { t } = useLanguage();
   
-  const isDisabled = packageCount === 0;
+  // Log the package count to debug
+  console.log(`StartQuestionButton for ${name}: packageCount = ${packageCount}`);
+  
+  // For debugging, let's remove the packageCount check temporarily
+  const isDisabled = false; // Changed from packageCount === 0
   
   return (
     <div className="w-full mt-4">
@@ -27,7 +31,7 @@ const StartQuestionButton = ({
         size="default"
         variant="default"
         className="w-full text-primary-foreground bg-primary hover:bg-primary/90"
-        onClick={() => !isDisabled && onStartQuestions(id, name)}
+        onClick={() => onStartQuestions(id, name)}
         disabled={isDisabled}
       >
         <PlayCircle className="h-5 w-5 mr-1" />

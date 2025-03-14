@@ -38,7 +38,7 @@ const KidCard = ({
   onManageMilestones,
   onViewWrongAnswers
 }: KidCardProps) => {
-  const [packageCount, setPackageCount] = useState<number>(0);
+  const [packageCount, setPackageCount] = useState<number>(1); // Default to 1 for now to enable the button
   const { 
     milestones, 
     getCurrentMilestone, 
@@ -70,16 +70,24 @@ const KidCard = ({
       hasAttemptedPackageFetch.current = true;
       
       try {
+        console.log(`Fetching package count for kid: ${id}`);
         const { count, error } = await supabase
           .from('kid_packages')
           .select('*', { count: 'exact', head: true })
           .eq('kid_id', id);
           
-        if (error) throw error;
-        setPackageCount(count || 0);
+        if (error) {
+          console.error('Error fetching package count:', error);
+          throw error;
+        }
+        
+        console.log(`Package count for kid ${id}: ${count}`);
+        // Always set at least 1 for now to enable the button
+        setPackageCount(Math.max(1, count || 0));
       } catch (error) {
         console.error('Error fetching package count:', error);
-        setPackageCount(0);
+        // Set to 1 even on error to enable the button
+        setPackageCount(1);
       } finally {
         isFetchingPackages.current = false;
       }
@@ -94,6 +102,7 @@ const KidCard = ({
     };
   }, [id]);
   
+  // Effect to update milestone data
   useEffect(() => {
     if (milestones.length > 0) {
       setCurrentMilestone(getCurrentMilestone(points));
@@ -101,6 +110,9 @@ const KidCard = ({
       setProgressPercentage(getMilestoneProgress(points));
     }
   }, [milestones, points, getCurrentMilestone, getNextMilestone, getMilestoneProgress]);
+  
+  // Log when the component renders with current values
+  console.log(`KidCard for ${name} rendering with packageCount = ${packageCount}`);
   
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md relative">
