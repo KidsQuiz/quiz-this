@@ -52,6 +52,27 @@ export const useEnhancedAnswerHandling = (
             points_earned: pointsEarned
           });
           
+        // If the answer is incorrect, also store it in the wrong_answers table
+        if (!isCorrect) {
+          // Get the correct answer content
+          const correctAnswer = answerOptions.find(opt => opt.is_correct);
+          
+          if (correctAnswer && selectedAnswer) {
+            await supabase
+              .from('kid_wrong_answers')
+              .insert({
+                kid_id: kidId,
+                question_id: currentQuestion.id,
+                answer_id: answerId,
+                question_content: currentQuestion.content,
+                answer_content: selectedAnswer.content,
+                correct_answer_content: correctAnswer.content
+              });
+              
+            console.log(`Wrong answer recorded for kid ${kidId}`);
+          }
+        }
+          
         console.log(`Answer recorded in database for kid ${kidId}`);
       } catch (error) {
         console.error('Error recording answer:', error);

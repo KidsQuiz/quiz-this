@@ -126,6 +126,61 @@ export type Database = {
           },
         ]
       }
+      kid_wrong_answers: {
+        Row: {
+          answer_content: string
+          answer_id: string
+          correct_answer_content: string
+          created_at: string
+          id: string
+          kid_id: string
+          question_content: string
+          question_id: string
+        }
+        Insert: {
+          answer_content: string
+          answer_id: string
+          correct_answer_content: string
+          created_at?: string
+          id?: string
+          kid_id: string
+          question_content: string
+          question_id: string
+        }
+        Update: {
+          answer_content?: string
+          answer_id?: string
+          correct_answer_content?: string
+          created_at?: string
+          id?: string
+          kid_id?: string
+          question_content?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kid_wrong_answers_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "answer_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kid_wrong_answers_kid_id_fkey"
+            columns: ["kid_id"]
+            isOneToOne: false
+            referencedRelation: "kids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kid_wrong_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kids: {
         Row: {
           age: number
