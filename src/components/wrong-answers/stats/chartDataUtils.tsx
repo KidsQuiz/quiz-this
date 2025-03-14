@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { WrongAnswer } from '../types';
 
 // Process data for the most frequent wrong answers chart
