@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { InfoIcon, UsersIcon, BarChart } from 'lucide-react';
+import { InfoIcon, UsersIcon, BarChart, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
-// Fetch all profiles with their created_at timestamps
 const fetchUserRegistrations = async () => {
   const { data, error } = await supabase
     .from('profiles')
@@ -20,19 +19,14 @@ const fetchUserRegistrations = async () => {
   return data;
 };
 
-// Format the data for the timeline chart
 const prepareChartData = (data) => {
-  // Create a map to hold the cumulative count for each month
   const monthCountMap = new Map();
 
-  // Process each registration
   data.forEach(profile => {
     const date = new Date(profile.updated_at);
     const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     
-    // Initialize or increment the count for this month
     if (!monthCountMap.has(monthYear)) {
-      // Find the count from the previous month if it exists
       const months = Array.from(monthCountMap.keys()).sort();
       const previousCount = months.length > 0 ? monthCountMap.get(months[months.length - 1]) : 0;
       monthCountMap.set(monthYear, previousCount + 1);
@@ -41,7 +35,6 @@ const prepareChartData = (data) => {
     }
   });
 
-  // Convert map to array of data points for chart
   return Array.from(monthCountMap.entries()).map(([month, count]) => ({
     month,
     count
@@ -56,8 +49,8 @@ const formatMonthYear = (monthYear) => {
 
 const AdminDashboard = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   
-  // Query to fetch user count
   const { data: userCount, isLoading: countLoading, error: countError } = useQuery({
     queryKey: ['userCount'],
     queryFn: async () => {
@@ -70,7 +63,6 @@ const AdminDashboard = () => {
     }
   });
 
-  // Query to fetch user registration data for timeline
   const { data: registrationData, isLoading: chartLoading, error: chartError } = useQuery({
     queryKey: ['userRegistrations'],
     queryFn: fetchUserRegistrations,
@@ -80,9 +72,23 @@ const AdminDashboard = () => {
   const error = countError || chartError;
   const loading = countLoading || chartLoading;
 
+  const handleBackToDashboard = () => {
+    navigate('/');
+  };
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold mb-6">{t('adminDashboard')}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">{t('adminDashboard')}</h1>
+        <Button 
+          variant="outline" 
+          onClick={handleBackToDashboard}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>{t('dashboard')}</span>
+        </Button>
+      </div>
       
       {error && (
         <Alert variant="destructive">
