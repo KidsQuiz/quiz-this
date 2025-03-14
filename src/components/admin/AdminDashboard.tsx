@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,31 +66,21 @@ const AdminDashboard = () => {
   const { data: activeUserCount, isLoading: activeCountLoading, error: activeCountError } = useQuery({
     queryKey: ['activeUserCount'],
     queryFn: async () => {
-      // Find parents with at least one kid who has answered at least one question
+      const { data: kidAnswers, error: answersError } = await supabase
+        .from('kid_answers')
+        .select('kid_id')
+        .limit(1);
+      
+      if (answersError) throw answersError;
+      
+      if (!kidAnswers || kidAnswers.length === 0) return 0;
+      
       const { data, error } = await supabase
-        .from('kid_answers')
-        .select('kid_id')
-        .limit(1);
-      
-      if (error) throw error;
-      
-      if (data.length === 0) return 0;
-      
-      const { data: kidsWithAnswers, error: kidsError } = await supabase
-        .from('kid_answers')
-        .select('kid_id')
-        .limit(1);
-      
-      if (kidsError) throw kidsError;
-      
-      if (kidsWithAnswers.length === 0) return 0;
-      
-      const { data: activeUsers, error: activeUsersError } = await supabase
         .rpc('count_active_users');
         
-      if (activeUsersError) throw activeUsersError;
+      if (error) throw error;
       
-      return activeUsers;
+      return data || 0;
     }
   });
 
@@ -104,8 +93,9 @@ const AdminDashboard = () => {
   const error = countError || chartError || activeCountError;
   const loading = countLoading || chartLoading || activeCountLoading;
 
-  const activeUserPercentage = userCount && activeUserCount ? 
-    Math.round((activeUserCount / userCount) * 100) : 0;
+  const activeUserPercentage = userCount && activeUserCount 
+    ? Math.round((Number(activeUserCount) / Number(userCount)) * 100) 
+    : 0;
 
   const handleBackToDashboard = () => {
     navigate('/');

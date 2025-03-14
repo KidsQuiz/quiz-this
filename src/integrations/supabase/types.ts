@@ -365,6 +365,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_active_users: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       create_kid_wrong_answers_policy: {
         Args: Record<PropertyKey, never>
         Returns: undefined
