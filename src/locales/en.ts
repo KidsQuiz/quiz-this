@@ -47,6 +47,7 @@ export const en = {
   dashboard: 'Dashboard',
   myKids: 'My Kids',
   addKid: 'Add Kid',
+  noKids: 'No kids added yet',
   
   // Kids
   name: 'Name',
