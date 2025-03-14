@@ -15,16 +15,30 @@ export const supabase = createClient<Database>(
   SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
-      persistSession: true
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
     },
     // Add retry logic to handle connectivity issues
     global: {
+      headers: {
+        'Content-Type': 'application/json'
+      },
       fetch: (url, options) => {
         return fetch(url, {
           ...options,
           // Reduce timeout to avoid hanging requests
-          signal: AbortSignal.timeout(10000), // 10 second timeout
+          signal: AbortSignal.timeout(8000), // 8 second timeout
         });
+      }
+    },
+    // Set reasonable defaults for requests to prevent overloading
+    db: {
+      schema: 'public'
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 2
       }
     }
   }

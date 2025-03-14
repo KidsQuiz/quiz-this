@@ -8,12 +8,19 @@ export const usePackagesFetch = () => {
   const [isLoading, setIsLoading] = useState(true);
   // Add a ref to track if there's a fetch in progress
   const fetchInProgress = useRef(false);
+  const fetchTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const fetchPackages = async (userId?: string) => {
     if (!userId) return [];
     
     // Prevent concurrent fetches for the same user
     if (fetchInProgress.current) return [];
+    
+    // Clear any existing timeout
+    if (fetchTimeoutId.current) {
+      clearTimeout(fetchTimeoutId.current);
+      fetchTimeoutId.current = null;
+    }
     
     try {
       fetchInProgress.current = true;
@@ -72,8 +79,11 @@ export const usePackagesFetch = () => {
       return [];
     } finally {
       setIsLoading(false);
-      // Reset the fetch in progress flag
-      fetchInProgress.current = false;
+      // Use a timeout to reset the fetch in progress flag after a small delay
+      // This prevents immediate subsequent fetch attempts
+      fetchTimeoutId.current = setTimeout(() => {
+        fetchInProgress.current = false;
+      }, 500);
     }
   };
 

@@ -10,12 +10,19 @@ export const useMilestonesData = (kidId?: string) => {
   const [isLoading, setIsLoading] = useState(true);
   const isFetchingRef = useRef(false);
   const hasAttemptedFetch = useRef(false);
+  const fetchTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const fetchMilestones = async () => {
     if (!user || isFetchingRef.current) return;
     
     // Mark that we've attempted a fetch for this session
     hasAttemptedFetch.current = true;
+    
+    // Clear any existing timeout
+    if (fetchTimeoutId.current) {
+      clearTimeout(fetchTimeoutId.current);
+      fetchTimeoutId.current = null;
+    }
     
     try {
       isFetchingRef.current = true;
@@ -46,7 +53,11 @@ export const useMilestonesData = (kidId?: string) => {
       });
     } finally {
       setIsLoading(false);
-      isFetchingRef.current = false;
+      // Use a timeout to reset the fetch in progress flag after a delay
+      // This prevents immediate subsequent fetch attempts
+      fetchTimeoutId.current = setTimeout(() => {
+        isFetchingRef.current = false;
+      }, 500);
     }
   };
 
@@ -182,7 +193,10 @@ export const useMilestonesData = (kidId?: string) => {
     
     // Clean up function will run when the component unmounts or when dependencies change
     return () => {
-      hasAttemptedFetch.current = false;
+      // Don't reset hasAttemptedFetch on unmount to prevent fetching on remount
+      if (fetchTimeoutId.current) {
+        clearTimeout(fetchTimeoutId.current);
+      }
     };
   }, [user, kidId]);
 
@@ -191,8 +205,8 @@ export const useMilestonesData = (kidId?: string) => {
     isLoading,
     fetchMilestones,
     addMilestone,
-    updateMilestone: async (id, updates) => null,
-    deleteMilestone: async (id) => false,
+    updateMilestone,
+    deleteMilestone,
     getCurrentMilestone,
     getNextMilestone,
     getMilestoneProgress

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,8 +53,15 @@ const KidCard = ({
   // Add refs to prevent multiple fetches
   const isFetchingPackages = useRef(false);
   const hasAttemptedPackageFetch = useRef(false);
+  const didMountRef = useRef(false);
   
   useEffect(() => {
+    // Skip on first render, only set didMountRef to true
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    
     const fetchPackageCount = async () => {
       if (isFetchingPackages.current || hasAttemptedPackageFetch.current) return;
       
@@ -80,16 +86,12 @@ const KidCard = ({
     
     fetchPackageCount();
     
-    // Only fetch milestones if we have them
-    if (milestones.length === 0) {
-      fetchMilestones();
-    }
-    
     // Clean up
     return () => {
-      hasAttemptedPackageFetch.current = false;
+      // We want to keep hasAttemptedPackageFetch.current true between renders
+      // to prevent refetching on every re-render
     };
-  }, [id, fetchMilestones]);
+  }, [id]);
   
   useEffect(() => {
     if (milestones.length > 0) {

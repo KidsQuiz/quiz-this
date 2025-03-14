@@ -13,28 +13,34 @@ export const usePackagesData = () => {
   // Add a ref to prevent multiple loadPackages calls
   const isLoadingRef = useRef(false);
   const hasLoadedRef = useRef(false);
+  const fetchAttemptedRef = useRef(false);
 
   const loadPackages = async () => {
     if (!user || isLoadingRef.current) return;
     
     isLoadingRef.current = true;
+    fetchAttemptedRef.current = true;
+    
     try {
       const data = await fetchPackages(user.id);
       setPackages(data);
       hasLoadedRef.current = true;
+    } catch (error) {
+      console.error("Error in loadPackages:", error);
     } finally {
       isLoadingRef.current = false;
     }
   };
 
   useEffect(() => {
-    if (user && !hasLoadedRef.current && !isLoadingRef.current) {
+    if (user && !hasLoadedRef.current && !isLoadingRef.current && !fetchAttemptedRef.current) {
       loadPackages();
     }
     
     // Clean up function
     return () => {
-      hasLoadedRef.current = false;
+      // Do not reset hasLoadedRef on unmount to prevent loading on remount
+      fetchAttemptedRef.current = false;
     };
   }, [user]);
 
