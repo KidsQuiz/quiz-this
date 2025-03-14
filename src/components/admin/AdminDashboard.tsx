@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { InfoIcon, UsersIcon, BarChart, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -154,11 +155,11 @@ const AdminDashboard = () => {
                     tick={{ fontSize: 12 }}
                   />
                   <YAxis tick={{ fontSize: 12 }} />
-                  <ChartTooltip
+                  <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <ChartTooltipContent>
+                          <div className="rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
                             <div className="flex flex-col gap-0.5">
                               <span className="text-xs text-muted-foreground">
                                 {formatMonthYear(payload[0].payload.month)}
@@ -167,7 +168,7 @@ const AdminDashboard = () => {
                                 {payload[0].payload.count} {t('users')}
                               </span>
                             </div>
-                          </ChartTooltipContent>
+                          </div>
                         );
                       }
                       return null;
