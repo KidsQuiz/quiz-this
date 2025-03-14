@@ -18,6 +18,7 @@ const Dashboard = ({ activeTab }) => {
         if (!authData?.user) return;
 
         // Execute RPC to create RLS policy (this is safe because it's idempotent)
+        // Pass an empty object as parameters since the function doesn't expect any arguments
         const { error } = await supabase.rpc('create_kid_wrong_answers_policy', {});
         if (error) {
           console.warn('Could not set up RLS policy:', error.message);
