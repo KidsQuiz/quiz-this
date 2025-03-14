@@ -58,7 +58,16 @@ export const useEnhancedAnswerHandling = (
           const correctAnswer = answerOptions.find(opt => opt.is_correct);
           
           if (correctAnswer && selectedAnswer) {
-            await supabase
+            console.log('Storing wrong answer in database:', {
+              kidId,
+              questionId: currentQuestion.id,
+              answerId,
+              questionContent: currentQuestion.content,
+              answerContent: selectedAnswer.content,
+              correctAnswerContent: correctAnswer.content
+            });
+            
+            const { data, error } = await supabase
               .from('kid_wrong_answers')
               .insert({
                 kid_id: kidId,
@@ -69,7 +78,11 @@ export const useEnhancedAnswerHandling = (
                 correct_answer_content: correctAnswer.content
               });
               
-            console.log(`Wrong answer recorded for kid ${kidId}`);
+            if (error) {
+              console.error('Error recording wrong answer:', error);
+            } else {
+              console.log(`Wrong answer recorded for kid ${kidId}`);
+            }
           }
         }
           

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,16 +44,23 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
   const fetchWrongAnswers = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching wrong answers for kid:', kidId);
       const { data, error } = await supabase
         .from('kid_wrong_answers')
         .select('*')
         .eq('kid_id', kidId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching wrong answers:', error);
+        throw error;
+      }
+      
+      console.log('Wrong answers fetched:', data?.length || 0);
       setWrongAnswers(data || []);
     } catch (error) {
       console.error('Error fetching wrong answers:', error);
+      setWrongAnswers([]);
     } finally {
       setIsLoading(false);
     }
@@ -78,6 +85,9 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             <AlertTriangle className="h-6 w-6 text-amber-500" />
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
+          <DialogDescription>
+            {t('wrongAnswersDescription')}
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 overflow-hidden flex flex-col">

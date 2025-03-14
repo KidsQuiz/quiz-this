@@ -23,6 +23,10 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
   const COLORS = ['#f43f5e', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#6366f1'];
 
   const mostFrequentWrongAnswers = useMemo(() => {
+    if (!wrongAnswers || wrongAnswers.length === 0) {
+      return [];
+    }
+    
     const questionCounts = wrongAnswers.reduce((acc, answer) => {
       const key = answer.question_content;
       if (!acc[key]) {
@@ -43,6 +47,10 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
 
   // For time-based analysis
   const wrongAnswersByMonth = useMemo(() => {
+    if (!wrongAnswers || wrongAnswers.length === 0) {
+      return [];
+    }
+    
     const monthCounts = wrongAnswers.reduce((acc, answer) => {
       const date = new Date(answer.created_at);
       const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
@@ -54,16 +62,19 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
       return acc;
     }, {} as Record<string, { month: string; count: number }>);
 
+    // Convert to array and sort chronologically
     return Object.values(monthCounts)
       .sort((a, b) => {
         const [aMonth, aYear] = a.month.split(' ');
         const [bMonth, bYear] = b.month.split(' ');
-        return new Date(`${aMonth} 1, ${aYear}`).getTime() - new Date(`${bMonth} 1, ${bYear}`).getTime();
+        const aDate = new Date(`${aMonth} 1, ${aYear}`);
+        const bDate = new Date(`${bMonth} 1, ${bYear}`);
+        return aDate.getTime() - bDate.getTime();
       })
       .slice(-6); // Last 6 months
   }, [wrongAnswers]);
 
-  if (wrongAnswers.length === 0) {
+  if (!wrongAnswers || wrongAnswers.length === 0) {
     return (
       <Card>
         <CardContent className="pt-6 pb-6">
@@ -153,7 +164,7 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ question, count, percent }) => `${Math.round(percent * 100)}%`}
+                      label={({ name, percent }) => `${Math.round(percent * 100)}%`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
