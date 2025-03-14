@@ -162,5 +162,8 @@ export const bg = {
   userRegistrationTimeline: 'График на регистрациите',
   registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
   users: 'потребители',
-  admin: 'Админ'
+  admin: 'Админ',
+  activeUsers: 'Активни Потребители',
+  usersWithActiveKids: 'Потребители с активни деца (отговорили на въпроси)',
+  ofAllUsers: 'от всички потребители',
 };

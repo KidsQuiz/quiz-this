@@ -175,4 +175,7 @@ export const en = {
   registrationsByMonth: 'Cumulative user registrations by month',
   users: 'users',
   admin: 'Admin',
+  activeUsers: 'Active Users',
+  usersWithActiveKids: 'Users with active kids (answered questions)',
+  ofAllUsers: 'of all users',
 };

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { InfoIcon, UsersIcon, BarChart, ArrowLeft } from 'lucide-react';
+import { InfoIcon, UsersIcon, BarChart, ArrowLeft, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
@@ -64,14 +64,48 @@ const AdminDashboard = () => {
     }
   });
 
+  const { data: activeUserCount, isLoading: activeCountLoading, error: activeCountError } = useQuery({
+    queryKey: ['activeUserCount'],
+    queryFn: async () => {
+      // Find parents with at least one kid who has answered at least one question
+      const { data, error } = await supabase
+        .from('kid_answers')
+        .select('kid_id')
+        .limit(1);
+      
+      if (error) throw error;
+      
+      if (data.length === 0) return 0;
+      
+      const { data: kidsWithAnswers, error: kidsError } = await supabase
+        .from('kid_answers')
+        .select('kid_id')
+        .limit(1);
+      
+      if (kidsError) throw kidsError;
+      
+      if (kidsWithAnswers.length === 0) return 0;
+      
+      const { data: activeUsers, error: activeUsersError } = await supabase
+        .rpc('count_active_users');
+        
+      if (activeUsersError) throw activeUsersError;
+      
+      return activeUsers;
+    }
+  });
+
   const { data: registrationData, isLoading: chartLoading, error: chartError } = useQuery({
     queryKey: ['userRegistrations'],
     queryFn: fetchUserRegistrations,
     select: prepareChartData,
   });
 
-  const error = countError || chartError;
-  const loading = countLoading || chartLoading;
+  const error = countError || chartError || activeCountError;
+  const loading = countLoading || chartLoading || activeCountLoading;
+
+  const activeUserPercentage = userCount && activeUserCount ? 
+    Math.round((activeUserCount / userCount) * 100) : 0;
 
   const handleBackToDashboard = () => {
     navigate('/');
@@ -115,6 +149,30 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <p className="text-3xl font-bold">{userCount}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              {t('activeUsers')}
+            </CardTitle>
+            <CardDescription>{t('usersWithActiveKids')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="h-12 flex items-center">
+                <div className="w-full h-6 bg-muted rounded animate-pulse"></div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-3xl font-bold">{activeUserCount || 0}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {activeUserPercentage}% {t('ofAllUsers')}
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
