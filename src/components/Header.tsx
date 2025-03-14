@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User, Users, Package } from 'lucide-react';
+import { LogOut, User, Users, Package, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -20,10 +20,13 @@ const Header = ({
   onTabChange
 }: HeaderProps) => {
   const {
-    signOut
+    signOut,
+    isAdmin
   } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isQuestionsPage = location.pathname.startsWith('/questions/');
+  const isAdminPage = location.pathname === '/admin';
   const {
     t
   } = useLanguage();
@@ -44,6 +47,10 @@ const Header = ({
     }
   };
 
+  const handleAdminClick = () => {
+    navigate('/admin');
+  };
+
   return <header className="w-full bg-card shadow-sm border-b">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -52,7 +59,7 @@ const Header = ({
             <h1 className="text-lg font-medium">{t('dashboard')}</h1>
           </div>
           
-          {!isQuestionsPage && 
+          {!isQuestionsPage && !isAdminPage && 
             <div className="ml-2 bg-muted rounded-lg p-1">
               <div className="flex gap-2">
                 <Button
@@ -77,6 +84,18 @@ const Header = ({
         </div>
         
         <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Button
+              onClick={handleAdminClick}
+              variant="outline"
+              size="sm"
+              className={`rounded-md flex items-center gap-1.5 ${isAdminPage ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span>{t('admin')}</span>
+            </Button>
+          )}
+
           <LanguageSwitcher />
           
           <button onClick={handleLogout} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors" aria-label={t('signOut')}>

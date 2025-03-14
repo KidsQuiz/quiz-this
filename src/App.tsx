@@ -12,6 +12,7 @@ import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import QuestionsManager from "./components/questions/QuestionsManager";
 import PackagesPage from "./pages/PackagesPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,11 @@ const App = () => (
               <Route path="/questions/:packageId" element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

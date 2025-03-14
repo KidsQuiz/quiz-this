@@ -1,4 +1,3 @@
-
 export const bg = {
   // General
   appName: 'Детска Викторина',
@@ -159,11 +158,17 @@ export const bg = {
   statistics: "Статистика",
   allCorrect: "Всички са верни!",
   noWrongAnswers: "Няма грешни отговори за показване. Браво!",
-  noWrongAnswersStats: "Все още няма грешни отговори за анализ.",
+  noWrongAnswersStats: "Все още няма грешни ��тговори за анализ.",
   mostFrequentWrongAnswers: "Най-чести грешни отговори",
   wrongAnswersByTime: "Грешни отговори във времето",
   topWrongAnswersDistribution: "Разпределение на грешните отговори",
   wrongCount: "Брой грешки",
   notEnoughData: "Недостатъчно данни за показване на статистика",
-  occurrences: "Брой срещания"
+  occurrences: "Брой срещания",
+  
+  // Admin translations
+  admin: 'Админ',
+  adminDashboard: 'Админ Табло',
+  registeredUsers: 'Регистрирани Потребители',
+  totalRegisteredUsers: 'Общ брой регистрирани потребители'
 }

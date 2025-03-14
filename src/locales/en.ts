@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -165,5 +164,11 @@ export const en = {
   topWrongAnswersDistribution: "Wrong Answers Distribution",
   wrongCount: "Wrong Count",
   notEnoughData: "Not enough data to display statistics",
-  occurrences: "Occurrences"
+  occurrences: "Occurrences",
+  
+  // Admin translations
+  admin: 'Admin',
+  adminDashboard: 'Admin Dashboard',
+  registeredUsers: 'Registered Users',
+  totalRegisteredUsers: 'Total number of registered users',
 };
