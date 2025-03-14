@@ -107,20 +107,14 @@ const KidCard = ({
             points={points}
           />
           
-          {milestones.length > 0 ? (
+          {milestones.length > 0 && currentMilestone && (
             <div className="w-full mt-4 border-t pt-3">
-              {currentMilestone && (
-                <KidMilestone
-                  currentMilestone={currentMilestone}
-                  nextMilestone={nextMilestone}
-                  points={points}
-                  progressPercentage={progressPercentage}
-                />
-              )}
-            </div>
-          ) : (
-            <div className="w-full mt-4 border-t pt-3 text-sm text-muted-foreground">
-              No milestones available
+              <KidMilestone
+                currentMilestone={currentMilestone}
+                nextMilestone={nextMilestone}
+                points={points}
+                progressPercentage={progressPercentage}
+              />
             </div>
           )}
           
