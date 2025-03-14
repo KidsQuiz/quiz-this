@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,7 +43,7 @@ const KidCard = ({
     milestones, 
     getCurrentMilestone, 
     getNextMilestone, 
-    getMilestoneProgress, 
+    getMilestoneProgress,
     fetchMilestones 
   } = useMilestonesData(id);
   
