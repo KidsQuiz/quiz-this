@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -107,9 +106,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
           <DialogDescription>
-            {hasWrongAnswers 
-              ? t('noWrongAnswers') 
-              : t('noWrongAnswers')}
+            {t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
 
