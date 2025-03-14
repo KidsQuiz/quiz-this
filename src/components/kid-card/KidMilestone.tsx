@@ -62,7 +62,7 @@ const KidMilestone = ({
           </div>
           
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <span>{t('nextMilestone')}:</span>
+            <span>{t('milestones')}:</span>
             <div className="flex items-center">
               <span className="font-medium">{nextMilestone.name}</span>
               <ArrowRight className="h-3.5 w-3.5 ml-1 text-primary" />
