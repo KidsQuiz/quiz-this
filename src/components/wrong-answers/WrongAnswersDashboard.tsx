@@ -99,7 +99,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
           </DialogTitle>
           <DialogDescription>
             {wrongAnswers.length > 0 
-              ? t('wrongAnswersDescription', { count: wrongAnswers.length }) 
+              ? t('wrongAnswersDescription', { count: wrongAnswers.length.toString() }) 
               : t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
