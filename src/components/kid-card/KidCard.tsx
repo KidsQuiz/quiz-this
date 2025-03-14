@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useMilestonesData } from '@/hooks/useMilestonesData';
@@ -51,8 +51,17 @@ const KidCard = ({
   const [nextMilestone, setNextMilestone] = useState<any>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
+  // Add refs to prevent multiple fetches
+  const isFetchingPackages = useRef(false);
+  const hasAttemptedPackageFetch = useRef(false);
+  
   useEffect(() => {
     const fetchPackageCount = async () => {
+      if (isFetchingPackages.current || hasAttemptedPackageFetch.current) return;
+      
+      isFetchingPackages.current = true;
+      hasAttemptedPackageFetch.current = true;
+      
       try {
         const { count, error } = await supabase
           .from('kid_packages')
@@ -64,11 +73,22 @@ const KidCard = ({
       } catch (error) {
         console.error('Error fetching package count:', error);
         setPackageCount(0);
+      } finally {
+        isFetchingPackages.current = false;
       }
     };
     
     fetchPackageCount();
-    fetchMilestones();
+    
+    // Only fetch milestones if we have them
+    if (milestones.length === 0) {
+      fetchMilestones();
+    }
+    
+    // Clean up
+    return () => {
+      hasAttemptedPackageFetch.current = false;
+    };
   }, [id, fetchMilestones]);
   
   useEffect(() => {

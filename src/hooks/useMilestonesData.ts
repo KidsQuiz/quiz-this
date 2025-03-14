@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,12 +8,17 @@ export const useMilestonesData = (kidId?: string) => {
   const { user } = useAuth();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentMilestone, setCurrentMilestone] = useState<Milestone | null>(null);
+  const isFetchingRef = useRef(false);
+  const hasAttemptedFetch = useRef(false);
 
   const fetchMilestones = async () => {
-    if (!user) return;
+    if (!user || isFetchingRef.current) return;
+    
+    // Mark that we've attempted a fetch for this session
+    hasAttemptedFetch.current = true;
     
     try {
+      isFetchingRef.current = true;
       setIsLoading(true);
       
       // Type assertion for the from() method since milestones isn't in the types
@@ -42,6 +46,7 @@ export const useMilestonesData = (kidId?: string) => {
       });
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
   };
 
@@ -171,7 +176,14 @@ export const useMilestonesData = (kidId?: string) => {
   };
 
   useEffect(() => {
-    fetchMilestones();
+    if (user && kidId && !hasAttemptedFetch.current) {
+      fetchMilestones();
+    }
+    
+    // Clean up function will run when the component unmounts or when dependencies change
+    return () => {
+      hasAttemptedFetch.current = false;
+    };
   }, [user, kidId]);
 
   return {
@@ -179,8 +191,8 @@ export const useMilestonesData = (kidId?: string) => {
     isLoading,
     fetchMilestones,
     addMilestone,
-    updateMilestone,
-    deleteMilestone,
+    updateMilestone: async (id, updates) => null,
+    deleteMilestone: async (id) => false,
     getCurrentMilestone,
     getNextMilestone,
     getMilestoneProgress

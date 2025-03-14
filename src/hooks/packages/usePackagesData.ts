@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePackagesFetch } from './usePackagesFetch';
 import { usePackagesManagement } from './usePackagesManagement';
@@ -10,15 +10,32 @@ export const usePackagesData = () => {
   const [packages, setPackages] = useState<Package[]>([]);
   const { isLoading, fetchPackages } = usePackagesFetch();
   const { deletePackage: deletePackageAction, clonePackage: clonePackageAction } = usePackagesManagement();
+  // Add a ref to prevent multiple loadPackages calls
+  const isLoadingRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
   const loadPackages = async () => {
-    if (!user) return;
-    const data = await fetchPackages(user.id);
-    setPackages(data);
+    if (!user || isLoadingRef.current) return;
+    
+    isLoadingRef.current = true;
+    try {
+      const data = await fetchPackages(user.id);
+      setPackages(data);
+      hasLoadedRef.current = true;
+    } finally {
+      isLoadingRef.current = false;
+    }
   };
 
   useEffect(() => {
-    loadPackages();
+    if (user && !hasLoadedRef.current && !isLoadingRef.current) {
+      loadPackages();
+    }
+    
+    // Clean up function
+    return () => {
+      hasLoadedRef.current = false;
+    };
   }, [user]);
 
   const deletePackage = async (id: string) => {
