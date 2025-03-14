@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -105,9 +105,6 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             <AlertTriangle className="h-6 w-6 text-amber-500" />
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
-          <DialogDescription>
-            {t('noWrongAnswers')}
-          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 overflow-hidden flex flex-col">
