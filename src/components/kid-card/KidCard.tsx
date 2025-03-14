@@ -38,7 +38,7 @@ const KidCard = ({
   onManageMilestones,
   onViewWrongAnswers
 }: KidCardProps) => {
-  const [packageCount, setPackageCount] = useState<number>(1); // Default to 1 for now to enable the button
+  const [packageCount, setPackageCount] = useState<number>(0);
   const { 
     milestones, 
     getCurrentMilestone, 
@@ -53,21 +53,12 @@ const KidCard = ({
   
   // Add refs to prevent multiple fetches
   const isFetchingPackages = useRef(false);
-  const hasAttemptedPackageFetch = useRef(false);
-  const didMountRef = useRef(false);
   
   useEffect(() => {
-    // Skip on first render, only set didMountRef to true
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-    
     const fetchPackageCount = async () => {
-      if (isFetchingPackages.current || hasAttemptedPackageFetch.current) return;
+      if (isFetchingPackages.current || !id) return;
       
       isFetchingPackages.current = true;
-      hasAttemptedPackageFetch.current = true;
       
       try {
         console.log(`Fetching package count for kid: ${id}`);
@@ -82,24 +73,19 @@ const KidCard = ({
         }
         
         console.log(`Package count for kid ${id}: ${count}`);
-        // Always set at least 1 for now to enable the button
-        setPackageCount(Math.max(1, count || 0));
+        setPackageCount(count || 0);
       } catch (error) {
         console.error('Error fetching package count:', error);
-        // Set to 1 even on error to enable the button
-        setPackageCount(1);
+        setPackageCount(0);
       } finally {
-        isFetchingPackages.current = false;
+        // Reset the flag after a delay to allow subsequent fetch attempts
+        setTimeout(() => {
+          isFetchingPackages.current = false;
+        }, 500);
       }
     };
     
     fetchPackageCount();
-    
-    // Clean up
-    return () => {
-      // We want to keep hasAttemptedPackageFetch.current true between renders
-      // to prevent refetching on every re-render
-    };
   }, [id]);
   
   // Effect to update milestone data
@@ -110,9 +96,6 @@ const KidCard = ({
       setProgressPercentage(getMilestoneProgress(points));
     }
   }, [milestones, points, getCurrentMilestone, getNextMilestone, getMilestoneProgress]);
-  
-  // Log when the component renders with current values
-  console.log(`KidCard for ${name} rendering with packageCount = ${packageCount}`);
   
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md relative">

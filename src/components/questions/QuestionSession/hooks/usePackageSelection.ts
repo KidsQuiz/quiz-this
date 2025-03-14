@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const usePackageSelection = (
   kidId: string,
@@ -11,6 +12,7 @@ export const usePackageSelection = (
   const [questionPackages, setQuestionPackages] = useState<{ id: string; name: string }[]>([]);
   const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   // Load assigned packages
   useEffect(() => {
@@ -28,10 +30,12 @@ export const usePackageSelection = (
           
         if (assignmentsError) throw assignmentsError;
         
+        console.log(`Assigned packages for kid ${kidId}:`, assignedPackages);
+        
         if (!assignedPackages || assignedPackages.length === 0) {
           toast({
-            title: "No packages assigned",
-            description: `${kidName} doesn't have any question packages assigned yet.`,
+            title: t("noPackagesAssigned"),
+            description: t("pleaseAssignPackages"),
             variant: "destructive"
           });
           onClose();
@@ -52,8 +56,8 @@ export const usePackageSelection = (
         console.error('Error loading assigned packages:', error.message);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to load assigned packages"
+          title: t("error"),
+          description: t("failedToLoadPackages")
         });
         onClose();
       } finally {
@@ -62,7 +66,7 @@ export const usePackageSelection = (
     };
     
     loadAssignedPackages();
-  }, [kidId, kidName, onClose, toast]);
+  }, [kidId, kidName, onClose, toast, t]);
 
   // Handle package selection
   const togglePackageSelection = useCallback((packageId: string) => {
