@@ -57,6 +57,10 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
       }
       
       console.log('Wrong answers fetched:', data?.length || 0);
+      if (data && data.length > 0) {
+        console.log('Sample wrong answer:', data[0]);
+      }
+      
       setWrongAnswers(data || []);
     } catch (error) {
       console.error('Error fetching wrong answers:', error);
@@ -67,14 +71,22 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('default', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      return new Intl.DateTimeFormat('default', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return 'Error';
+    }
   };
 
   return (
@@ -86,7 +98,9 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
           <DialogDescription>
-            {t('noWrongAnswers')}
+            {wrongAnswers.length > 0 
+              ? t('wrongAnswersDescription', { count: wrongAnswers.length }) 
+              : t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
 

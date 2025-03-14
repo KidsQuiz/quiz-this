@@ -22,12 +22,17 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
 
   const COLORS = ['#f43f5e', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#6366f1'];
 
+  // Process and transform data for visualization
   const mostFrequentWrongAnswers = useMemo(() => {
     if (!wrongAnswers || wrongAnswers.length === 0) {
+      console.log("No wrong answers data available for stats");
       return [];
     }
     
+    console.log(`Processing ${wrongAnswers.length} wrong answers for stats`);
+    
     const questionCounts = wrongAnswers.reduce((acc, answer) => {
+      // Use question_content as the key
       const key = answer.question_content;
       if (!acc[key]) {
         acc[key] = { 
@@ -42,7 +47,7 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
 
     return Object.values(questionCounts)
       .sort((a, b) => b.count - a.count)
-      .slice(0, 6);
+      .slice(0, 6); // Top 6 wrong answers
   }, [wrongAnswers]);
 
   // For time-based analysis
@@ -52,13 +57,29 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
     }
     
     const monthCounts = wrongAnswers.reduce((acc, answer) => {
-      const date = new Date(answer.created_at);
-      const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-      
-      if (!acc[monthYear]) {
-        acc[monthYear] = { month: monthYear, count: 0 };
+      // Check if created_at is valid before processing
+      if (!answer.created_at) {
+        console.warn('Missing created_at in wrong answer:', answer);
+        return acc;
       }
-      acc[monthYear].count += 1;
+      
+      try {
+        const date = new Date(answer.created_at);
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid date in wrong answer:', answer.created_at);
+          return acc;
+        }
+        
+        const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        
+        if (!acc[monthYear]) {
+          acc[monthYear] = { month: monthYear, count: 0 };
+        }
+        acc[monthYear].count += 1;
+      } catch (error) {
+        console.error('Error processing date:', error);
+      }
+      
       return acc;
     }, {} as Record<string, { month: string; count: number }>);
 
@@ -73,6 +94,10 @@ const WrongAnswersStats = ({ wrongAnswers, kidName }: WrongAnswersStatsProps) =>
       })
       .slice(-6); // Last 6 months
   }, [wrongAnswers]);
+
+  // Debug output
+  console.log("Most frequent wrong answers:", mostFrequentWrongAnswers);
+  console.log("Wrong answers by month:", wrongAnswersByMonth);
 
   if (!wrongAnswers || wrongAnswers.length === 0) {
     return (
