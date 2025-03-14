@@ -67,7 +67,7 @@ const KidCard = ({
     
     fetchPackageCount();
     fetchMilestones();
-  }, [id]);
+  }, [id, fetchMilestones]);
   
   useEffect(() => {
     if (milestones.length > 0) {
@@ -75,10 +75,10 @@ const KidCard = ({
       setNextMilestone(getNextMilestone(points));
       setProgressPercentage(getMilestoneProgress(points));
     }
-  }, [milestones, points]);
+  }, [milestones, points, getCurrentMilestone, getNextMilestone, getMilestoneProgress]);
   
   return (
-    <Card className="overflow-hidden transition-colors hover:shadow-md relative">
+    <Card className="overflow-hidden transition-all hover:shadow-md relative">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="flex justify-between items-center w-full">
@@ -107,13 +107,21 @@ const KidCard = ({
             points={points}
           />
           
-          {currentMilestone && (
-            <KidMilestone
-              currentMilestone={currentMilestone}
-              nextMilestone={nextMilestone}
-              points={points}
-              progressPercentage={progressPercentage}
-            />
+          {milestones.length > 0 ? (
+            <div className="w-full mt-4 border-t pt-3">
+              {currentMilestone && (
+                <KidMilestone
+                  currentMilestone={currentMilestone}
+                  nextMilestone={nextMilestone}
+                  points={points}
+                  progressPercentage={progressPercentage}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="w-full mt-4 border-t pt-3 text-sm text-muted-foreground">
+              No milestones available
+            </div>
           )}
           
           {onStartQuestions && (
