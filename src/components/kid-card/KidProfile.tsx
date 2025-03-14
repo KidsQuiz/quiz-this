@@ -20,8 +20,8 @@ const KidProfile = ({
   const { t } = useLanguage();
   
   return (
-    <div>
-      <div className="mb-4">
+    <div className="flex flex-col items-center text-center">
+      <div className="mb-4 flex justify-center">
         {avatarUrl ? (
           <Avatar 
             src={avatarUrl} 

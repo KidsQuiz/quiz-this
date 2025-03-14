@@ -52,7 +52,7 @@ const ImportQuestionsDialog = ({ isOpen, onClose, onSuccess, packageId }: Import
             <ul className="list-disc text-sm text-muted-foreground pl-5 space-y-1">
               <li>{t('csvMustContain')}</li>
               <li>{t('csvExample')}</li>
-              <li>{t('correctAnswerNote')}</li>
+              <li>{t('csvCorrectAnswerNote')}</li>
             </ul>
           </div>
           

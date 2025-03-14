@@ -4,7 +4,8 @@ import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/co
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Package } from 'lucide-react';
+import { Package, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ConfigScreenProps {
@@ -51,6 +52,16 @@ const ConfigScreen = ({
       <div className="py-6 space-y-4">
         <div className="space-y-2">
           <Label>{t('selectQuestionPackages')}</Label>
+          
+          {noPackagesAvailable && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              <AlertDescription>
+                {t('noPackages')} {t('assignPackagesFirst')}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div className="flex gap-2 mb-2">
             <Button 
               variant="outline" 
@@ -74,8 +85,8 @@ const ConfigScreen = ({
               <p className="text-sm text-muted-foreground">{t('loading')}</p>
             ) : noPackagesAvailable ? (
               <div className="text-center py-4">
-                <Package className="h-10 w-10 text-muted-foreground mx-auto mb-2 opacity-50" />
-                <p className="text-sm text-muted-foreground">{t('noPackages')}</p>
+                <Package className="h-10 w-10 text-destructive mx-auto mb-2 opacity-70" />
+                <p className="text-sm text-destructive font-medium">{t('noPackages')}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {t('assignPackagesFirst')}
                 </p>

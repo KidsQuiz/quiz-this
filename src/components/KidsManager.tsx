@@ -8,6 +8,7 @@ import { useKidsDragDrop } from '@/hooks/useKidsDragDrop';
 import KidsHeader from './kids/KidsHeader';
 import KidsDialogs from './kids/KidsDialogs';
 import MilestonesDialog from './milestones/MilestonesDialog';
+import WrongAnswersDashboard from './wrong-answers';
 
 const KidsManager = () => {
   const { kids, isLoading, fetchKids, deleteKid, reorderKids } = useKidsData();
@@ -16,6 +17,10 @@ const KidsManager = () => {
   // Milestone dialog state
   const [isMilestoneDialogOpen, setIsMilestoneDialogOpen] = useState(false);
   const [selectedKidForMilestones, setSelectedKidForMilestones] = useState<{ id: string; name: string; points: number } | null>(null);
+  
+  // Wrong answers dialog state
+  const [isWrongAnswersDialogOpen, setIsWrongAnswersDialogOpen] = useState(false);
+  const [selectedKidForWrongAnswers, setSelectedKidForWrongAnswers] = useState<{ id: string; name: string } | null>(null);
   
   const {
     // Kid form
@@ -79,6 +84,17 @@ const KidsManager = () => {
     fetchKids();
   };
   
+  // Wrong answers management functions
+  const openWrongAnswersDialog = (id: string, name: string) => {
+    setSelectedKidForWrongAnswers({ id, name });
+    setIsWrongAnswersDialogOpen(true);
+  };
+  
+  const closeWrongAnswersDialog = () => {
+    setIsWrongAnswersDialogOpen(false);
+    setSelectedKidForWrongAnswers(null);
+  };
+  
   return (
     <div className="w-full max-w-4xl mx-auto">
       <KidsHeader onAddKid={openAddKidForm} />
@@ -94,6 +110,7 @@ const KidsManager = () => {
         onStartQuestions={openQuestionSession}
         onResetPoints={openResetPointsDialog}
         onManageMilestones={openMilestoneDialog}
+        onViewWrongAnswers={openWrongAnswersDialog}
       />
       
       <KidsDialogs
@@ -130,6 +147,16 @@ const KidsManager = () => {
           kidId={selectedKidForMilestones.id}
           kidName={selectedKidForMilestones.name}
           kidPoints={selectedKidForMilestones.points}
+        />
+      )}
+      
+      {/* Wrong Answers Dashboard */}
+      {selectedKidForWrongAnswers && (
+        <WrongAnswersDashboard
+          isOpen={isWrongAnswersDialogOpen}
+          onClose={closeWrongAnswersDialog}
+          kidId={selectedKidForWrongAnswers.id}
+          kidName={selectedKidForWrongAnswers.name}
         />
       )}
     </div>

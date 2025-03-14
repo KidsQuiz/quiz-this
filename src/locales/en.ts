@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -46,6 +47,7 @@ export const en = {
   dashboard: 'Dashboard',
   myKids: 'My Kids',
   addKid: 'Add Kid',
+  noKids: 'No kids added yet',
   
   // Kids
   name: 'Name',
@@ -90,7 +92,7 @@ export const en = {
   importQuestionsInstructions: 'Import questions from a CSV file with the following structure:',
   csvMustContain: 'CSV must contain columns: question, answer1, answer2, answer3, answer4, correctAnswer, points, timelimit (optional)',
   csvExample: 'Example: correctAnswer should be 1, 2, 3, or 4 to indicate which answer is correct',
-  correctAnswerNote: 'correctAnswer should be a number (1-4) corresponding to the correct answer option',
+  csvCorrectAnswerNote: 'correctAnswer should be a number (1-4) corresponding to the correct answer option',
   clickToSelectCSV: 'Click to select a CSV file',
   onlyCSVSupported: 'Only CSV files are supported',
   deleteAll: 'Delete All',
@@ -146,5 +148,21 @@ export const en = {
   pointsRequired: "Points Required",
   icon: "Icon",
   confirmDeleteMilestone: "Are you sure you want to delete this milestone?",
-  manageMilestones: "Manage Milestones"
+  manageMilestones: "Manage Milestones",
+  
+  // Wrong Answers Dashboard
+  wrongAnswersDashboard: "Wrong Answers Dashboard",
+  viewWrongAnswers: "View Wrong Answers",
+  wrongAnswersList: "Wrong Answers List",
+  wrongAnswer: "Wrong Answer",
+  date: "Date",
+  statistics: "Statistics",
+  allCorrect: "All Correct!",
+  noWrongAnswers: "There are no wrong answers to display. Great job!",
+  noWrongAnswersStats: "There are no wrong answers to analyze yet.",
+  mostFrequentWrongAnswers: "Most Frequent Wrong Answers",
+  wrongAnswersByTime: "Wrong Answers Over Time",
+  topWrongAnswersDistribution: "Wrong Answers Distribution",
+  wrongCount: "Wrong Count",
+  notEnoughData: "Not enough data to display statistics"
 };

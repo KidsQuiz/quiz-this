@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useMilestonesData } from '@/hooks/useMilestonesData';
@@ -21,6 +21,7 @@ interface KidCardProps {
   onStartQuestions?: (id: string, name: string) => void;
   onResetPoints?: (id: string, name: string) => void;
   onManageMilestones?: (id: string, name: string, points: number) => void;
+  onViewWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidCard = ({ 
@@ -34,14 +35,15 @@ const KidCard = ({
   onAssignPackages,
   onStartQuestions,
   onResetPoints,
-  onManageMilestones
+  onManageMilestones,
+  onViewWrongAnswers
 }: KidCardProps) => {
   const [packageCount, setPackageCount] = useState<number>(0);
   const { 
     milestones, 
     getCurrentMilestone, 
     getNextMilestone, 
-    getMilestoneProgress, 
+    getMilestoneProgress,
     fetchMilestones 
   } = useMilestonesData(id);
   
@@ -49,36 +51,54 @@ const KidCard = ({
   const [nextMilestone, setNextMilestone] = useState<any>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
+  // Add refs to prevent multiple fetches
+  const isFetchingPackages = useRef(false);
+  
   useEffect(() => {
     const fetchPackageCount = async () => {
+      if (isFetchingPackages.current || !id) return;
+      
+      isFetchingPackages.current = true;
+      
       try {
+        console.log(`Fetching package count for kid: ${id}`);
         const { count, error } = await supabase
           .from('kid_packages')
           .select('*', { count: 'exact', head: true })
           .eq('kid_id', id);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching package count:', error);
+          throw error;
+        }
+        
+        console.log(`Package count for kid ${id}: ${count}`);
         setPackageCount(count || 0);
       } catch (error) {
         console.error('Error fetching package count:', error);
         setPackageCount(0);
+      } finally {
+        // Reset the flag after a delay to allow subsequent fetch attempts
+        setTimeout(() => {
+          isFetchingPackages.current = false;
+        }, 500);
       }
     };
     
     fetchPackageCount();
-    fetchMilestones();
   }, [id]);
   
+  // Effect to update milestone data
   useEffect(() => {
     if (milestones.length > 0) {
       setCurrentMilestone(getCurrentMilestone(points));
       setNextMilestone(getNextMilestone(points));
       setProgressPercentage(getMilestoneProgress(points));
     }
-  }, [milestones, points]);
+  }, [milestones, points, getCurrentMilestone, getNextMilestone, getMilestoneProgress]);
   
   return (
-    <Card className="overflow-hidden transition-colors hover:shadow-md relative">
+    <Card className="overflow-hidden transition-all hover:shadow-md relative">
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
           <div className="flex justify-between items-center w-full">
@@ -97,6 +117,7 @@ const KidCard = ({
               onEdit={onEdit}
               onDelete={onDelete}
               onResetPoints={onResetPoints}
+              onViewWrongAnswers={onViewWrongAnswers}
             />
           </div>
           
@@ -107,13 +128,15 @@ const KidCard = ({
             points={points}
           />
           
-          {currentMilestone && (
-            <KidMilestone
-              currentMilestone={currentMilestone}
-              nextMilestone={nextMilestone}
-              points={points}
-              progressPercentage={progressPercentage}
-            />
+          {milestones.length > 0 && currentMilestone && (
+            <div className="w-full mt-4 border-t pt-3">
+              <KidMilestone
+                currentMilestone={currentMilestone}
+                nextMilestone={nextMilestone}
+                points={points}
+                progressPercentage={progressPercentage}
+              />
+            </div>
           )}
           
           {onStartQuestions && (
@@ -122,6 +145,7 @@ const KidCard = ({
               name={name}
               packageCount={packageCount}
               onStartQuestions={onStartQuestions}
+              onAssignPackages={onAssignPackages}
             />
           )}
         </div>

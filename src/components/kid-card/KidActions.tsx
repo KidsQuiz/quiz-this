@@ -1,14 +1,8 @@
 
 import React from 'react';
-import { Edit, Trash2, MoreVertical, RotateCcw } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Pencil, Trash2, RotateCcw, ChartPieIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidActionsProps {
@@ -17,6 +11,7 @@ interface KidActionsProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onResetPoints?: (id: string, name: string) => void;
+  onViewWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidActions = ({ 
@@ -24,42 +19,48 @@ const KidActions = ({
   name, 
   onEdit, 
   onDelete, 
-  onResetPoints 
+  onResetPoints,
+  onViewWrongAnswers
 }: KidActionsProps) => {
   const { t } = useLanguage();
   
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="h-8 w-8 p-0 rounded-full hover:bg-accent flex items-center justify-center focus:outline-none">
-        <MoreVertical className="h-4 w-4" />
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0 absolute top-2 right-2">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem 
-          onClick={() => onEdit(id)}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <Edit className="h-4 w-4" />
-          <span>{t('edit')}</span>
+      
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(id)}>
+          <Pencil className="mr-2 h-4 w-4" />
+          {t('edit')}
         </DropdownMenuItem>
         
         {onResetPoints && (
-          <DropdownMenuItem 
-            onClick={() => onResetPoints(id, name)}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <RotateCcw className="h-4 w-4" />
-            <span>{t('resetPoints')}</span>
+          <DropdownMenuItem onClick={() => onResetPoints(id, name)}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t('resetPoints')}
+          </DropdownMenuItem>
+        )}
+        
+        {onViewWrongAnswers && (
+          <DropdownMenuItem onClick={() => onViewWrongAnswers(id, name)}>
+            <ChartPieIcon className="mr-2 h-4 w-4" />
+            {t('viewWrongAnswers')}
           </DropdownMenuItem>
         )}
         
         <DropdownMenuSeparator />
         
         <DropdownMenuItem 
+          className="text-red-600" 
           onClick={() => onDelete(id)}
-          className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
         >
-          <Trash2 className="h-4 w-4" />
-          <span>{t('delete')}</span>
+          <Trash2 className="mr-2 h-4 w-4" />
+          {t('delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

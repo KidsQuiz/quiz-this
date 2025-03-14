@@ -1,3 +1,4 @@
+
 export const bg = {
   // General
   appName: 'Детска Викторина',
@@ -46,6 +47,7 @@ export const bg = {
   dashboard: 'Табло',
   myKids: 'Моите деца',
   addKid: 'Добави дете',
+  noKids: 'Все още няма добавени деца',
   
   // Kids
   name: 'Име',
@@ -90,7 +92,7 @@ export const bg = {
   importQuestionsInstructions: 'Импортирайте въпроси от CSV файл със следната структура:',
   csvMustContain: 'CSV трябва да съдържа колони: question, answer1, answer2, answer3, answer4, correctAnswer, points, timelimit (по избор)',
   csvExample: 'Пример: correctAnswer трябва да е 1, 2, 3 или 4, за да покаже кой отговор е правилен',
-  correctAnswerNote: 'correctAnswer трябва да е число (1-4), съответстващо на правилния отговор',
+  csvCorrectAnswerNote: 'correctAnswer трябва да е число (1-4), съответстващо на правилния отговор',
   clickToSelectCSV: 'Кликнете, за да изберете CSV файл',
   onlyCSVSupported: 'Поддържат се само CSV файлове',
   deleteAll: 'Изтрий всички',
@@ -146,5 +148,21 @@ export const bg = {
   pointsRequired: "Необходими точки",
   icon: "Икона",
   confirmDeleteMilestone: "Сигурни ли сте, че искате да изтриете този етап?",
-  manageMilestones: "Управление на етапи"
-};
+  manageMilestones: "Управление на етапи",
+  
+  // Wrong Answers Dashboard
+  wrongAnswersDashboard: "Табло с грешни отговори",
+  viewWrongAnswers: "Преглед на грешни отговори",
+  wrongAnswersList: "Списък с грешни отговори",
+  wrongAnswer: "Грешен отговор",
+  date: "Дата",
+  statistics: "Статистика",
+  allCorrect: "Всички са верни!",
+  noWrongAnswers: "Няма грешни отговори за показване. Браво!",
+  noWrongAnswersStats: "Все още няма грешни отговори за анализ.",
+  mostFrequentWrongAnswers: "Най-чести грешни отговори",
+  wrongAnswersByTime: "Грешни отговори във времето",
+  topWrongAnswersDistribution: "Разпределение на грешните отговори",
+  wrongCount: "Брой грешки",
+  notEnoughData: "Недостатъчно данни за показване на статистика"
+}

@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Milestone } from '@/hooks/packages/types';
-import { useMilestonesData } from '@/hooks/useMilestonesData';
+import { useMilestonesData, Milestone } from '@/hooks/useMilestonesData';
 import { Plus, Edit, Trash2, Trophy } from 'lucide-react';
 import MilestoneForm from './MilestoneForm';
 import { Progress } from '@/components/ui/progress';
@@ -94,7 +92,6 @@ const MilestonesDialog = ({ isOpen, onClose, kidId, kidName, kidPoints }: Milest
           </DialogHeader>
           
           <div className="py-4 space-y-6">
-            {/* Current milestone status */}
             <div className="bg-muted/50 rounded-lg p-4">
               <h3 className="text-lg font-medium mb-2">{t('currentStatus')}</h3>
               <div className="flex items-center mb-3">
@@ -126,7 +123,6 @@ const MilestonesDialog = ({ isOpen, onClose, kidId, kidName, kidPoints }: Milest
               )}
             </div>
             
-            {/* Milestone list */}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-medium">{t('allMilestones')}</h3>
@@ -183,7 +179,6 @@ const MilestonesDialog = ({ isOpen, onClose, kidId, kidName, kidPoints }: Milest
         </DialogContent>
       </Dialog>
       
-      {/* Milestone form dialog */}
       <MilestoneForm 
         isOpen={isFormOpen}
         onClose={handleCloseForm}

@@ -12,3 +12,5 @@ export { useSessionCompletion } from './useSessionCompletion';
 export { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
 export { useTimeoutHandling } from './useTimeoutHandling';
 export { useSessionDialog } from './useSessionDialog';
+export { useDialogManagement } from './useDialogManagement';
+export { useSessionManagement } from './useSessionManagement';

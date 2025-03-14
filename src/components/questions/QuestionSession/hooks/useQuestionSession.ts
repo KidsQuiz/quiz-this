@@ -10,11 +10,13 @@ import { useCurrentQuestion } from './useCurrentQuestion';
 import { useSessionCompletion } from './useSessionCompletion';
 import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
 import { useTimeoutHandling } from './useTimeoutHandling';
-import { useSessionDialog } from './useSessionDialog';
+import { useDialogManagement } from './useDialogManagement';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   // Use session state hook for state management
   const {
@@ -28,6 +30,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTotalPoints,
     showWowEffect,
     setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
     isModalOpen,
     setIsModalOpen,
     kidAnswers,
@@ -82,7 +86,10 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTotalPoints,
     setShowWowEffect,
     setCurrentQuestionIndex,
-    setIsModalOpen
+    setIsModalOpen,
+    questions,
+    setShowBoomEffect,
+    setSessionComplete
   );
 
   // Handle session startup
@@ -127,7 +134,10 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     currentQuestionIndex,
     questions,
     totalPoints,
-    setSessionComplete
+    correctAnswers,
+    setSessionComplete,
+    setShowBoomEffect,
+    setIsModalOpen
   );
 
   // Enhanced answer handling with database recording
@@ -139,10 +149,17 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers
   );
 
-  // Handle dialog closing - moved to separate hook
-  const { handleDialogClose } = useSessionDialog(onClose, setIsModalOpen);
+  // Handle dialog closing
+  const { handleDialogClose } = useDialogManagement(
+    setIsModalOpen,
+    onClose,
+    showBoomEffect,
+    sessionComplete,
+    correctAnswers,
+    questions
+  );
 
-  // Handle timeouts - moved to separate hook
+  // Handle timeouts
   useTimeoutHandling(
     timeRemaining,
     currentQuestion,
@@ -173,6 +190,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
     isModalOpen,
     kidAnswers,
     togglePackageSelection,

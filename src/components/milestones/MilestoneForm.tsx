@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Trophy, Award, Star, Medal, Gift, Badge, Flag, Gem } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Milestone } from '@/hooks/packages/types';
+import { Milestone } from '@/hooks/useMilestonesData';
 
 interface MilestoneFormProps {
   isOpen: boolean;
@@ -42,14 +41,12 @@ const MilestoneForm = ({ isOpen, onClose, onSave, kidId, milestone }: MilestoneF
       setName(milestone.name);
       setPointsRequired(milestone.points_required.toString());
       if (milestone.image_url) {
-        // Extract icon name from URL if it exists
         const iconName = milestone.image_url.split('/').pop()?.split('.')[0];
         if (iconName && MILESTONE_ICONS.some(i => i.name.toLowerCase() === iconName.toLowerCase())) {
           setSelectedIcon(iconName.charAt(0).toUpperCase() + iconName.slice(1));
         }
       }
     } else {
-      // Reset form when opening in add mode
       setName('');
       setPointsRequired('');
       setSelectedIcon('Trophy');
