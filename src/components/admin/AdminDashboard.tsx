@@ -122,32 +122,32 @@ const AdminDashboard = () => {
           </CardTitle>
           <CardDescription>{t('registrationsByMonth')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           {loading ? (
             <div className="h-80 w-full flex items-center justify-center">
               <div className="w-full h-64 bg-muted rounded animate-pulse"></div>
             </div>
           ) : (
             <div className="h-80 w-full">
-              <ChartContainer
-                config={{
-                  users: {
-                    label: 'Users',
-                    color: 'hsl(var(--primary))'
-                  }
-                }}
-              >
+              <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={registrationData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
                 >
+                  <defs>
+                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="month" 
                     tickFormatter={formatMonthYear}
                     tickMargin={10}
+                    tick={{ fontSize: 12 }}
                   />
-                  <YAxis />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <ChartTooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
@@ -172,10 +172,11 @@ const AdminDashboard = () => {
                     dataKey="count"
                     name="users"
                     stroke="hsl(var(--primary))"
-                    fill="hsl(var(--primary) / 0.2)"
+                    fillOpacity={1}
+                    fill="url(#colorCount)"
                   />
                 </AreaChart>
-              </ChartContainer>
+              </ResponsiveContainer>
             </div>
           )}
         </CardContent>
