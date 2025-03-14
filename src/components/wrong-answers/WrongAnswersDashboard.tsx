@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,10 +30,22 @@ interface WrongAnswer {
   created_at: string;
 }
 
+interface GroupedWrongAnswer {
+  id: string;
+  question_id: string;
+  question_content: string;
+  answer_content: string;
+  correct_answer_content: string;
+  created_at: string;
+  count: number;
+  latest_date: string;
+}
+
 const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswersDashboardProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
+  const [groupedWrongAnswers, setGroupedWrongAnswers] = useState<GroupedWrongAnswer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('list');
 
@@ -41,6 +54,57 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
       fetchWrongAnswers();
     }
   }, [isOpen, kidId]);
+
+  // Process and group wrong answers
+  useEffect(() => {
+    if (wrongAnswers.length > 0) {
+      const groupedAnswers = groupWrongAnswers(wrongAnswers);
+      setGroupedWrongAnswers(groupedAnswers);
+    } else {
+      setGroupedWrongAnswers([]);
+    }
+  }, [wrongAnswers]);
+
+  const groupWrongAnswers = (answers: WrongAnswer[]): GroupedWrongAnswer[] => {
+    const grouped = answers.reduce((acc, answer) => {
+      // Use question_id as the key for grouping
+      const key = answer.question_id;
+      
+      if (!acc[key]) {
+        acc[key] = {
+          id: answer.id,
+          question_id: answer.question_id,
+          question_content: answer.question_content,
+          answer_content: answer.answer_content,
+          correct_answer_content: answer.correct_answer_content,
+          created_at: answer.created_at,
+          count: 1,
+          latest_date: answer.created_at
+        };
+      } else {
+        // Increment the count for this question
+        acc[key].count += 1;
+        
+        // Update the latest date if this answer is more recent
+        const existingDate = new Date(acc[key].latest_date);
+        const currentDate = new Date(answer.created_at);
+        
+        if (currentDate > existingDate) {
+          acc[key].latest_date = answer.created_at;
+        }
+      }
+      
+      return acc;
+    }, {} as Record<string, GroupedWrongAnswer>);
+    
+    return Object.values(grouped).sort((a, b) => {
+      // Sort by count (descending) and then by date (newest first)
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return new Date(b.latest_date).getTime() - new Date(a.latest_date).getTime();
+    });
+  };
 
   const fetchWrongAnswers = async () => {
     setIsLoading(true);
@@ -139,14 +203,15 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[40%]">{t('question')}</TableHead>
-                      <TableHead className="w-[25%]">{t('wrongAnswer')}</TableHead>
-                      <TableHead className="w-[25%]">{t('correctAnswer')}</TableHead>
-                      <TableHead className="w-[10%]">{t('date')}</TableHead>
+                      <TableHead className="w-[35%]">{t('question')}</TableHead>
+                      <TableHead className="w-[20%]">{t('wrongAnswer')}</TableHead>
+                      <TableHead className="w-[20%]">{t('correctAnswer')}</TableHead>
+                      <TableHead className="w-[15%]">{t('date')}</TableHead>
+                      <TableHead className="w-[10%]">{t('occurrences')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {wrongAnswers.map((answer) => (
+                    {groupedWrongAnswers.map((answer) => (
                       <TableRow key={answer.id}>
                         <TableCell className="font-medium">{answer.question_content}</TableCell>
                         <TableCell>
@@ -160,7 +225,12 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
                           </Badge>
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
-                          {formatDate(answer.created_at)}
+                          {formatDate(answer.latest_date)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="font-semibold">
+                            {answer.count}
+                          </Badge>
                         </TableCell>
                       </TableRow>
                     ))}
