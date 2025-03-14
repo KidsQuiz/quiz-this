@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WrongAnswersStats from './WrongAnswersStats';
+import { useToast } from '@/hooks/use-toast';
 
 interface WrongAnswersDashboardProps {
   isOpen: boolean;
@@ -30,6 +32,7 @@ interface WrongAnswer {
 
 const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswersDashboardProps) => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('list');
@@ -52,6 +55,11 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
 
       if (error) {
         console.error('Error fetching wrong answers:', error);
+        toast({
+          variant: "destructive",
+          title: t('error'),
+          description: t('errorFetchingData')
+        });
         throw error;
       }
       
@@ -88,6 +96,8 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
     }
   };
 
+  const hasWrongAnswers = wrongAnswers.length > 0;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col">
@@ -97,8 +107,8 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
             {t('wrongAnswersDashboard')}: {kidName}
           </DialogTitle>
           <DialogDescription>
-            {wrongAnswers.length > 0 
-              ? t('noWrongAnswersStats') 
+            {hasWrongAnswers 
+              ? t('wrongAnswersIntro') 
               : t('noWrongAnswers')}
           </DialogDescription>
         </DialogHeader>
@@ -120,7 +130,7 @@ const WrongAnswersDashboard = ({ isOpen, onClose, kidId, kidName }: WrongAnswers
               <div className="flex items-center justify-center h-80">
                 <p>{t('loading')}</p>
               </div>
-            ) : wrongAnswers.length === 0 ? (
+            ) : !hasWrongAnswers ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center pt-8 pb-8">
                   <Check className="h-12 w-12 text-green-500 mb-4" />
