@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { UserStatsCards } from './UserStatsCards';
 import { RegistrationChart } from './RegistrationChart';
-import { DashboardError } from './DashboardError';
+import AdminErrorBoundaryWithLanguage from './AdminErrorBoundary';
 
 const AdminDashboard = () => {
   const { t } = useLanguage();
@@ -30,8 +30,13 @@ const AdminDashboard = () => {
         </Button>
       </div>
       
-      <UserStatsCards />
-      <RegistrationChart />
+      <AdminErrorBoundaryWithLanguage>
+        <UserStatsCards />
+      </AdminErrorBoundaryWithLanguage>
+      
+      <AdminErrorBoundaryWithLanguage>
+        <RegistrationChart />
+      </AdminErrorBoundaryWithLanguage>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import Header from '@/components/Header';
+import AdminErrorBoundaryWithLanguage from '@/components/admin/AdminErrorBoundary';
 
 const AdminPage = () => {
   const { isAdmin, isLoading } = useAuth();
@@ -29,7 +30,9 @@ const AdminPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header activeTab="" onTabChange={() => navigate('/')} />
       <main className="flex-1 bg-background">
-        <AdminDashboard />
+        <AdminErrorBoundaryWithLanguage>
+          <AdminDashboard />
+        </AdminErrorBoundaryWithLanguage>
       </main>
     </div>
   );
