@@ -3,14 +3,7 @@ import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-interface WrongAnswer {
-  id: string;
-  question_content: string;
-  answer_content: string;
-  correct_answer_content: string;
-  created_at: string;
-}
+import { WrongAnswer } from './types';
 
 interface WrongAnswersStatsProps {
   wrongAnswers: WrongAnswer[];
