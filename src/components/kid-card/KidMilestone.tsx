@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trophy, ArrowRight } from 'lucide-react';
+import { Trophy, ArrowRight, Star } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
@@ -51,8 +51,20 @@ const KidMilestone = ({
               <span className="text-[10px] text-muted-foreground">{t('points')}</span>
             </div>
             
-            <div className="flex-1 mx-2">
-              <Progress value={progressPercentage} className="h-2.5" />
+            <div className="flex-1 mx-2 relative">
+              <Progress 
+                value={progressPercentage} 
+                className="h-2.5 bg-gray-200" 
+                indicatorClassName="bg-gradient-to-r from-amber-400 to-amber-500"
+              />
+              {progressPercentage > 0 && progressPercentage < 100 && (
+                <div 
+                  className="absolute top-0 left-0 flex items-center justify-center"
+                  style={{ left: `${progressPercentage}%`, transform: 'translateX(-50%)' }}
+                >
+                  <Star className="h-3 w-3 text-amber-500 fill-amber-500 mt-[-8px]" />
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col items-center">
