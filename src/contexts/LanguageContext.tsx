@@ -11,12 +11,15 @@ export type SupportedLanguage = 'en' | 'bg';
 // Type for the language pack dictionaries
 export type LanguagePack = typeof en;
 
+// Allow any string as a key for dynamic translations
+type TranslationKey = keyof LanguagePack | string;
+
 // Type for the language context
 interface LanguageContextType {
   currentLanguage: SupportedLanguage;
   languagePack: LanguagePack;
   changeLanguage: (lang: SupportedLanguage) => void;
-  t: (key: keyof LanguagePack) => string;
+  t: (key: TranslationKey) => string;
 }
 
 // Available language packs
@@ -119,9 +122,21 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     document.documentElement.lang = currentLanguage;
   }, [currentLanguage]);
 
-  // Translation function
-  const t = (key: keyof LanguagePack): string => {
-    return languagePack[key] || key.toString();
+  // Translation function - updated to handle keys not in the type definition
+  const t = (key: TranslationKey): string => {
+    const translationKey = key as keyof LanguagePack;
+    // Check if the key exists in the language pack
+    if (languagePack[translationKey]) {
+      return languagePack[translationKey];
+    }
+    
+    // If not found in the current language pack, check English as fallback
+    if (currentLanguage !== 'en' && languagePacks.en[translationKey]) {
+      return languagePacks.en[translationKey];
+    }
+    
+    // Return the key itself as a last resort
+    return String(key);
   };
 
   // Create a memoized context value to prevent unnecessary re-renders

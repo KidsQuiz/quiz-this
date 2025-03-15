@@ -1,104 +1,103 @@
 
-import { useState } from 'react';
-import { AnswerOption, Question } from '@/hooks/questionsTypes';
-import { playSound } from '@/utils/soundEffects';
+import { useState, useCallback } from 'react';
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Question } from '@/hooks/questionsTypes';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useAnswerHandling = (
-  answerOptions: AnswerOption[],
-  currentQuestion: Question | null,
-  setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>,
-  setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
-  setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   questions: Question[],
-  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
+  kidId: string,
+  setIsSessionOver: (isOver: boolean) => void,
+  setShowRelaxAnimation: (show: boolean) => void
 ) => {
-  const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const { t } = useLanguage();
 
-  // Handle answer selection
-  const handleSelectAnswer = async (answerId: string) => {
+  const currentQuestion = questions[currentQuestionIndex];
+  
+  const resetAnswer = useCallback(() => {
+    setSelectedAnswer(null);
+    setIsCorrect(null);
+    setAnswerSubmitted(false);
+  }, []);
+  
+  const handleAnswerSelect = useCallback((answerId: string) => {
     if (answerSubmitted) return;
+    setSelectedAnswer(answerId);
+  }, [answerSubmitted]);
+  
+  const checkAnswer = useCallback(async () => {
+    if (!selectedAnswer || !currentQuestion || answerSubmitted) return;
     
-    setSelectedAnswerId(answerId);
+    const correctAnswerId = currentQuestion.answers.find(a => a.is_correct)?.id;
+    const isAnswerCorrect = selectedAnswer === correctAnswerId;
+    
+    setIsCorrect(isAnswerCorrect);
     setAnswerSubmitted(true);
     
-    // Find if the selected answer is correct
-    const selectedAnswer = answerOptions.find(option => option.id === answerId);
-    const wasCorrect = selectedAnswer?.is_correct || false;
-    setIsCorrect(wasCorrect);
-    
-    // Update scores
-    if (wasCorrect && currentQuestion) {
-      const points = currentQuestion.points;
-      console.log(`Correct answer! Adding ${points} points to session total`);
-      
-      // Play correct sound effect
-      playSound('correct');
-      
-      // Update correct answers count
-      let newCorrectAnswers = 0;
-      setCorrectAnswers(prev => {
-        newCorrectAnswers = prev + 1;
-        console.log(`Updated correctAnswers: ${prev} -> ${newCorrectAnswers}`);
-        return newCorrectAnswers;
-      });
-      
-      setTotalPoints(prev => prev + points);
-      setShowWowEffect(true);
-      
-      // Check if this was the last question AND if all answers were correct
-      const isLastQuestion = (idx: number) => idx + 1 >= questions.length;
-      
-      // Show celebration effect for a short duration
-      setTimeout(() => {
-        setShowWowEffect(false);
-        
-        if (isLastQuestion(currentQuestionIndex => currentQuestionIndex)) {
-          // If perfect score (all questions answered correctly)
-          if (newCorrectAnswers === questions.length) {
-            console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
-            setSessionComplete(true);
-            setShowBoomEffect(true);
-            // Dialog will close automatically in useSessionCompletion
-          } else {
-            // Move to completion screen if not perfect score
-            setCurrentQuestionIndex(prev => prev + 1);
-            setIsModalOpen(true);
-          }
-        } else {
-          // Not the last question, move to next
-          setCurrentQuestionIndex(prev => prev + 1);
-          setIsModalOpen(true);
-        }
-      }, 1500);
+    if (isAnswerCorrect) {
+      setCorrectAnswers(prev => prev + 1);
+      setTotalPoints(prev => prev + (currentQuestion.points || 0));
     } else {
-      // Play incorrect sound effect
-      playSound('incorrect');
-      console.log("Incorrect answer submitted, waiting 5 seconds before proceeding");
-      
-      // For incorrect answers, wait 5 seconds before moving to next question
-      // to give the kid time to see the correct answer and the relaxation animation
+      // Show relaxation animation for wrong answers
       setTimeout(() => {
-        console.log("5 second timeout completed, moving to next question");
-        setCurrentQuestionIndex(prev => prev + 1);
-        setIsModalOpen(true);
-      }, 5000); // 5 seconds wait time
+        setShowRelaxAnimation(true);
+        
+        // Hide after 4 seconds
+        setTimeout(() => {
+          setShowRelaxAnimation(false);
+        }, 4000);
+      }, 1000);
     }
     
-    return wasCorrect;
-  };
-
+    try {
+      await supabase.from('kid_answers').insert({
+        kid_id: kidId,
+        question_id: currentQuestion.id,
+        answer_id: selectedAnswer,
+        is_correct: isAnswerCorrect,
+        points_earned: isAnswerCorrect ? currentQuestion.points : 0
+      });
+      
+      if (isAnswerCorrect) {
+        await supabase.rpc('update_kid_points', { 
+          kid_id: kidId, 
+          points_to_add: currentQuestion.points || 0 
+        });
+      }
+    } catch (error) {
+      console.error('Error recording answer:', error);
+    }
+  }, [selectedAnswer, currentQuestion, answerSubmitted, kidId, setShowRelaxAnimation]);
+  
+  const goToNextQuestion = useCallback(() => {
+    // Fix: Convert the callback to a numeric value
+    const nextIndex = currentQuestionIndex + 1;
+    
+    if (nextIndex < questions.length) {
+      resetAnswer();
+      setCurrentQuestionIndex(nextIndex);
+    } else {
+      setIsSessionOver(true);
+    }
+  }, [currentQuestionIndex, questions.length, resetAnswer, setIsSessionOver]);
+  
   return {
-    selectedAnswerId,
-    answerSubmitted,
+    selectedAnswer,
     isCorrect,
-    setSelectedAnswerId,
-    setAnswerSubmitted,
-    setIsCorrect,
-    handleSelectAnswer
+    answerSubmitted,
+    currentQuestionIndex,
+    currentQuestion,
+    correctAnswers,
+    totalPoints,
+    handleAnswerSelect,
+    checkAnswer,
+    goToNextQuestion
   };
 };
