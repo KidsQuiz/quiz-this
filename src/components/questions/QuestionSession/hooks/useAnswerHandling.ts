@@ -4,6 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePointsUpdate } from './usePointsUpdate';
 
 export const useAnswerHandling = (
   questions: Question[],
@@ -77,20 +78,19 @@ export const useAnswerHandling = (
       });
       
       if (isAnswerCorrect) {
-        // Update kid points in the database using a custom function call
-        const { error } = await supabase.rpc('update_kid_points', { 
-          kid_id: kidId, 
-          points_to_add: currentQuestion.points || 0 
-        });
+        // Get current kid points first
+        const { data: kidData } = await supabase
+          .from('kids')
+          .select('points')
+          .eq('id', kidId)
+          .single();
         
-        if (error) {
-          console.error('Error updating kid points:', error);
-          // Fallback: directly update the kids table if the RPC fails
+        // Then update the points directly
+        if (kidData) {
+          const newPoints = (kidData.points || 0) + (currentQuestion.points || 0);
           await supabase
             .from('kids')
-            .update({ 
-              points: supabase.rpc('get_kid_points', { kid_id: kidId }) + (currentQuestion.points || 0) 
-            })
+            .update({ points: newPoints })
             .eq('id', kidId);
         }
       }

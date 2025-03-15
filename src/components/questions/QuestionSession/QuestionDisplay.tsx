@@ -25,6 +25,7 @@ interface QuestionDisplayProps {
   selectedAnswerId: string | null;
   isCorrect: boolean;
   showWowEffect: boolean;
+  showRelaxAnimationState?: boolean;
   handleSelectAnswer: (answerId: string) => void;
 }
 
@@ -38,9 +39,14 @@ const QuestionDisplay = ({
   selectedAnswerId,
   isCorrect,
   showWowEffect,
+  showRelaxAnimationState,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
   const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
+  
+  // Use the state from props if provided, otherwise use local state
+  const relaxAnimationVisible = showRelaxAnimationState !== undefined ? 
+    showRelaxAnimationState : showRelaxAnimation;
   
   // Play sound effect when answer is submitted or time runs out
   useEffect(() => {
@@ -141,8 +147,8 @@ const QuestionDisplay = ({
       
       <AnimationStyles />
       
-      {/* Show relaxing animation when answer is incorrect */}
-      <RelaxAnimation show={showRelaxAnimation} />
+      {/* Show relaxing animation when answer is incorrect - use the combined state */}
+      <RelaxAnimation show={relaxAnimationVisible} />
     </div>
   );
 };

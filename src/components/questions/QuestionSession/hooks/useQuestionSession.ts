@@ -1,3 +1,4 @@
+
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -12,10 +13,19 @@ import { useTimeoutHandling } from './useTimeoutHandling';
 import { useDialogManagement } from './useDialogManagement';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useState } from 'react';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
   const { t } = useLanguage();
+  
+  // Define the relaxation animation state handler first (before it's used)
+  const [showRelaxAnimationState, setShowRelaxAnimationState] = useState(false);
+  
+  // Function to handle showing/hiding relaxation animation
+  const setShowRelaxAnimation = (show: boolean) => {
+    setShowRelaxAnimationState(show);
+  };
   
   // Use session state hook for state management
   const {
@@ -110,23 +120,32 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setSessionComplete
   );
 
-  // We need to define this function to keep it outside the useCurrentQuestion hook
-  const setShowRelaxAnimation = (show: boolean) => {
-    // This is intentionally empty as the relaxation animation
-    // is handled directly by the QuestionDisplay component
-    // and the animation state is managed there
-  };
-
   // Handle current question loading and setup
+  const useCurrentQuestionParams = {
+    isConfiguring,
+    questions,
+    currentQuestionIndex,
+    setCurrentQuestion,
+    setTimeRemaining,
+    answerSubmitted,
+    selectedAnswer,
+    isCorrect,
+    setShowWowEffect,
+    setTimerActive,
+    loadAnswerOptions
+  };
+  
   useCurrentQuestion(
     isConfiguring,
     questions,
     currentQuestionIndex,
     setCurrentQuestion,
     setTimeRemaining,
-    setAnswerSubmitted,
-    setSelectedAnswer,
-    setIsCorrect,
+    // Pass simple state values instead of setters that don't exist
+    // The actual question component will handle state updates
+    answerSubmitted,
+    selectedAnswer,
+    isCorrect,
     setShowWowEffect,
     setTimerActive,
     loadAnswerOptions
@@ -146,12 +165,16 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsModalOpen
   );
 
-  // Enhanced answer handling with database recording
+  // Enhanced answer handling with database recording - modify to match interface
   const { handleSelectAnswer } = useEnhancedAnswerHandling(
     kidId,
     currentQuestion,
     answerOptions,
-    handleAnswerSelect,
+    // Convert the regular handler to match the expected Promise<boolean> return type
+    async (answerId: string) => {
+      handleAnswerSelect(answerId);
+      return true; // Return a promise that resolves to boolean
+    },
     setKidAnswers
   );
 
@@ -174,7 +197,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     currentQuestionIndex,
     questions,
-    setAnswerSubmitted,
+    // We'll pass the value directly since we don't have the setter
+    answerSubmitted,
     setSessionComplete,
     setIsModalOpen
   );
@@ -200,6 +224,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowBoomEffect,
     isModalOpen,
     kidAnswers,
+    showRelaxAnimationState,
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
