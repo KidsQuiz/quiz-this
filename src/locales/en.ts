@@ -44,7 +44,7 @@ export const en = {
   processing: 'Processing...',
   
   // Dashboard
-  dashboard: 'Dashboard',
+  dashboard: 'Mathwondo',
   myKids: 'My Kids',
   addKid: 'Add Kid',
   noKids: 'No kids added yet',
