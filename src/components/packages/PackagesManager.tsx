@@ -38,7 +38,6 @@ const PackagesManager = () => {
         onDeletePackage={deletePackage}
         onClonePackage={clonePackage}
         onAddPackage={handleAddPackage}
-        alwaysShowAddCard={true}
       />
       
       <PackageForm
