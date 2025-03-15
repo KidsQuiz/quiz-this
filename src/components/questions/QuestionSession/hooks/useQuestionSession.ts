@@ -18,15 +18,12 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   const { toast } = useToast();
   const { t } = useLanguage();
   
-  // Define the relaxation animation state handler first (before it's used)
   const [showRelaxAnimationState, setShowRelaxAnimationState] = useState(false);
   
-  // Function to handle showing/hiding relaxation animation
   const setShowRelaxAnimation = (show: boolean) => {
     setShowRelaxAnimationState(show);
   };
-  
-  // Use session state hook for state management
+
   const {
     isConfiguring,
     setIsConfiguring,
@@ -46,7 +43,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers
   } = useSessionState();
 
-  // Load packages and handle selection
   const {
     questionPackages,
     selectedPackageIds,
@@ -55,7 +51,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     deselectAllPackages
   } = usePackageSelection(kidId, kidName, onClose, toast);
 
-  // Load questions and answer options
   const {
     isLoading,
     questions,
@@ -66,7 +61,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadAnswerOptions
   } = useQuestionLoading();
 
-  // Handle question navigation and timers
   const {
     currentQuestionIndex,
     timeRemaining,
@@ -78,7 +72,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Handle answer submission and scoring
   const {
     selectedAnswer,
     answerSubmitted,
@@ -97,10 +90,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowRelaxAnimation
   );
 
-  // Map return values to expected props
   const selectedAnswerId = selectedAnswer;
 
-  // Handle session startup
   const { handleStartSession } = useSessionStartup(
     selectedPackageIds,
     loadQuestions,
@@ -108,7 +99,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCurrentQuestionIndex
   );
 
-  // Handle modal transitions between questions
   useModalTransition(
     isModalOpen,
     sessionComplete,
@@ -119,7 +109,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setSessionComplete
   );
 
-  // Handle current question loading and setup
   useCurrentQuestion(
     isConfiguring,
     questions,
@@ -134,7 +123,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadAnswerOptions
   );
 
-  // Handle session completion
   useSessionCompletion(
     kidId,
     kidName,
@@ -148,20 +136,17 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsModalOpen
   );
 
-  // Enhanced answer handling with database recording
   const { handleSelectAnswer } = useEnhancedAnswerHandling(
     kidId,
     currentQuestion,
     answerOptions,
-    // Convert the regular handler to match the expected Promise<boolean> return type
     async (answerId: string) => {
       handleAnswerSelect(answerId);
-      return true; // Return a promise that resolves to boolean
+      return true;
     },
     setKidAnswers
   );
 
-  // Handle dialog closing
   const { handleDialogClose } = useDialogManagement(
     setIsModalOpen,
     onClose,
@@ -171,7 +156,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     questions
   );
 
-  // Handle timeouts
   useTimeoutHandling(
     timeRemaining,
     currentQuestion,
@@ -180,7 +164,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     currentQuestionIndex,
     questions,
-    answerSubmitted,
+    null,
     setSessionComplete,
     setIsModalOpen
   );

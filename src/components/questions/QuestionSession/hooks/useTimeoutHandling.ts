@@ -9,7 +9,8 @@ export const useTimeoutHandling = (
   answerSubmitted: boolean,
   currentQuestionIndex: number,
   questions: any[],
-  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
+  // Change this from a setter to a dummy parameter we don't use
+  _unused: any,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
@@ -18,8 +19,8 @@ export const useTimeoutHandling = (
     if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
     
     if (timeRemaining === 0) {
-      // Mark as submitted with no selection
-      setAnswerSubmitted(true);
+      // We don't use setAnswerSubmitted anymore since we don't have access to it
+      // Just close the dialog after timeout which will effectively move to the next question
       
       // Wait 2 seconds to show the timeout state, then move to next question
       setTimeout(() => {
@@ -38,7 +39,6 @@ export const useTimeoutHandling = (
     isConfiguring, 
     sessionComplete, 
     answerSubmitted, 
-    setAnswerSubmitted, 
     currentQuestionIndex, 
     questions.length, 
     setSessionComplete,
