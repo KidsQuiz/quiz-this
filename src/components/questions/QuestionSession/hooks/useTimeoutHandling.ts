@@ -16,14 +16,12 @@ export const useTimeoutHandling = (
 ) => {
   // Monitor time remaining and close the question dialog when time elapses
   useEffect(() => {
-    if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
+    if (!currentQuestion || isConfiguring || sessionComplete) return;
     
-    if (timeRemaining === 0) {
-      // We don't use setAnswerSubmitted anymore since we don't have access to it
-      // Just close the dialog after timeout which will effectively move to the next question
-      
-      // Wait 2 seconds to show the timeout state, then move to next question
-      setTimeout(() => {
+    // When answer is submitted OR time runs out, move to next question after a delay
+    if (answerSubmitted || timeRemaining === 0) {
+      // Wait 2 seconds to show the feedback, then move to next question
+      const timer = setTimeout(() => {
         if (currentQuestionIndex >= questions.length - 1) {
           // Last question, will complete the session
           setSessionComplete(true);
@@ -32,6 +30,8 @@ export const useTimeoutHandling = (
           setIsModalOpen(false);
         }
       }, 2000);
+      
+      return () => clearTimeout(timer);
     }
   }, [
     timeRemaining, 

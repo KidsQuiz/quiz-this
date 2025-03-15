@@ -31,10 +31,14 @@ export const useAnswerHandling = (
   const handleAnswerSelect = useCallback((answerId: string) => {
     if (answerSubmitted) return;
     setSelectedAnswer(answerId);
+    
+    // Automatically check answer when selected
+    checkAnswer(answerId);
   }, [answerSubmitted]);
   
-  const checkAnswer = useCallback(async () => {
-    if (!selectedAnswer || !currentQuestion || answerSubmitted) return;
+  const checkAnswer = useCallback(async (answerId?: string) => {
+    const idToCheck = answerId || selectedAnswer;
+    if (!idToCheck || !currentQuestion || answerSubmitted) return;
     
     // Get all the answer options for the current question from the database
     const { data: answerOptions } = await supabase
@@ -48,7 +52,7 @@ export const useAnswerHandling = (
     }
     
     const correctAnswerId = answerOptions.find(a => a.is_correct)?.id;
-    const isAnswerCorrect = selectedAnswer === correctAnswerId;
+    const isAnswerCorrect = idToCheck === correctAnswerId;
     
     setIsCorrect(isAnswerCorrect);
     setAnswerSubmitted(true);
@@ -72,7 +76,7 @@ export const useAnswerHandling = (
       await supabase.from('kid_answers').insert({
         kid_id: kidId,
         question_id: currentQuestion.id,
-        answer_id: selectedAnswer,
+        answer_id: idToCheck,
         is_correct: isAnswerCorrect,
         points_earned: isAnswerCorrect ? currentQuestion.points : 0
       });
