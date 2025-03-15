@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -11,6 +11,7 @@ import CelebrationEffect from './components/CelebrationEffect';
 import AnswerOptionsList from './components/AnswerOptionsList';
 import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
+import RelaxAnimation from './components/RelaxAnimation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 
@@ -39,17 +40,36 @@ const QuestionDisplay = ({
   showWowEffect,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
+  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
+  
   // Play sound effect when answer is submitted or time runs out
   useEffect(() => {
     if (answerSubmitted) {
       // If time ran out (no selection made) play the incorrect sound
       if (selectedAnswerId === null && timeRemaining === 0) {
         playSound('incorrect');
+        setShowRelaxAnimation(true);
       } else if (selectedAnswerId !== null) {
-        playSound(isCorrect ? 'correct' : 'incorrect');
+        if (isCorrect) {
+          playSound('correct');
+        } else {
+          playSound('incorrect');
+          setShowRelaxAnimation(true);
+        }
       }
     }
   }, [answerSubmitted, isCorrect, selectedAnswerId, timeRemaining]);
+
+  // Reset relax animation after a delay
+  useEffect(() => {
+    if (showRelaxAnimation) {
+      const timer = setTimeout(() => {
+        setShowRelaxAnimation(false);
+      }, 4000); // Show for 4 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showRelaxAnimation]);
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
@@ -113,6 +133,9 @@ const QuestionDisplay = ({
       </Card>
       
       <AnimationStyles />
+      
+      {/* Show relaxing animation when answer is incorrect */}
+      <RelaxAnimation show={showRelaxAnimation} />
     </div>
   );
 };

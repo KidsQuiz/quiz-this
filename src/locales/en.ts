@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -179,4 +178,9 @@ export const en = {
   activeUsers: 'Active Users',
   usersWithActiveKids: 'Users with active kids (answered questions)',
   ofAllUsers: 'of all users',
-};
+  
+  // Relaxation messages
+  "dontWorry": "Don't worry!",
+  "learningTakesTime": "Learning takes time.",
+  "tryNextQuestion": "Let's try the next question!"
+} as const;
