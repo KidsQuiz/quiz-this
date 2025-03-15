@@ -23,7 +23,7 @@ interface QuestionDisplayProps {
   timeRemaining: number;
   answerSubmitted: boolean;
   selectedAnswerId: string | null;
-  isCorrect: boolean;
+  isCorrect: boolean | null;
   showWowEffect: boolean;
   showRelaxAnimationState?: boolean;
   handleSelectAnswer: (answerId: string) => void;
@@ -51,6 +51,8 @@ const QuestionDisplay = ({
   // Play sound effect when answer is submitted or time runs out
   useEffect(() => {
     if (answerSubmitted) {
+      console.log(`Answer submitted, isCorrect: ${isCorrect}, selectedAnswerId: ${selectedAnswerId}`);
+      
       // If time ran out (no selection made) play the incorrect sound
       if (selectedAnswerId === null && timeRemaining === 0) {
         playSound('incorrect');
@@ -86,6 +88,13 @@ const QuestionDisplay = ({
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
+
+  const handleAnswerClick = (answerId: string) => {
+    console.log(`Answer clicked: ${answerId}`);
+    if (!answerSubmitted) {
+      handleSelectAnswer(answerId);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -123,7 +132,7 @@ const QuestionDisplay = ({
                       </div>
                     ) : (
                       <FeedbackMessage 
-                        isCorrect={isCorrect}
+                        isCorrect={!!isCorrect}
                         points={currentQuestion.points}
                         answerSubmitted={answerSubmitted}
                       />
@@ -137,7 +146,7 @@ const QuestionDisplay = ({
                   answerOptions={answerOptions}
                   selectedAnswerId={selectedAnswerId}
                   answerSubmitted={answerSubmitted}
-                  handleSelectAnswer={handleSelectAnswer}
+                  handleSelectAnswer={handleAnswerClick}
                 />
               </div>
             </div>

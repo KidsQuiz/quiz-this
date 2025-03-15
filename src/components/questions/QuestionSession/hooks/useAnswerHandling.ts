@@ -40,11 +40,18 @@ export const useAnswerHandling = (
     const idToCheck = answerId || selectedAnswer;
     if (!idToCheck || !currentQuestion || answerSubmitted) return;
     
+    console.log(`Checking answer ${idToCheck} for question ${currentQuestion.id}`);
+    
     // Get all the answer options for the current question from the database
-    const { data: answerOptions } = await supabase
+    const { data: answerOptions, error } = await supabase
       .from('answer_options')
       .select('*')
       .eq('question_id', currentQuestion.id);
+      
+    if (error) {
+      console.error('Error fetching answer options:', error);
+      return;
+    }
       
     if (!answerOptions || answerOptions.length === 0) {
       console.error('No answer options found for question:', currentQuestion.id);
@@ -54,6 +61,8 @@ export const useAnswerHandling = (
     const correctAnswerId = answerOptions.find(a => a.is_correct)?.id;
     const isAnswerCorrect = idToCheck === correctAnswerId;
     
+    console.log(`Answer is ${isAnswerCorrect ? 'correct' : 'incorrect'}, correct answer ID: ${correctAnswerId}`);
+    
     setIsCorrect(isAnswerCorrect);
     setAnswerSubmitted(true);
     
@@ -62,6 +71,7 @@ export const useAnswerHandling = (
       setTotalPoints(prev => prev + (currentQuestion.points || 0));
     } else {
       // Show relaxation animation for wrong answers
+      console.log('Showing relaxation animation for wrong answer');
       setTimeout(() => {
         setShowRelaxAnimation(true);
         
@@ -73,6 +83,7 @@ export const useAnswerHandling = (
     }
     
     try {
+      // Record the answer in the database
       await supabase.from('kid_answers').insert({
         kid_id: kidId,
         question_id: currentQuestion.id,
@@ -101,6 +112,13 @@ export const useAnswerHandling = (
     } catch (error) {
       console.error('Error recording answer:', error);
     }
+    
+    // Add a delay before moving to the next question after answer
+    setTimeout(() => {
+      goToNextQuestion();
+    }, 3000); // Wait 3 seconds to show feedback before proceeding
+    
+    return isAnswerCorrect;
   }, [selectedAnswer, currentQuestion, answerSubmitted, kidId, setShowRelaxAnimation]);
   
   const goToNextQuestion = useCallback(() => {
