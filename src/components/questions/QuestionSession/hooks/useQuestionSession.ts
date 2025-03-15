@@ -1,4 +1,3 @@
-
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -72,25 +71,25 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
 
   // Handle answer submission and scoring
   const {
-    selectedAnswerId,
+    selectedAnswer,
     answerSubmitted,
     isCorrect,
-    setAnswerSubmitted,
-    setSelectedAnswerId,
-    setIsCorrect,
-    handleSelectAnswer: originalHandleSelectAnswer
+    currentQuestionIndex: answerQuestionIndex,
+    currentQuestion: answerCurrentQuestion,
+    correctAnswers: answerCorrectCount,
+    totalPoints: answerTotalPoints,
+    handleAnswerSelect,
+    checkAnswer,
+    goToNextQuestion
   } = useAnswerHandling(
-    answerOptions,
-    currentQuestion,
-    setCorrectAnswers,
-    setTotalPoints,
-    setShowWowEffect,
-    setCurrentQuestionIndex,
-    setIsModalOpen,
     questions,
-    setShowBoomEffect,
-    setSessionComplete
+    kidId,
+    setSessionComplete,
+    setShowRelaxAnimation
   );
+
+  // Map return values to expected props
+  const selectedAnswerId = selectedAnswer;
 
   // Handle session startup
   const { handleStartSession } = useSessionStartup(
@@ -111,6 +110,13 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setSessionComplete
   );
 
+  // We need to define this function to keep it outside the useCurrentQuestion hook
+  const setShowRelaxAnimation = (show: boolean) => {
+    // This is intentionally empty as the relaxation animation
+    // is handled directly by the QuestionDisplay component
+    // and the animation state is managed there
+  };
+
   // Handle current question loading and setup
   useCurrentQuestion(
     isConfiguring,
@@ -119,7 +125,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCurrentQuestion,
     setTimeRemaining,
     setAnswerSubmitted,
-    setSelectedAnswerId,
+    setSelectedAnswer,
     setIsCorrect,
     setShowWowEffect,
     setTimerActive,
@@ -145,7 +151,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     kidId,
     currentQuestion,
     answerOptions,
-    originalHandleSelectAnswer,
+    handleAnswerSelect,
     setKidAnswers
   );
 
@@ -186,7 +192,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionComplete,
     correctAnswers,
     totalPoints,
-    selectedAnswerId,
+    selectedAnswerId, 
     answerSubmitted,
     isCorrect,
     showWowEffect,

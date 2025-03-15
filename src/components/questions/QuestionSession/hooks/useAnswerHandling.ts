@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Question } from '@/hooks/questionsTypes';
+import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useAnswerHandling = (
@@ -35,7 +35,18 @@ export const useAnswerHandling = (
   const checkAnswer = useCallback(async () => {
     if (!selectedAnswer || !currentQuestion || answerSubmitted) return;
     
-    const correctAnswerId = currentQuestion.answers.find(a => a.is_correct)?.id;
+    // Get all the answer options for the current question from the database
+    const { data: answerOptions } = await supabase
+      .from('answer_options')
+      .select('*')
+      .eq('question_id', currentQuestion.id);
+      
+    if (!answerOptions || answerOptions.length === 0) {
+      console.error('No answer options found for question:', currentQuestion.id);
+      return;
+    }
+    
+    const correctAnswerId = answerOptions.find(a => a.is_correct)?.id;
     const isAnswerCorrect = selectedAnswer === correctAnswerId;
     
     setIsCorrect(isAnswerCorrect);
@@ -66,10 +77,22 @@ export const useAnswerHandling = (
       });
       
       if (isAnswerCorrect) {
-        await supabase.rpc('update_kid_points', { 
+        // Update kid points in the database using a custom function call
+        const { error } = await supabase.rpc('update_kid_points', { 
           kid_id: kidId, 
           points_to_add: currentQuestion.points || 0 
         });
+        
+        if (error) {
+          console.error('Error updating kid points:', error);
+          // Fallback: directly update the kids table if the RPC fails
+          await supabase
+            .from('kids')
+            .update({ 
+              points: supabase.rpc('get_kid_points', { kid_id: kidId }) + (currentQuestion.points || 0) 
+            })
+            .eq('id', kidId);
+        }
       }
     } catch (error) {
       console.error('Error recording answer:', error);
@@ -77,7 +100,6 @@ export const useAnswerHandling = (
   }, [selectedAnswer, currentQuestion, answerSubmitted, kidId, setShowRelaxAnimation]);
   
   const goToNextQuestion = useCallback(() => {
-    // Fix: Convert the callback to a numeric value
     const nextIndex = currentQuestionIndex + 1;
     
     if (nextIndex < questions.length) {
