@@ -12,29 +12,28 @@ export const fetchUserRegistrations = async () => {
 };
 
 export const prepareChartData = (data: any[]) => {
-  const monthCountMap = new Map();
+  const dailyCountMap = new Map();
 
   data.forEach(profile => {
     const date = new Date(profile.updated_at);
-    const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const dayDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
     
-    if (!monthCountMap.has(monthYear)) {
-      const months = Array.from(monthCountMap.keys()).sort();
-      const previousCount = months.length > 0 ? monthCountMap.get(months[months.length - 1]) : 0;
-      monthCountMap.set(monthYear, previousCount + 1);
+    if (!dailyCountMap.has(dayDate)) {
+      const days = Array.from(dailyCountMap.keys()).sort();
+      const previousCount = days.length > 0 ? dailyCountMap.get(days[days.length - 1]) : 0;
+      dailyCountMap.set(dayDate, previousCount + 1);
     } else {
-      monthCountMap.set(monthYear, monthCountMap.get(monthYear) + 1);
+      dailyCountMap.set(dayDate, dailyCountMap.get(dayDate) + 1);
     }
   });
 
-  return Array.from(monthCountMap.entries()).map(([month, count]) => ({
-    month,
+  return Array.from(dailyCountMap.entries()).map(([day, count]) => ({
+    day,
     count
   }));
 };
 
-export const formatMonthYear = (monthYear: string) => {
-  const [year, month] = monthYear.split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1);
-  return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+export const formatDayDate = (dayDate: string) => {
+  const date = new Date(dayDate);
+  return date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
 };

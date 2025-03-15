@@ -5,7 +5,7 @@ import { BarChart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { fetchUserRegistrations, prepareChartData, formatMonthYear } from './utils/adminDataUtils';
+import { fetchUserRegistrations, prepareChartData, formatDayDate } from './utils/adminDataUtils';
 
 export const RegistrationChart = () => {
   const { t } = useLanguage();
@@ -23,7 +23,7 @@ export const RegistrationChart = () => {
           <BarChart className="h-5 w-5 text-primary" />
           {t('userRegistrationTimeline')}
         </CardTitle>
-        <CardDescription>{t('registrationsByMonth')}</CardDescription>
+        <CardDescription>{t('registrationsByDay')}</CardDescription>
       </CardHeader>
       <CardContent className="p-4">
         {chartLoading ? (
@@ -45,10 +45,11 @@ export const RegistrationChart = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
-                  dataKey="month" 
-                  tickFormatter={formatMonthYear}
+                  dataKey="day" 
+                  tickFormatter={formatDayDate}
                   tickMargin={10}
                   tick={{ fontSize: 12 }}
+                  interval="preserveStartEnd"
                 />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip
@@ -58,7 +59,7 @@ export const RegistrationChart = () => {
                         <div className="rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs text-muted-foreground">
-                              {formatMonthYear(payload[0].payload.month)}
+                              {formatDayDate(payload[0].payload.day)}
                             </span>
                             <span className="font-bold">
                               {payload[0].payload.count} {t('users')}

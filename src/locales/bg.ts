@@ -1,4 +1,3 @@
-
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -40,7 +39,7 @@ export const bg = {
   dontHaveAccount: 'Нямате акаунт? Регистрирайте се',
   processing: 'Обработка...',
   
-  dashboard: 'Табло',
+  dashboard: 'Матуондо',
   myKids: 'Моите деца',
   addKid: 'Добави дете',
   noKids: 'Все още няма добавени деца',
@@ -161,6 +160,7 @@ export const bg = {
   totalRegisteredUsers: 'Общ брой регистрирани потребители',
   userRegistrationTimeline: 'График на регистрациите',
   registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
+  registrationsByDay: 'Натрупване на потребителски регистрации по дни',
   users: 'потребители',
   admin: 'Админ',
   activeUsers: 'Активни Потребители',

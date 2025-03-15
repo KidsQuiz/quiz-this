@@ -44,7 +44,7 @@ export const en = {
   processing: 'Processing...',
   
   // Dashboard
-  dashboard: 'Dashboard',
+  dashboard: 'Mathwondo',
   myKids: 'My Kids',
   addKid: 'Add Kid',
   noKids: 'No kids added yet',
@@ -173,6 +173,7 @@ export const en = {
   totalRegisteredUsers: 'Total number of registered users',
   userRegistrationTimeline: 'User Registration Timeline',
   registrationsByMonth: 'Cumulative user registrations by month',
+  registrationsByDay: 'Cumulative user registrations by day',
   users: 'users',
   admin: 'Admin',
   activeUsers: 'Active Users',

@@ -62,6 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom colors from the image
+				mathwondo: {
+				  blue: '#1EAEDB',
+				  lightBlue: '#33C3F0',
+				  teal: '#4ED8C9',
+				  yellow: '#FFD43B',
+				  orange: '#FF9138',
+				  purple: '#A64AC9',
+				  background: '#4ED8C9'
 				}
 			},
 			borderRadius: {
