@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { usePointsUpdate } from './usePointsUpdate';
+import { updateKidPoints } from './usePointsUpdate';
 
 export const useAnswerHandling = (
   questions: Question[],

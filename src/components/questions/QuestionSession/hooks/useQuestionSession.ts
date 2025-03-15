@@ -1,4 +1,3 @@
-
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -121,28 +120,12 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   );
 
   // Handle current question loading and setup
-  const useCurrentQuestionParams = {
-    isConfiguring,
-    questions,
-    currentQuestionIndex,
-    setCurrentQuestion,
-    setTimeRemaining,
-    answerSubmitted,
-    selectedAnswer,
-    isCorrect,
-    setShowWowEffect,
-    setTimerActive,
-    loadAnswerOptions
-  };
-  
   useCurrentQuestion(
     isConfiguring,
     questions,
     currentQuestionIndex,
     setCurrentQuestion,
     setTimeRemaining,
-    // Pass simple state values instead of setters that don't exist
-    // The actual question component will handle state updates
     answerSubmitted,
     selectedAnswer,
     isCorrect,
@@ -165,7 +148,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsModalOpen
   );
 
-  // Enhanced answer handling with database recording - modify to match interface
+  // Enhanced answer handling with database recording
   const { handleSelectAnswer } = useEnhancedAnswerHandling(
     kidId,
     currentQuestion,
@@ -197,7 +180,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     currentQuestionIndex,
     questions,
-    // We'll pass the value directly since we don't have the setter
     answerSubmitted,
     setSessionComplete,
     setIsModalOpen
