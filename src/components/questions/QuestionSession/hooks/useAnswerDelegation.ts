@@ -17,14 +17,12 @@ export const useAnswerDelegation = (
   handleAnswerSelect: (answerId: string) => void,
   setKidAnswers: React.Dispatch<React.SetStateAction<KidAnswer[]>>
 ) => {
+  // The key issue was here - we're not correctly passing through the answer selection
   const { handleSelectAnswer } = useEnhancedAnswerHandling(
     kidId,
     currentQuestion,
     answerOptions,
-    async (answerId: string) => {
-      handleAnswerSelect(answerId);
-      return true;
-    },
+    handleAnswerSelect, // Pass the original handler directly without wrapping
     setKidAnswers
   );
   

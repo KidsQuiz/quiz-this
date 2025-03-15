@@ -38,7 +38,12 @@ const AnswerOptionsList = ({
           return (
             <button
               key={option.id}
-              onClick={() => !answerSubmitted && handleSelectAnswer(option.id)}
+              onClick={() => {
+                if (!answerSubmitted) {
+                  console.log(`Answer option clicked: ${option.id}`);
+                  handleSelectAnswer(option.id);
+                }
+              }}
               disabled={answerSubmitted}
               className={answerClasses}
             >

@@ -21,11 +21,10 @@ export const useEnhancedAnswerHandling = (
   const { toast } = useToast();
 
   // Modified handleSelectAnswer to record answers
-  const handleSelectAnswer = async (answerId: string) => {
+  const handleSelectAnswer = (answerId: string) => {
     console.log(`Enhanced answer handling: processing answer ${answerId}`);
     
-    // Call the original handler which processes the answer
-    // Don't await it here - the original handler will handle its own flow
+    // Call the original handler first - this processes the answer in the parent component
     originalHandleSelectAnswer(answerId);
     
     // Record this answer for our internal state tracking

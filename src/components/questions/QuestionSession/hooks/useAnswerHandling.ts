@@ -30,6 +30,8 @@ export const useAnswerHandling = (
   
   const handleAnswerSelect = useCallback((answerId: string) => {
     if (answerSubmitted) return;
+    
+    console.log(`Answer selected: ${answerId}`);
     setSelectedAnswer(answerId);
     
     // Automatically check answer when selected
@@ -72,14 +74,7 @@ export const useAnswerHandling = (
     } else {
       // Show relaxation animation for wrong answers
       console.log('Showing relaxation animation for wrong answer');
-      setTimeout(() => {
-        setShowRelaxAnimation(true);
-        
-        // Hide after 4 seconds
-        setTimeout(() => {
-          setShowRelaxAnimation(false);
-        }, 4000);
-      }, 1000);
+      setShowRelaxAnimation(true);
     }
     
     try {
