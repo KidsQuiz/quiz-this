@@ -17,3 +17,6 @@ export { useSessionManagement } from './useSessionManagement';
 export { useRelaxAnimation } from './useRelaxAnimation';
 export { useQuestionDialog } from './useQuestionDialog';
 export { useEffectsHandling } from './useEffectsHandling';
+export { useSessionConfig } from './useSessionConfig';
+export { usePerfectScoreHandling } from './usePerfectScoreHandling';
+export { useAnswerDelegation } from './useAnswerDelegation';
