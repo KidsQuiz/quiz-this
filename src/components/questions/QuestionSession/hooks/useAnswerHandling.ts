@@ -51,7 +51,7 @@ export const useAnswerHandling = (
       setShowWowEffect(true);
       
       // Check if this was the last question AND if all answers were correct
-      const isLastQuestion = currentQuestionIndex => currentQuestionIndex + 1 >= questions.length;
+      const isLastQuestion = (idx: number) => idx + 1 >= questions.length;
       
       // Show celebration effect for a short duration
       setTimeout(() => {
@@ -78,13 +78,15 @@ export const useAnswerHandling = (
     } else {
       // Play incorrect sound effect
       playSound('incorrect');
+      console.log("Incorrect answer submitted, waiting 5 seconds before proceeding");
       
       // For incorrect answers, wait 5 seconds before moving to next question
-      // to give the kid time to see the correct answer
+      // to give the kid time to see the correct answer and the relaxation animation
       setTimeout(() => {
+        console.log("5 second timeout completed, moving to next question");
         setCurrentQuestionIndex(prev => prev + 1);
         setIsModalOpen(true);
-      }, 5000); // Changed from 1000 to 5000 (5 seconds)
+      }, 5000); // 5 seconds wait time
     }
     
     return wasCorrect;

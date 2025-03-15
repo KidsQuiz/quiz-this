@@ -22,6 +22,8 @@ export const useEnhancedAnswerHandling = (
 
   // Modified handleSelectAnswer to record answers
   const handleSelectAnswer = async (answerId: string) => {
+    console.log(`Enhanced answer handling: processing answer ${answerId}`);
+    
     // Call the original handler which processes the answer
     const isCorrectAnswer = await originalHandleSelectAnswer(answerId);
     

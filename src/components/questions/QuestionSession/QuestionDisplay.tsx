@@ -49,12 +49,14 @@ const QuestionDisplay = ({
       if (selectedAnswerId === null && timeRemaining === 0) {
         playSound('incorrect');
         setShowRelaxAnimation(true);
+        console.log("Time ran out, showing relax animation");
       } else if (selectedAnswerId !== null) {
         if (isCorrect) {
           playSound('correct');
         } else {
           playSound('incorrect');
           setShowRelaxAnimation(true);
+          console.log("Incorrect answer, showing relax animation");
         }
       }
     }
@@ -63,11 +65,16 @@ const QuestionDisplay = ({
   // Reset relax animation after a delay
   useEffect(() => {
     if (showRelaxAnimation) {
+      console.log("RelaxAnimation is showing, will hide after 4 seconds");
       const timer = setTimeout(() => {
         setShowRelaxAnimation(false);
+        console.log("RelaxAnimation timer completed, hiding animation");
       }, 4000); // Show for 4 seconds
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        console.log("RelaxAnimation timer cleared");
+      };
     }
   }, [showRelaxAnimation]);
 
