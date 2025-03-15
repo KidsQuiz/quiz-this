@@ -20,3 +20,8 @@ export { useEffectsHandling } from './useEffectsHandling';
 export { useSessionConfig } from './useSessionConfig';
 export { usePerfectScoreHandling } from './usePerfectScoreHandling';
 export { useAnswerDelegation } from './useAnswerDelegation';
+// Export new hooks
+export { useSessionAnswers } from './useSessionAnswers';
+export { useSessionDialogControl } from './useSessionDialogControl';
+export { useSessionEffects } from './useSessionEffects';
+export { useSessionQuestions } from './useSessionQuestions';

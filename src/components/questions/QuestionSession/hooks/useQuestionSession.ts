@@ -1,20 +1,13 @@
 
-import { useQuestionLoading } from './useQuestionLoading';
-import { useQuestionNavigation } from './useQuestionNavigation';
-import { useAnswerHandling } from './useAnswerHandling';
+import { useState } from 'react';
 import { useSessionState } from './useSessionState';
-import { useSessionStartup } from './useSessionStartup';
-import { useModalTransition } from './useModalTransition';
-import { useCurrentQuestion } from './useCurrentQuestion';
-import { useSessionCompletion } from './useSessionCompletion';
-import { useTimeoutHandling } from './useTimeoutHandling';
-import { useDialogManagement } from './useDialogManagement';
-import { useRelaxAnimation } from './useRelaxAnimation';
-import { useQuestionDialog } from './useQuestionDialog';
-import { useEffectsHandling } from './useEffectsHandling';
 import { useSessionConfig } from './useSessionConfig';
-import { usePerfectScoreHandling } from './usePerfectScoreHandling';
-import { useAnswerDelegation } from './useAnswerDelegation';
+import { useSessionStartup } from './useSessionStartup';
+import { useSessionCompletion } from './useSessionCompletion';
+import { useSessionDialogControl } from './useSessionDialogControl';
+import { useSessionEffects } from './useSessionEffects';
+import { useSessionQuestions } from './useSessionQuestions';
+import { useSessionAnswers } from './useSessionAnswers';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   // Use session configuration hook
@@ -29,10 +22,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     deselectAllPackages
   } = useSessionConfig(kidId, kidName, onClose);
   
-  // Use our extracted dialog and animation hooks
-  const { showRelaxAnimationState, setShowRelaxAnimation } = useRelaxAnimation();
-  const { isModalOpen, setIsModalOpen, getEffectiveOpenState } = useQuestionDialog(onClose);
-
   // Use session state management
   const {
     sessionComplete,
@@ -41,64 +30,82 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCorrectAnswers,
     totalPoints,
     setTotalPoints,
-    showWowEffect,
-    setShowWowEffect,
-    showBoomEffect,
-    setShowBoomEffect,
     kidAnswers,
     setKidAnswers
   } = useSessionState();
 
-  // Use the extracted effects hook
-  const { handleBoomEffectComplete } = useEffectsHandling(
-    showWowEffect,
-    showBoomEffect,
-    setShowBoomEffect
+  // Use dialog control hook
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    getEffectiveOpenState,
+    handleDialogClose
+  } = useSessionDialogControl(
+    onClose,
+    false, // Initial showBoomEffect value - will be updated by the effects hook
+    sessionComplete,
+    correctAnswers,
+    [] // Initial questions value - will be updated later
   );
 
-  // Use question loading hook
+  // Use session effects hook
+  const {
+    showWowEffect,
+    setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
+    showRelaxAnimationState,
+    setShowRelaxAnimation
+  } = useSessionEffects(
+    sessionComplete,
+    correctAnswers,
+    [], // Initial questions value - will be updated later
+    setIsModalOpen
+  );
+
+  // Use session questions hook
   const {
     questions,
     currentQuestion,
-    setCurrentQuestion,
     answerOptions,
-    loadQuestions,
-    loadAnswerOptions
-  } = useQuestionLoading();
-
-  // Use question navigation hook
-  const {
     currentQuestionIndex,
     timeRemaining,
     timerActive,
-    setTimerActive,
-    setCurrentQuestionIndex,
-    setTimeRemaining,
-    handleTimeUp,
-    handleTerminateSession
-  } = useQuestionNavigation();
+    loadQuestions,
+    setCurrentQuestionIndex
+  } = useSessionQuestions(
+    isConfiguring,
+    isModalOpen,
+    sessionComplete,
+    false, // Initial answerSubmitted value - will be updated by the answers hook
+    null, // Initial selectedAnswer value - will be updated by the answers hook
+    null, // Initial isCorrect value - will be updated by the answers hook
+    setSessionComplete,
+    setIsModalOpen,
+    setShowWowEffect
+  );
 
-  // Use answer handling hook
+  // Use session answers hook
   const {
     selectedAnswer,
     answerSubmitted,
     isCorrect,
-    currentQuestionIndex: answerQuestionIndex,
-    currentQuestion: answerCurrentQuestion,
-    correctAnswers: answerCorrectCount,
-    totalPoints: answerTotalPoints,
-    handleAnswerSelect,
+    answerQuestionIndex,
+    answerCurrentQuestion,
+    answerCorrectCount,
+    answerTotalPoints,
+    handleSelectAnswer,
     checkAnswer,
     goToNextQuestion
-  } = useAnswerHandling(
-    questions,
+  } = useSessionAnswers(
     kidId,
+    questions,
+    currentQuestion,
+    answerOptions,
     setSessionComplete,
-    setShowRelaxAnimation
+    setShowRelaxAnimation,
+    setKidAnswers
   );
-
-  // Get selected answer ID
-  const selectedAnswerId = selectedAnswer;
 
   // Use session startup hook
   const { handleStartSession } = useSessionStartup(
@@ -106,32 +113,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadQuestions,
     setIsConfiguring,
     setCurrentQuestionIndex
-  );
-
-  // Use modal transition hook
-  useModalTransition(
-    isModalOpen,
-    sessionComplete,
-    currentQuestionIndex,
-    questions,
-    setCurrentQuestionIndex,
-    setIsModalOpen,
-    setSessionComplete
-  );
-
-  // Use current question hook
-  useCurrentQuestion(
-    isConfiguring,
-    questions,
-    currentQuestionIndex,
-    setCurrentQuestion,
-    setTimeRemaining,
-    answerSubmitted,
-    selectedAnswer,
-    isCorrect,
-    setShowWowEffect,
-    setTimerActive,
-    loadAnswerOptions
   );
 
   // Use session completion hook
@@ -148,48 +129,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsModalOpen
   );
 
-  // Use perfect score handling
-  usePerfectScoreHandling(
-    sessionComplete,
-    correctAnswers,
-    questions,
-    setIsModalOpen,
-    setShowBoomEffect
-  );
-
-  // Use enhanced answer handling delegation
-  const { handleSelectAnswer } = useAnswerDelegation(
-    kidId,
-    currentQuestion,
-    answerOptions,
-    handleAnswerSelect,
-    setKidAnswers
-  );
-
-  // Use dialog management hook
-  const { handleDialogClose } = useDialogManagement(
-    setIsModalOpen,
-    onClose,
-    showBoomEffect,
-    sessionComplete,
-    correctAnswers,
-    questions
-  );
-
-  // Use timeout handling hook
-  useTimeoutHandling(
-    timeRemaining,
-    currentQuestion,
-    isConfiguring,
-    sessionComplete,
-    answerSubmitted,
-    currentQuestionIndex,
-    questions,
-    null,
-    setSessionComplete,
-    setIsModalOpen
-  );
-
   return {
     isConfiguring,
     isLoading,
@@ -203,12 +142,12 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionComplete,
     correctAnswers,
     totalPoints,
-    selectedAnswerId, 
+    selectedAnswerId: selectedAnswer, 
     answerSubmitted,
     isCorrect,
     showWowEffect,
     showBoomEffect,
-    setShowBoomEffect: handleBoomEffectComplete,
+    setShowBoomEffect,
     isModalOpen,
     kidAnswers,
     showRelaxAnimationState,
