@@ -161,6 +161,7 @@ export const bg = {
   totalRegisteredUsers: 'Общ брой регистрирани потребители',
   userRegistrationTimeline: 'График на регистрациите',
   registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
+  registrationsByDay: 'Натрупване на потребителски регистрации по дни',
   users: 'потребители',
   admin: 'Админ',
   activeUsers: 'Активни Потребители',

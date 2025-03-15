@@ -173,6 +173,7 @@ export const en = {
   totalRegisteredUsers: 'Total number of registered users',
   userRegistrationTimeline: 'User Registration Timeline',
   registrationsByMonth: 'Cumulative user registrations by month',
+  registrationsByDay: 'Cumulative user registrations by day',
   users: 'users',
   admin: 'Admin',
   activeUsers: 'Active Users',
