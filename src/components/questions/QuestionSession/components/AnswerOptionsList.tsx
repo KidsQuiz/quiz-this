@@ -26,11 +26,17 @@ const AnswerOptionsList = ({
           const isCorrectAnswer = option.is_correct;
           const isIncorrectSelection = answerSubmitted && isSelected && !isCorrectAnswer;
           
+          // Always highlight the correct answer after submission
+          const showCorrectHighlight = answerSubmitted && isCorrectAnswer;
+          
           let answerClasses = cn(
             "w-full p-4 text-left rounded-xl border-2 text-lg transition-all",
+            // Standard states (not submitted)
             isSelected && !answerSubmitted && "border-primary bg-primary/10 shadow-md",
-            answerSubmitted && isCorrectAnswer && "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-md",
+            // After submission
+            showCorrectHighlight && "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-md",
             isIncorrectSelection && "border-red-500 bg-red-50 dark:bg-red-950/30 shadow-md",
+            // Not selected and not submitted
             !isSelected && !answerSubmitted && "hover:bg-accent hover:border-accent/50 hover:shadow-md",
             answerSubmitted ? "cursor-default" : "cursor-pointer"
           );
@@ -49,7 +55,7 @@ const AnswerOptionsList = ({
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl">{option.content}</span>
-                {answerSubmitted && isCorrectAnswer && (
+                {showCorrectHighlight && (
                   <CheckCircle className="h-8 w-8 text-green-600 flex-shrink-0 ml-2" fill="#dcfce7" />
                 )}
                 {isIncorrectSelection && (

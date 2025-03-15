@@ -43,10 +43,19 @@ const QuestionDisplay = ({
   handleSelectAnswer
 }: QuestionDisplayProps) => {
   const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
+  const [timeIsUp, setTimeIsUp] = useState(false);
   
   // Use the state from props if provided, otherwise use local state
   const relaxAnimationVisible = showRelaxAnimationState !== undefined ? 
     showRelaxAnimationState : showRelaxAnimation;
+  
+  // Check if time ran out
+  useEffect(() => {
+    if (timeRemaining === 0 && !answerSubmitted) {
+      setTimeIsUp(true);
+      playSound('incorrect');
+    }
+  }, [timeRemaining, answerSubmitted]);
   
   // Play sound effect when answer is submitted or time runs out
   useEffect(() => {
@@ -87,7 +96,7 @@ const QuestionDisplay = ({
   }, [showRelaxAnimation]);
 
   // Check if time ran out
-  const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
+  const timeRanOut = timeIsUp || (timeRemaining === 0 && answerSubmitted && selectedAnswerId === null);
 
   const handleAnswerClick = (answerId: string) => {
     console.log(`Answer clicked: ${answerId}`);
@@ -123,12 +132,12 @@ const QuestionDisplay = ({
                   />
                 </QuestionCard>
                 
-                {answerSubmitted && (
+                {(answerSubmitted || timeRanOut) && (
                   <div className="mt-4">
                     {timeRanOut ? (
                       <div className="bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
                         <Clock className="h-5 w-5 text-red-500" />
-                        <p className="text-red-700 dark:text-red-400 font-medium">Time's up! Moving to next question...</p>
+                        <p className="text-red-700 dark:text-red-400 font-medium">Time's up! The correct answer is highlighted.</p>
                       </div>
                     ) : (
                       <FeedbackMessage 
@@ -145,7 +154,7 @@ const QuestionDisplay = ({
                 <AnswerOptionsList 
                   answerOptions={answerOptions}
                   selectedAnswerId={selectedAnswerId}
-                  answerSubmitted={answerSubmitted}
+                  answerSubmitted={answerSubmitted || timeRanOut}
                   handleSelectAnswer={handleAnswerClick}
                 />
               </div>

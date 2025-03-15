@@ -108,10 +108,15 @@ export const useAnswerHandling = (
       console.error('Error recording answer:', error);
     }
     
+    // Set different delays based on correct/incorrect:
+    // - Correct: move to next question after 3 seconds
+    // - Incorrect: move to next question after 5 seconds (to show the correct answer)
+    const delayTime = isAnswerCorrect ? 3000 : 5000;
+    
     // Add a delay before moving to the next question after answer
     setTimeout(() => {
       goToNextQuestion();
-    }, 3000); // Wait 3 seconds to show feedback before proceeding
+    }, delayTime);
     
     return isAnswerCorrect;
   }, [selectedAnswer, currentQuestion, answerSubmitted, kidId, setShowRelaxAnimation]);
