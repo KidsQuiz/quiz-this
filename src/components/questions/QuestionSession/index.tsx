@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
@@ -34,7 +33,9 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     deselectAllPackages,
     handleStartSession,
     handleSelectAnswer,
-    handleDialogClose
+    handleDialogClose,
+    getEffectiveOpenState,
+    showRelaxAnimationState
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Clean up effect for when component unmounts
@@ -53,7 +54,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   }, [showBoomEffect]);
 
   // Determine effective open state as a combination of parent control and internal state
-  const effectiveOpenState = isOpen && isModalOpen;
+  const effectiveOpenState = getEffectiveOpenState(isOpen);
 
   return (
     <>
@@ -124,10 +125,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       {/* Boom effect shown when the kid answers all questions correctly - outside Dialog */}
       <BoomEffect 
         isVisible={showBoomEffect} 
-        onComplete={() => {
-          console.log("🎉 BoomEffect onComplete called, hiding effect");
-          setShowBoomEffect(false);
-        }} 
+        onComplete={setShowBoomEffect} 
       />
     </>
   );

@@ -1,3 +1,4 @@
+
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -10,19 +11,19 @@ import { useSessionCompletion } from './useSessionCompletion';
 import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
 import { useTimeoutHandling } from './useTimeoutHandling';
 import { useDialogManagement } from './useDialogManagement';
+import { useRelaxAnimation } from './useRelaxAnimation';
+import { useQuestionDialog } from './useQuestionDialog';
+import { useEffectsHandling } from './useEffectsHandling';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast } = useToast();
   const { t } = useLanguage();
   
-  const [showRelaxAnimationState, setShowRelaxAnimationState] = useState(false);
-  
-  const setShowRelaxAnimation = (show: boolean) => {
-    setShowRelaxAnimationState(show);
-  };
+  // Use our new extracted hooks
+  const { showRelaxAnimationState, setShowRelaxAnimation } = useRelaxAnimation();
+  const { isModalOpen, setIsModalOpen, getEffectiveOpenState } = useQuestionDialog(onClose);
 
   const {
     isConfiguring,
@@ -37,11 +38,16 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowWowEffect,
     showBoomEffect,
     setShowBoomEffect,
-    isModalOpen,
-    setIsModalOpen,
     kidAnswers,
     setKidAnswers
   } = useSessionState();
+
+  // Use the extracted effects hook
+  const { handleBoomEffectComplete } = useEffectsHandling(
+    showWowEffect,
+    showBoomEffect,
+    setShowBoomEffect
+  );
 
   const {
     questionPackages,
@@ -187,7 +193,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     isCorrect,
     showWowEffect,
     showBoomEffect,
-    setShowBoomEffect,
+    setShowBoomEffect: handleBoomEffectComplete,
     isModalOpen,
     kidAnswers,
     showRelaxAnimationState,
@@ -196,6 +202,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     deselectAllPackages,
     handleStartSession,
     handleSelectAnswer,
-    handleDialogClose
+    handleDialogClose,
+    getEffectiveOpenState
   };
 };

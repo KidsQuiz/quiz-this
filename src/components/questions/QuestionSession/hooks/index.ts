@@ -14,3 +14,6 @@ export { useTimeoutHandling } from './useTimeoutHandling';
 export { useSessionDialog } from './useSessionDialog';
 export { useDialogManagement } from './useDialogManagement';
 export { useSessionManagement } from './useSessionManagement';
+export { useRelaxAnimation } from './useRelaxAnimation';
+export { useQuestionDialog } from './useQuestionDialog';
+export { useEffectsHandling } from './useEffectsHandling';
