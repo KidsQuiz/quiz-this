@@ -1,0 +1,22 @@
+
+export const wrongAnswers = {
+  wrongAnswersDashboard: "Табло с грешни отговори",
+  viewWrongAnswers: "Преглед на грешни отговори",
+  wrongAnswersList: "Списък с грешни отговори",
+  wrongAnswer: "Грешен отговор",
+  date: "Дата",
+  statistics: "Статистика",
+  allCorrect: "Всички са верни!",
+  noWrongAnswers: "Няма грешни отговори за показване. Браво!",
+  noWrongAnswersStats: "Все още няма грешни отговори за анализ.",
+  mostFrequentWrongAnswers: "Най-чести грешни отговори",
+  wrongAnswersByTime: "Гре��ни отговори във вр��мето",
+  topWrongAnswersDistribution: "Разпределение на грешните отговори",
+  wrongCount: "Брой грешки",
+  notEnoughData: "Недостатъчно данни за показване на статистика",
+  occurrences: "Брой срещания",
+  resetWrongAnswers: "Нулиране на грешни отговори",
+  resetWrongAnswersConfirmation: "Сигурни ли сте, че искате да нулирате всички грешни отговори за {name}?",
+  wrongAnswersResetSuccess: "Грешните отговори бяха успешно нулирани",
+  errorResettingWrongAnswers: "Възникна грешка при нулирането на грешните отговори",
+} as const;

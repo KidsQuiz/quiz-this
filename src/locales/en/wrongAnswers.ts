@@ -1,0 +1,22 @@
+
+export const wrongAnswers = {
+  wrongAnswersDashboard: "Wrong Answers Dashboard",
+  viewWrongAnswers: "View Wrong Answers",
+  wrongAnswersList: "Wrong Answers List",
+  wrongAnswer: "Wrong Answer",
+  date: "Date",
+  statistics: "Statistics",
+  allCorrect: "All Correct!",
+  noWrongAnswers: "There are no wrong answers to display. Great job!",
+  noWrongAnswersStats: "There are no wrong answers to analyze yet.",
+  mostFrequentWrongAnswers: "Most Frequent Wrong Answers",
+  wrongAnswersByTime: "Wrong Answers Over Time",
+  topWrongAnswersDistribution: "Wrong Answers Distribution",
+  wrongCount: "Wrong Count",
+  notEnoughData: "Not enough data to display statistics",
+  occurrences: "Occurrences",
+  resetWrongAnswers: "Reset Wrong Answers",
+  resetWrongAnswersConfirmation: "Are you sure you want to reset all wrong answers for {name}?",
+  wrongAnswersResetSuccess: "Wrong answers have been reset successfully",
+  errorResettingWrongAnswers: "There was an error resetting wrong answers",
+} as const;
