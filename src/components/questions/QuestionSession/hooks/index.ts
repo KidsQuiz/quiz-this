@@ -25,3 +25,4 @@ export { useIncorrectAnswerHandling } from './useIncorrectAnswerHandling';
 export { useSessionTransition } from './useSessionTransition';
 export { useQuestionPreparation } from './useQuestionPreparation';
 export { useTimeoutEffects } from './useTimeoutEffects';
+export { useSessionSetup } from './useSessionSetup';
