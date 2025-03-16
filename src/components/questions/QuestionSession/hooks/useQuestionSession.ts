@@ -1,4 +1,5 @@
 
+import { useEffect } from 'react';
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -41,7 +42,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
-    handleStartSession: configureStartSession
+    handleStartSession,
+    initializeSessionFunctions
   } = useSessionConfig(kidId, kidName, onClose);
 
   // Load questions and answer options
@@ -67,12 +69,14 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Get the configured start session handler
-  const handleStartSession = configureStartSession(
-    setIsConfiguring,
-    setCurrentQuestionIndex,
-    loadQuestions
-  );
+  // Initialize session config functions
+  useEffect(() => {
+    initializeSessionFunctions(
+      loadQuestions,
+      setIsConfiguring,
+      setCurrentQuestionIndex
+    );
+  }, [initializeSessionFunctions, loadQuestions, setIsConfiguring, setCurrentQuestionIndex]);
 
   // Process answers and handle submissions
   const {

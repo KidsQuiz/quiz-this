@@ -1,7 +1,10 @@
 
+import { useState, useCallback } from 'react';
 import { useToastAndLanguage } from './useToastAndLanguage';
 import { usePackageSelection } from './usePackageSelection';
-import { useSessionStartup } from './useSessionStartup';
+
+type LoadQuestionsFunction = (selectedPackageIds: string[]) => Promise<void>;
+type SetStateFn<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export const useSessionConfig = (
   kidId: string, 
@@ -9,6 +12,11 @@ export const useSessionConfig = (
   onClose: () => void
 ) => {
   const { toast, t } = useToastAndLanguage();
+  
+  // These functions will be provided later by useQuestionSession
+  const [loadQuestionsFn, setLoadQuestionsFn] = useState<LoadQuestionsFunction | null>(null);
+  const [setIsConfiguringFn, setIsConfiguringStateFn] = useState<SetStateFn<boolean> | null>(null);
+  const [setCurrentQuestionIndexFn, setCurrentQuestionIndexStateFn] = useState<SetStateFn<number> | null>(null);
   
   // Load packages and handle selection
   const {
@@ -20,16 +28,35 @@ export const useSessionConfig = (
   } = usePackageSelection(kidId, kidName, onClose, toast);
 
   // Handle session startup
-  const { handleStartSession } = useSessionStartup(
-    selectedPackageIds,
-    (selectedIds) => loadQuestions(selectedIds),
-    setIsConfiguring,
-    setCurrentQuestionIndex
-  );
+  const handleStartSession = useCallback(async () => {
+    if (selectedPackageIds.length === 0) {
+      toast({
+        title: t('noPackagesSelected'),
+        description: t('pleaseSelectPackages'),
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (loadQuestionsFn && setIsConfiguringFn && setCurrentQuestionIndexFn) {
+      await loadQuestionsFn(selectedPackageIds);
+      setIsConfiguringFn(false);
+      setCurrentQuestionIndexFn(0);
+    } else {
+      console.error('Session functions not initialized');
+    }
+  }, [loadQuestionsFn, selectedPackageIds, setIsConfiguringFn, setCurrentQuestionIndexFn, toast, t]);
 
-  const setIsConfiguring = () => {}; // This will be replaced by the real function in useQuestionSession
-  const setCurrentQuestionIndex = () => {}; // This will be replaced by the real function in useQuestionSession
-  const loadQuestions = async () => {}; // This will be replaced by the real function in useQuestionSession
+  // This function will be called by useQuestionSession to initialize the required functions
+  const initializeSessionFunctions = useCallback((
+    loadQuestions: LoadQuestionsFunction,
+    setIsConfiguring: SetStateFn<boolean>,
+    setCurrentQuestionIndex: SetStateFn<number>
+  ) => {
+    setLoadQuestionsFn(() => loadQuestions);
+    setIsConfiguringStateFn(() => setIsConfiguring);
+    setCurrentQuestionIndexStateFn(() => setCurrentQuestionIndex);
+  }, []);
 
   return {
     questionPackages,
@@ -37,11 +64,7 @@ export const useSessionConfig = (
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
-    handleStartSession: (setIsConfiguringFn: any, setCurrentQuestionIndexFn: any, loadQuestionsFn: any) => {
-      setIsConfiguring = setIsConfiguringFn;
-      setCurrentQuestionIndex = setCurrentQuestionIndexFn;
-      loadQuestions = loadQuestionsFn;
-      return handleStartSession;
-    }
+    handleStartSession,
+    initializeSessionFunctions
   };
 };
