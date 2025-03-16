@@ -51,6 +51,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTimerActive,
     setCurrentQuestionIndex,
     setTimeRemaining,
+    updateTimeLimit,
     handleTimeUp,
     handleTerminateSession
   } = useQuestionNavigation();
@@ -100,7 +101,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsCorrect,
     loadAnswerOptions,
     setTimeRemaining,
-    setTimerActive
+    setTimerActive,
+    updateTimeLimit
   );
 
   // Use time up handler hook
@@ -151,6 +153,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     kidAnswers,
     handleSelectAnswer,
     handleDialogClose,
-    loadQuestions  // Export loadQuestions so it can be used in the component
+    loadQuestions
   };
 };

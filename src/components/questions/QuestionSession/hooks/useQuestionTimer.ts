@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
   initialTime: number,
@@ -8,11 +8,19 @@ export const useQuestionTimer = (
   const [timeRemaining, setTimeRemaining] = useState(initialTime);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(isActive);
+  const initialTimeRef = useRef(initialTime);
   
-  // Keep activeRef updated with latest isActive value
+  // Keep refs updated with latest values
   useEffect(() => {
     activeRef.current = isActive;
   }, [isActive]);
+  
+  useEffect(() => {
+    initialTimeRef.current = initialTime;
+    if (!isActive) {
+      setTimeRemaining(initialTime);
+    }
+  }, [initialTime, isActive]);
   
   // Set up and manage the timer
   useEffect(() => {
@@ -22,14 +30,15 @@ export const useQuestionTimer = (
       timerRef.current = null;
     }
     
-    // Reset time when inactive or when initial time changes
+    // Reset time when inactive
     if (!isActive) {
-      setTimeRemaining(initialTime);
+      console.log("Timer stopped, resetting to:", initialTimeRef.current);
+      setTimeRemaining(initialTimeRef.current);
       return;
     }
     
-    console.log("Timer started with", initialTime, "seconds");
-    setTimeRemaining(initialTime);
+    console.log("Timer started with", initialTimeRef.current, "seconds");
+    setTimeRemaining(initialTimeRef.current);
     
     // Start the timer
     timerRef.current = setInterval(() => {
@@ -66,14 +75,16 @@ export const useQuestionTimer = (
   }, [initialTime, isActive, onTimeUp]);
   
   // Reset the timer
-  const resetTimer = (newTime?: number) => {
+  const resetTimer = useCallback((newTime?: number) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
     
-    setTimeRemaining(newTime !== undefined ? newTime : initialTime);
-  };
+    const timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
+    console.log("Resetting timer to:", timeToSet);
+    setTimeRemaining(timeToSet);
+  }, []);
   
   return {
     timeRemaining,

@@ -14,7 +14,8 @@ export const useQuestionChangeEffects = (
   setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
   loadAnswerOptions: (questionId: string) => Promise<void>,
   setTimeRemaining: (newTime: number) => void,
-  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>
+  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
+  updateTimeLimit: (newTimeLimit: number) => void
 ) => {
   // Update current question when index changes
   useEffect(() => {
@@ -26,6 +27,7 @@ export const useQuestionChangeEffects = (
     
     const question = questions[currentQuestionIndex];
     console.log("Setting current question:", question?.content);
+    console.log("Question time limit:", question?.time_limit || 30);
     setCurrentQuestion(question);
     
     // Reset answer state when question changes
@@ -39,7 +41,12 @@ export const useQuestionChangeEffects = (
     
     // Set the timer based on the question's time limit
     if (question.time_limit && !sessionComplete) {
-      setTimeRemaining(question.time_limit);
+      const timeLimit = question.time_limit || 30;
+      // Update the time limit first
+      updateTimeLimit(timeLimit);
+      // Then reset the timer to this new limit
+      setTimeRemaining(timeLimit);
+      
       // Start the timer after a short delay to allow the UI to update
       setTimeout(() => {
         setTimerActive(true);
@@ -57,6 +64,7 @@ export const useQuestionChangeEffects = (
     setIsCorrect,
     setSelectedAnswerId,
     setTimeRemaining,
-    setTimerActive
+    setTimerActive,
+    updateTimeLimit
   ]);
 };
