@@ -18,3 +18,7 @@ export { useToastAndLanguage } from './useToastAndLanguage';
 export { useSessionConfig } from './useSessionConfig';
 export { useSessionEffects } from './useSessionEffects';
 export { useAnswerProcessing } from './useAnswerProcessing';
+export { useAnswerState } from './useAnswerState';
+export { useAnswerRecording } from './useAnswerRecording';
+export { useCorrectAnswerHandling } from './useCorrectAnswerHandling';
+export { useIncorrectAnswerHandling } from './useIncorrectAnswerHandling';
