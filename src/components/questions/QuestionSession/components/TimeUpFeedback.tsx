@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
@@ -10,25 +10,6 @@ interface TimeUpFeedbackProps {
 
 const TimeUpFeedback: React.FC<TimeUpFeedbackProps> = ({ show }) => {
   const { t } = useLanguage();
-  const [countdown, setCountdown] = useState(5);
-  
-  useEffect(() => {
-    if (!show) return;
-    
-    setCountdown(5);
-    
-    const interval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [show]);
   
   if (!show) return null;
   
@@ -47,19 +28,8 @@ const TimeUpFeedback: React.FC<TimeUpFeedbackProps> = ({ show }) => {
           {t('timeUp') || 'Time\'s Up!'}
         </h2>
         
-        <p className="text-lg mb-4">
+        <p className="text-lg">
           {t('correctAnswerShown') || 'The correct answer is highlighted.'}
-        </p>
-        
-        <div className="bg-gray-100 dark:bg-gray-700 rounded-full h-4 mb-2">
-          <div 
-            className="bg-red-500 h-4 rounded-full transition-all duration-1000"
-            style={{ width: `${(countdown / 5) * 100}%` }}
-          ></div>
-        </div>
-        
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t('nextQuestionIn') || 'Next question in'} <span className="font-bold">{countdown}</span> {t('seconds') || 'seconds'}
         </p>
       </div>
     </motion.div>

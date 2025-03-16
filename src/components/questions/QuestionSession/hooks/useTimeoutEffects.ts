@@ -67,9 +67,9 @@ export const useTimeoutEffects = (
         setSelectedAnswerId(correctAnswer.id);
       }
       
-      // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
+      // Immediately move to next question after a very brief highlight delay
       timeoutIdRef.current = setTimeout(() => {
-        console.log('TIMEOUT COMPLETE: Now advancing to next question');
+        console.log('TIMEOUT COMPLETE: Now advancing to next question immediately');
         timeoutIdRef.current = null;
         
         // Reset any lingering DOM state
@@ -108,7 +108,7 @@ export const useTimeoutEffects = (
           advancementScheduledRef.current = false;
           console.log('Question advancement process complete, advancement flag reset');
         }, 100);
-      }, 5000); // 5 seconds delay
+      }, 500); // Brief 500ms delay to show the correct answer before advancing
       
       return () => {
         if (timeoutIdRef.current) {

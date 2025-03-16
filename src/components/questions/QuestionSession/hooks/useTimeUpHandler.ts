@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -65,7 +64,6 @@ export const useTimeUpHandler = ({
     
     // Update UI states
     setIsTimeUp(true);
-    setShowingTimeUpFeedback(true); // Show the feedback explicitly
     setAnswerSubmitted(true);
     setIsCorrect(false);
     
@@ -76,10 +74,10 @@ export const useTimeUpHandler = ({
       setSelectedAnswerId(correctAnswer.id);
     }
     
-    // Wait 5 seconds then go to next question
-    console.log("Setting timeout to advance to next question in 5 seconds");
+    // Briefly pause to show the correct answer (just long enough for the UI to update)
+    console.log("Briefly highlighting correct answer before advancing");
     timeoutRef.current = setTimeout(() => {
-      console.log("Time's up timeout completed - advancing to next question now");
+      console.log("Immediately advancing to next question after time up");
       
       // Clean up states
       setIsTimeUp(false);
@@ -98,7 +96,7 @@ export const useTimeUpHandler = ({
         timeoutRef.current = null;
       }, 100);
       
-    }, 5000); // 5 seconds delay
+    }, 500); // Brief 500ms delay to show the correct answer
     
     return () => {
       // Clean up if component unmounts during timeout
