@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
 import QuestionDisplay from './QuestionDisplay';
@@ -8,6 +8,7 @@ import BoomEffect from './components/BoomEffect';
 import RelaxAnimation from './components/RelaxAnimation';
 import { QuestionSessionProps } from './types';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
+import { supabase } from '@/integrations/supabase/client';
 
 const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClose }) => {
   const {
@@ -29,7 +30,8 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     isModalOpen,
     handleSelectAnswer,
     handleDialogClose,
-    setShowBoomEffect
+    setShowBoomEffect,
+    loadQuestions
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Render a loading state if currentQuestion is null but we're not at the completion screen
@@ -40,6 +42,35 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     console.log("Boom effect complete, hiding animation");
     setShowBoomEffect(false);
   };
+
+  // Auto-load all assigned packages for the kid
+  useEffect(() => {
+    const loadAssignedPackages = async () => {
+      try {
+        console.log(`Auto-loading packages for kid ${kidId}`);
+        
+        // Get all assigned packages for this kid
+        const { data: assignedPackages, error } = await supabase
+          .from('kid_packages')
+          .select('package_id')
+          .eq('kid_id', kidId);
+          
+        if (error) throw error;
+        
+        if (assignedPackages && assignedPackages.length > 0) {
+          const packageIds = assignedPackages.map(p => p.package_id);
+          console.log(`Found ${packageIds.length} assigned packages, loading questions:`, packageIds);
+          await loadQuestions(packageIds);
+        } else {
+          console.warn(`No packages assigned to kid ${kidId}`);
+        }
+      } catch (error) {
+        console.error('Error auto-loading assigned packages:', error);
+      }
+    };
+    
+    loadAssignedPackages();
+  }, [kidId, loadQuestions]);
 
   return (
     <>

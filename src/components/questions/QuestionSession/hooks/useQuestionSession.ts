@@ -150,6 +150,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     isModalOpen,
     kidAnswers,
     handleSelectAnswer,
-    handleDialogClose
+    handleDialogClose,
+    loadQuestions  // Export loadQuestions so it can be used in the component
   };
 };
