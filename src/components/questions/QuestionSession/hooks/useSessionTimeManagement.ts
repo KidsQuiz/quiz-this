@@ -47,4 +47,12 @@ export const useSessionTimeManagement = ({
       setTimerActive(false);
     }
   }, [timeRemaining, timerActive, setTimerActive]);
+  
+  // Extra safety to ensure time up is processed when timer reaches zero
+  useEffect(() => {
+    if (timeRemaining === 0 && !timeUpTriggered && !answerSubmitted) {
+      console.log("Extra safety: Timer at zero but timeUpTriggered not set");
+      setTimeUpTriggered(true);
+    }
+  }, [timeRemaining, timeUpTriggered, answerSubmitted, setTimeUpTriggered]);
 };

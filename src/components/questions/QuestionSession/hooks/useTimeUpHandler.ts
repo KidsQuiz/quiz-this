@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -64,7 +65,7 @@ export const useTimeUpHandler = ({
     
     // Update UI states
     setIsTimeUp(true);
-    setShowingTimeUpFeedback(false);
+    setShowingTimeUpFeedback(true); // Show the feedback explicitly
     setAnswerSubmitted(true);
     setIsCorrect(false);
     
@@ -78,19 +79,24 @@ export const useTimeUpHandler = ({
     // Wait 5 seconds then go to next question
     console.log("Setting timeout to advance to next question in 5 seconds");
     timeoutRef.current = setTimeout(() => {
-      console.log("Time's up timeout completed - advancing to next question");
+      console.log("Time's up timeout completed - advancing to next question now");
       
       // Clean up states
       setIsTimeUp(false);
       setShowingTimeUpFeedback(false);
       setTimeUpTriggered(false);
       
+      // Explicitly force pointer events to be enabled before navigation
+      document.body.style.pointerEvents = '';
+      
       // Force-advance to next question
       goToNextQuestion();
       
-      // Reset processing flag
-      isProcessingTimeUpRef.current = false;
-      timeoutRef.current = null;
+      // Reset processing flag after a short delay to prevent race conditions
+      setTimeout(() => {
+        isProcessingTimeUpRef.current = false;
+        timeoutRef.current = null;
+      }, 100);
       
     }, 5000); // 5 seconds delay
     
@@ -100,6 +106,7 @@ export const useTimeUpHandler = ({
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      isProcessingTimeUpRef.current = false;
     };
   }, [
     timeUpTriggered,
