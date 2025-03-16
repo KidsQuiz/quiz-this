@@ -1,113 +1,98 @@
 
-import { useState } from 'react';
+import { usePackageSelection } from './usePackageSelection';
+import { useQuestionLoading } from './useQuestionLoading';
+import { useQuestionNavigation } from './useQuestionNavigation';
+import { useAnswerHandling } from './useAnswerHandling';
 import { useSessionState } from './useSessionState';
-import { useSessionConfig } from './useSessionConfig';
 import { useSessionStartup } from './useSessionStartup';
+import { useModalTransition } from './useModalTransition';
+import { useCurrentQuestion } from './useCurrentQuestion';
 import { useSessionCompletion } from './useSessionCompletion';
-import { useSessionDialogControl } from './useSessionDialogControl';
-import { useSessionEffects } from './useSessionEffects';
-import { useSessionQuestions } from './useSessionQuestions';
-import { useSessionAnswers } from './useSessionAnswers';
+import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
+import { useTimeoutHandling } from './useTimeoutHandling';
+import { useDialogManagement } from './useDialogManagement';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
-  // Use session configuration hook
+  const { toast } = useToast();
+  const { t } = useLanguage();
+  
+  // Use session state hook for state management
   const {
     isConfiguring,
     setIsConfiguring,
-    isLoading,
-    questionPackages,
-    selectedPackageIds,
-    togglePackageSelection,
-    selectAllPackages,
-    deselectAllPackages
-  } = useSessionConfig(kidId, kidName, onClose);
-  
-  // Use session state management
-  const {
     sessionComplete,
     setSessionComplete,
     correctAnswers,
     setCorrectAnswers,
     totalPoints,
     setTotalPoints,
-    kidAnswers,
-    setKidAnswers
-  } = useSessionState();
-
-  // Use dialog control hook
-  const {
-    isModalOpen,
-    setIsModalOpen,
-    getEffectiveOpenState,
-    handleDialogClose
-  } = useSessionDialogControl(
-    onClose,
-    false, // Initial showBoomEffect value - will be updated by the effects hook
-    sessionComplete,
-    correctAnswers,
-    [] // Initial questions value - will be updated later
-  );
-
-  // Use session effects hook
-  const {
     showWowEffect,
     setShowWowEffect,
     showBoomEffect,
     setShowBoomEffect,
-    showRelaxAnimationState,
-    setShowRelaxAnimation
-  } = useSessionEffects(
-    sessionComplete,
-    correctAnswers,
-    [], // Initial questions value - will be updated later
-    setIsModalOpen
-  );
+    isModalOpen,
+    setIsModalOpen,
+    kidAnswers,
+    setKidAnswers
+  } = useSessionState();
 
-  // Use session questions hook
+  // Load packages and handle selection
   const {
+    questionPackages,
+    selectedPackageIds,
+    togglePackageSelection,
+    selectAllPackages,
+    deselectAllPackages
+  } = usePackageSelection(kidId, kidName, onClose, toast);
+
+  // Load questions and answer options
+  const {
+    isLoading,
     questions,
     currentQuestion,
+    setCurrentQuestion,
     answerOptions,
+    loadQuestions,
+    loadAnswerOptions
+  } = useQuestionLoading();
+
+  // Handle question navigation and timers
+  const {
     currentQuestionIndex,
     timeRemaining,
     timerActive,
-    loadQuestions,
-    setCurrentQuestionIndex
-  } = useSessionQuestions(
-    isConfiguring,
-    isModalOpen,
-    sessionComplete,
-    false, // Initial answerSubmitted value - will be updated by the answers hook
-    null, // Initial selectedAnswer value - will be updated by the answers hook
-    null, // Initial isCorrect value - will be updated by the answers hook
-    setSessionComplete,
-    setIsModalOpen,
-    setShowWowEffect
-  );
+    setTimerActive,
+    setCurrentQuestionIndex,
+    setTimeRemaining,
+    handleTimeUp,
+    handleTerminateSession
+  } = useQuestionNavigation();
 
-  // Use session answers hook
+  // Handle answer submission and scoring
   const {
-    selectedAnswer,
+    selectedAnswerId,
     answerSubmitted,
     isCorrect,
-    answerQuestionIndex,
-    answerCurrentQuestion,
-    answerCorrectCount,
-    answerTotalPoints,
-    handleSelectAnswer,
-    checkAnswer,
-    goToNextQuestion
-  } = useSessionAnswers(
-    kidId,
-    questions,
-    currentQuestion,
+    setAnswerSubmitted,
+    setSelectedAnswerId,
+    setIsCorrect,
+    handleSelectAnswer: originalHandleSelectAnswer
+  } = useAnswerHandling(
     answerOptions,
-    setSessionComplete,
-    setShowRelaxAnimation,
-    setKidAnswers
+    currentQuestion,
+    setCorrectAnswers,
+    setTotalPoints,
+    setShowWowEffect,
+    setCurrentQuestionIndex,
+    setIsModalOpen,
+    questions,
+    setShowBoomEffect,
+    setSessionComplete
   );
 
-  // Use session startup hook
+  // Handle session startup
   const { handleStartSession } = useSessionStartup(
     selectedPackageIds,
     loadQuestions,
@@ -115,7 +100,33 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCurrentQuestionIndex
   );
 
-  // Use session completion hook
+  // Handle modal transitions between questions
+  useModalTransition(
+    isModalOpen,
+    sessionComplete,
+    currentQuestionIndex,
+    questions,
+    setCurrentQuestionIndex,
+    setIsModalOpen,
+    setSessionComplete
+  );
+
+  // Handle current question loading and setup
+  useCurrentQuestion(
+    isConfiguring,
+    questions,
+    currentQuestionIndex,
+    setCurrentQuestion,
+    setTimeRemaining,
+    setAnswerSubmitted,
+    setSelectedAnswerId,
+    setIsCorrect,
+    setShowWowEffect,
+    setTimerActive,
+    loadAnswerOptions
+  );
+
+  // Handle session completion
   useSessionCompletion(
     kidId,
     kidName,
@@ -126,6 +137,39 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     correctAnswers,
     setSessionComplete,
     setShowBoomEffect,
+    setIsModalOpen
+  );
+
+  // Enhanced answer handling with database recording
+  const { handleSelectAnswer } = useEnhancedAnswerHandling(
+    kidId,
+    currentQuestion,
+    answerOptions,
+    originalHandleSelectAnswer,
+    setKidAnswers
+  );
+
+  // Handle dialog closing
+  const { handleDialogClose } = useDialogManagement(
+    setIsModalOpen,
+    onClose,
+    showBoomEffect,
+    sessionComplete,
+    correctAnswers,
+    questions
+  );
+
+  // Handle timeouts
+  useTimeoutHandling(
+    timeRemaining,
+    currentQuestion,
+    isConfiguring,
+    sessionComplete,
+    answerSubmitted,
+    currentQuestionIndex,
+    questions,
+    setAnswerSubmitted,
+    setSessionComplete,
     setIsModalOpen
   );
 
@@ -142,7 +186,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionComplete,
     correctAnswers,
     totalPoints,
-    selectedAnswerId: selectedAnswer, 
+    selectedAnswerId,
     answerSubmitted,
     isCorrect,
     showWowEffect,
@@ -150,13 +194,11 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowBoomEffect,
     isModalOpen,
     kidAnswers,
-    showRelaxAnimationState,
     togglePackageSelection,
     selectAllPackages,
     deselectAllPackages,
     handleStartSession,
     handleSelectAnswer,
-    handleDialogClose,
-    getEffectiveOpenState
+    handleDialogClose
   };
 };

@@ -9,19 +9,20 @@ export const useTimeoutHandling = (
   answerSubmitted: boolean,
   currentQuestionIndex: number,
   questions: any[],
-  // Change this from a setter to a dummy parameter we don't use
-  _unused: any,
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   // Monitor time remaining and close the question dialog when time elapses
   useEffect(() => {
-    if (!currentQuestion || isConfiguring || sessionComplete) return;
+    if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
     
-    // When time runs out but answer isn't submitted yet, handle timeout
-    if (timeRemaining === 0 && !answerSubmitted) {
-      // Wait 5 seconds to show the feedback (correct answer), then move to next question
-      const timer = setTimeout(() => {
+    if (timeRemaining === 0) {
+      // Mark as submitted with no selection
+      setAnswerSubmitted(true);
+      
+      // Wait 2 seconds to show the timeout state, then move to next question
+      setTimeout(() => {
         if (currentQuestionIndex >= questions.length - 1) {
           // Last question, will complete the session
           setSessionComplete(true);
@@ -29,9 +30,7 @@ export const useTimeoutHandling = (
           // Close current question dialog to trigger opening the next one
           setIsModalOpen(false);
         }
-      }, 5000); // Exactly 5 seconds to show the correct answer
-      
-      return () => clearTimeout(timer);
+      }, 2000);
     }
   }, [
     timeRemaining, 
@@ -39,6 +38,7 @@ export const useTimeoutHandling = (
     isConfiguring, 
     sessionComplete, 
     answerSubmitted, 
+    setAnswerSubmitted, 
     currentQuestionIndex, 
     questions.length, 
     setSessionComplete,

@@ -1,149 +1,102 @@
 
-import { useState, useCallback } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Question, AnswerOption } from '@/hooks/questionsTypes';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { updateKidPoints } from './usePointsUpdate';
+import { useState } from 'react';
+import { AnswerOption, Question } from '@/hooks/questionsTypes';
+import { playSound } from '@/utils/soundEffects';
 
 export const useAnswerHandling = (
+  answerOptions: AnswerOption[],
+  currentQuestion: Question | null,
+  setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>,
+  setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
+  setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   questions: Question[],
-  kidId: string,
-  setIsSessionOver: (isOver: boolean) => void,
-  setShowRelaxAnimation: (show: boolean) => void
+  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const { t } = useLanguage();
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  const currentQuestion = questions[currentQuestionIndex];
-  
-  const resetAnswer = useCallback(() => {
-    setSelectedAnswer(null);
-    setIsCorrect(null);
-    setAnswerSubmitted(false);
-  }, []);
-  
-  const handleAnswerSelect = useCallback((answerId: string) => {
+  // Handle answer selection
+  const handleSelectAnswer = async (answerId: string) => {
     if (answerSubmitted) return;
     
-    console.log(`Answer selected: ${answerId}`);
-    setSelectedAnswer(answerId);
-    
-    // Explicitly check answer when selected - ensure this is called
-    checkAnswer(answerId);
-  }, [answerSubmitted]);
-  
-  const checkAnswer = useCallback(async (answerId?: string) => {
-    const idToCheck = answerId || selectedAnswer;
-    if (!idToCheck || !currentQuestion || answerSubmitted) return;
-    
-    console.log(`Checking answer ${idToCheck} for question ${currentQuestion.id}`);
-    
-    // Get all the answer options for the current question from the database
-    const { data: answerOptions, error } = await supabase
-      .from('answer_options')
-      .select('*')
-      .eq('question_id', currentQuestion.id);
-      
-    if (error) {
-      console.error('Error fetching answer options:', error);
-      return;
-    }
-      
-    if (!answerOptions || answerOptions.length === 0) {
-      console.error('No answer options found for question:', currentQuestion.id);
-      return;
-    }
-    
-    const correctAnswerId = answerOptions.find(a => a.is_correct)?.id;
-    const isAnswerCorrect = idToCheck === correctAnswerId;
-    
-    console.log(`Answer is ${isAnswerCorrect ? 'correct' : 'incorrect'}, correct answer ID: ${correctAnswerId}`);
-    
-    // Set the answer state immediately
-    setIsCorrect(isAnswerCorrect);
+    setSelectedAnswerId(answerId);
     setAnswerSubmitted(true);
     
-    if (isAnswerCorrect) {
-      setCorrectAnswers(prev => prev + 1);
-      setTotalPoints(prev => prev + (currentQuestion.points || 0));
-    } else {
-      // Show relaxation animation for wrong answers immediately
-      console.log('Showing relaxation animation for wrong answer');
-      setShowRelaxAnimation(true);
-    }
+    // Find if the selected answer is correct
+    const selectedAnswer = answerOptions.find(option => option.id === answerId);
+    const wasCorrect = selectedAnswer?.is_correct || false;
+    setIsCorrect(wasCorrect);
     
-    try {
-      // Record the answer in the database
-      await supabase.from('kid_answers').insert({
-        kid_id: kidId,
-        question_id: currentQuestion.id,
-        answer_id: idToCheck,
-        is_correct: isAnswerCorrect,
-        points_earned: isAnswerCorrect ? currentQuestion.points : 0
+    // Update scores
+    if (wasCorrect && currentQuestion) {
+      const points = currentQuestion.points;
+      console.log(`Correct answer! Adding ${points} points to session total`);
+      
+      // Play correct sound effect
+      playSound('correct');
+      
+      // Update correct answers count
+      let newCorrectAnswers = 0;
+      setCorrectAnswers(prev => {
+        newCorrectAnswers = prev + 1;
+        console.log(`Updated correctAnswers: ${prev} -> ${newCorrectAnswers}`);
+        return newCorrectAnswers;
       });
       
-      if (isAnswerCorrect) {
-        // Get current kid points first
-        const { data: kidData } = await supabase
-          .from('kids')
-          .select('points')
-          .eq('id', kidId)
-          .single();
+      setTotalPoints(prev => prev + points);
+      setShowWowEffect(true);
+      
+      // Check if this was the last question AND if all answers were correct
+      const isLastQuestion = currentQuestionIndex => currentQuestionIndex + 1 >= questions.length;
+      
+      // Show celebration effect for a short duration
+      setTimeout(() => {
+        setShowWowEffect(false);
         
-        // Then update the points directly
-        if (kidData) {
-          const newPoints = (kidData.points || 0) + (currentQuestion.points || 0);
-          await supabase
-            .from('kids')
-            .update({ points: newPoints })
-            .eq('id', kidId);
+        if (isLastQuestion(currentQuestionIndex => currentQuestionIndex)) {
+          // If perfect score (all questions answered correctly)
+          if (newCorrectAnswers === questions.length) {
+            console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
+            setSessionComplete(true);
+            setShowBoomEffect(true);
+            // Dialog will close automatically in useSessionCompletion
+          } else {
+            // Move to completion screen if not perfect score
+            setCurrentQuestionIndex(prev => prev + 1);
+            setIsModalOpen(true);
+          }
+        } else {
+          // Not the last question, move to next
+          setCurrentQuestionIndex(prev => prev + 1);
+          setIsModalOpen(true);
         }
-      }
-    } catch (error) {
-      console.error('Error recording answer:', error);
-    }
-    
-    // Set different delays based on correct/incorrect:
-    // - Correct: move to next question after 2.5 seconds (to show animation)
-    // - Incorrect: move to next question after 5 seconds (to show the correct answer)
-    const delayTime = isAnswerCorrect ? 2500 : 5000;
-    
-    // Add a delay before moving to the next question after answer
-    setTimeout(() => {
-      goToNextQuestion();
-    }, delayTime);
-    
-    return isAnswerCorrect;
-  }, [selectedAnswer, currentQuestion, answerSubmitted, kidId, setShowRelaxAnimation]);
-  
-  const goToNextQuestion = useCallback(() => {
-    const nextIndex = currentQuestionIndex + 1;
-    
-    if (nextIndex < questions.length) {
-      // Critical fix: Reset the answer state before changing the question index
-      resetAnswer();
-      setCurrentQuestionIndex(nextIndex);
+      }, 1500);
     } else {
-      setIsSessionOver(true);
+      // Play incorrect sound effect
+      playSound('incorrect');
+      
+      // For incorrect answers, wait 5 seconds before moving to next question
+      // to give the kid time to see the correct answer
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev + 1);
+        setIsModalOpen(true);
+      }, 5000); // Changed from 1000 to 5000 (5 seconds)
     }
-  }, [currentQuestionIndex, questions.length, resetAnswer, setIsSessionOver]);
-  
+    
+    return wasCorrect;
+  };
+
   return {
-    selectedAnswer,
-    isCorrect,
+    selectedAnswerId,
     answerSubmitted,
-    currentQuestionIndex,
-    currentQuestion,
-    correctAnswers,
-    totalPoints,
-    handleAnswerSelect,
-    checkAnswer,
-    goToNextQuestion
+    isCorrect,
+    setSelectedAnswerId,
+    setAnswerSubmitted,
+    setIsCorrect,
+    handleSelectAnswer
   };
 };

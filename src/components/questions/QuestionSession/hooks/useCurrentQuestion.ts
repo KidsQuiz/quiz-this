@@ -8,9 +8,9 @@ export const useCurrentQuestion = (
   currentQuestionIndex: number,
   setCurrentQuestion: React.Dispatch<React.SetStateAction<Question | null>>,
   setTimeRemaining: React.Dispatch<React.SetStateAction<number>>,
-  answerSubmitted: boolean,
-  selectedAnswerId: string | null,
-  isCorrect: boolean,
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
+  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>,
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
   setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
   loadAnswerOptions: (questionId: string) => Promise<void>
@@ -26,7 +26,9 @@ export const useCurrentQuestion = (
       const question = questions[currentQuestionIndex];
       setCurrentQuestion(question);
       setTimeRemaining(question.time_limit);
-      // We only update state variables we have control of
+      setAnswerSubmitted(false);
+      setSelectedAnswerId(null);
+      setIsCorrect(false);
       setShowWowEffect(false);
       
       await loadAnswerOptions(question.id);
@@ -41,7 +43,10 @@ export const useCurrentQuestion = (
     isConfiguring, 
     questions, 
     loadAnswerOptions, 
+    setAnswerSubmitted, 
     setCurrentQuestion, 
+    setIsCorrect, 
+    setSelectedAnswerId, 
     setShowWowEffect, 
     setTimeRemaining, 
     setTimerActive
