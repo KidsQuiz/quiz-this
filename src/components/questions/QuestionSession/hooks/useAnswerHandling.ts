@@ -18,7 +18,7 @@ export const useAnswerHandling = (
   setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>
-) {
+) => {
   // Get answer state from our hook
   const {
     selectedAnswerId,
