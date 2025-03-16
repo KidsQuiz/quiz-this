@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 
 export const useDialogManagement = (
@@ -10,7 +11,7 @@ export const useDialogManagement = (
 ) => {
   // Handle dialog closing
   const handleDialogClose = useCallback(() => {
-    // Clean up any styles applied to the body
+    // Always clean up any styles applied to the body
     document.body.style.removeProperty('pointer-events');
     
     // If we have a perfect score and the session is complete, keep the boom effect visible

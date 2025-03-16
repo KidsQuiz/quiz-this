@@ -13,9 +13,11 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
   const [particles, setParticles] = useState<React.ReactNode[]>([]);
   const { t } = useLanguage();
   
+  // This effect handles the animation and cleanup
   useEffect(() => {
     if (isVisible) {
       console.log("🎉 BoomEffect is visible! Generating particles...");
+      
       // Generate confetti particles
       const newParticles = Array.from({ length: 100 }).map((_, i) => {
         const colors = ['bg-amber-500', 'bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500'];
@@ -49,21 +51,21 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
       const timer = setTimeout(() => {
         if (onComplete) {
           console.log("🎉 BoomEffect animation complete, calling onComplete");
-          // Ensure pointer events are re-enabled when animation completes
+          // Always restore pointer events before calling onComplete
           document.body.style.removeProperty('pointer-events');
           onComplete();
         }
-      }, 5000); // Increased from 3000 to 5000 for longer visibility
+      }, 5000); // Keep at 5000 for visibility
       
       return () => {
         clearTimeout(timer);
-        // Ensure pointer events are restored when component unmounts
+        // Ensure pointer events are restored on cleanup
         document.body.style.removeProperty('pointer-events');
       };
     }
   }, [isVisible, onComplete]);
   
-  // Cleanup function when component unmounts completely
+  // Always ensure pointer events are restored when component unmounts
   useEffect(() => {
     return () => {
       document.body.style.removeProperty('pointer-events');

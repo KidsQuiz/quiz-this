@@ -44,7 +44,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Clean up effect for when component unmounts
   useEffect(() => {
     return () => {
-      // Remove any global styles or event listeners
+      // Always restore pointer events when unmounting
       document.body.style.removeProperty('pointer-events');
     };
   }, []);
@@ -59,7 +59,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Handle boom effect completion
   const handleBoomEffectComplete = () => {
     console.log(t('boomEffectComplete'));
-    // Ensure pointer events are restored
+    // Explicitly restore pointer events
     document.body.style.removeProperty('pointer-events');
     setShowBoomEffect(false);
   };
@@ -73,7 +73,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
         open={effectiveOpenState} 
         onOpenChange={(open) => {
           if (!open) {
-            // When dialog is closing, call our custom close handler
+            // When dialog is closing, call our custom close handler which ensures cleanup
             handleDialogClose();
           }
         }}
@@ -84,11 +84,13 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
             handleDialogClose();
           }}
           onInteractOutside={() => {
+            // Always ensure pointer events are restored
             document.body.style.removeProperty('pointer-events');
           }}
           onCloseAutoFocus={(e) => {
             // Prevent the default focus behavior which can cause issues
             e.preventDefault();
+            // Always ensure pointer events are restored
             document.body.style.removeProperty('pointer-events');
           }}
         >

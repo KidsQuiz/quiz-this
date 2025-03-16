@@ -28,6 +28,8 @@ export const useSessionCompletion = (
         
         // Close the dialog with a short delay to allow points to update first
         setTimeout(() => {
+          // Make sure to restore pointer events before closing
+          document.body.style.removeProperty('pointer-events');
           setIsModalOpen(false);
         }, 800);
       }
