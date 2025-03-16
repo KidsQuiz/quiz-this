@@ -1,14 +1,12 @@
 
 export const admin = {
-  adminDashboard: 'Административен Панел',
-  registeredUsers: 'Регистрирани Потребители',
-  totalRegisteredUsers: 'Общ брой регистрирани потребители',
-  userRegistrationTimeline: 'График на регистрациите',
-  registrationsByMonth: 'Натрупване на потребителски регистрации по месеци',
-  registrationsByDay: 'Натрупване на потребителски регистрации по дни',
-  users: 'потребители',
+  adminDashboard: 'Административно табло',
   admin: 'Админ',
-  activeUsers: 'Активни Потребители',
-  usersWithActiveKids: 'Потребители с активни деца (отговорили на въпроси)',
+  registeredUsers: 'Регистрирани потребители',
+  totalRegisteredUsers: 'Общ брой регистрирани потребители',
+  activeUsers: 'Активни потребители',
+  usersWithActiveKids: 'Потребители с активни деца',
   ofAllUsers: 'от всички потребители',
+  userRegistrationTimeline: 'Хронология на регистрациите',
+  registrationsByDay: 'Регистрации по дни',
 } as const;

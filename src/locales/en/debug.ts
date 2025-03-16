@@ -1,9 +1,10 @@
 
 export const debug = {
-  dontWorry: "Don't worry!",
-  learningTakesTime: "Learning takes time.",
-  tryNextQuestion: "Let's try the next question!",
-  sessionFunctionsNotInitialized: "Session functions not initialized",
-  boomEffectVisible: "🎉 BoomEffect state is true, should be visible now",
-  boomEffectComplete: "🎉 BoomEffect onComplete called, hiding effect",
+  debug: 'Debug',
+  enableDebugMode: 'Enable Debug Mode',
+  disableDebugMode: 'Disable Debug Mode',
+  debugModeEnabled: 'Debug Mode Enabled',
+  debugModeDisabled: 'Debug Mode Disabled',
+  showLogs: 'Show Logs',
+  hideLogs: 'Hide Logs',
 } as const;

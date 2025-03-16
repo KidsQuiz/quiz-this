@@ -13,6 +13,8 @@ export const general = {
   confirm: 'Потвърди',
   user: 'Потребител',
   error: 'Грешка',
-  clone: 'Клонирай',
+  clone: 'Клониране',
   success: 'Успех',
+  points: 'точки',
+  somethingWentWrong: 'Нещо се обърка',
 } as const;
