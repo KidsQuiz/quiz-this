@@ -2,6 +2,8 @@
 import { useEffect } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 import { supabase } from '@/integrations/supabase/client';
+import { updateKidPoints } from './usePointsUpdate';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Manages the session completion logic and recording final results
@@ -18,6 +20,8 @@ export const useSessionCompletion = (
   setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  const { toast } = useToast();
+  
   // Handle session completion
   useEffect(() => {
     if (!sessionComplete) return;
@@ -26,6 +30,11 @@ export const useSessionCompletion = (
       console.log(`Session completed for ${kidName}. Score: ${correctAnswers}/${questions.length}`);
       
       try {
+        // Update kid's points in the database
+        if (totalPoints > 0) {
+          await updateKidPoints(kidId, kidName, totalPoints, toast);
+        }
+        
         // Record session results in database using kid_answers table
         // We'll create a summary record by inserting a special answer record
         await supabase.from('kid_answers').insert({
@@ -65,7 +74,8 @@ export const useSessionCompletion = (
     kidName, 
     questions.length, 
     correctAnswers, 
-    totalPoints
+    totalPoints,
+    toast
   ]);
   
   return {

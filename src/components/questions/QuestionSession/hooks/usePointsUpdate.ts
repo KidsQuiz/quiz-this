@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export const updateKidPoints = async (
   kidId: string, 
@@ -10,6 +11,8 @@ export const updateKidPoints = async (
   if (earnedPoints <= 0) return;
   
   try {
+    console.log(`Updating points for kid ${kidName} (${kidId}): +${earnedPoints} points`);
+    
     const { data: kidData, error: kidError } = await supabase
       .from('kids')
       .select('points')
@@ -28,6 +31,8 @@ export const updateKidPoints = async (
       
     if (updateError) throw updateError;
     
+    console.log(`Points updated successfully. ${kidName} now has ${newTotalPoints} points`);
+    
     toast({
       title: "Points updated!",
       description: `${kidName} now has ${newTotalPoints} points!`,
@@ -36,6 +41,11 @@ export const updateKidPoints = async (
     return newTotalPoints;
   } catch (error) {
     console.error('Error updating points:', error);
+    toast({
+      variant: "destructive",
+      title: "Error updating points",
+      description: "There was a problem updating the points. Please try again.",
+    });
     return null;
   }
 };
