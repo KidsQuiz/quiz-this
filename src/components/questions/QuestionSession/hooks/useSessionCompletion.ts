@@ -91,14 +91,14 @@ export const useSessionCompletion = (
             console.log('Perfect score milestone recorded');
           }
           
-          // For perfect scores, immediately trigger boom effect if not already shown
-          if (correctAnswers === questions.length && questions.length > 0) {
-            console.log("Ensuring boom effect is shown for perfect score");
-            setShowBoomEffect(true);
-            
-            // Hide modal to skip summary screen for perfect scores
-            setIsModalOpen(false);
-          }
+          // For perfect scores, ensure boom effect is shown and modal stays closed
+          console.log("Confirming modal is closed and boom effect is shown for perfect score");
+          setIsModalOpen(false);
+          setShowBoomEffect(true);
+        } else {
+          // For non-perfect scores, ensure the summary modal is shown
+          console.log("Non-perfect score, ensuring modal is open for summary screen");
+          setIsModalOpen(true);
         }
         
         console.log(`===== SESSION COMPLETION FINISHED =====`);

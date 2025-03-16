@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
@@ -7,6 +6,7 @@ export const useModalTransition = (
   sessionComplete: boolean,
   currentQuestionIndex: number,
   questions: Question[],
+  correctAnswers: number,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,6 +23,31 @@ export const useModalTransition = (
         // If we've reached the end, mark session as complete
         console.log('Reached end of questions, completing session');
         setSessionComplete(true);
+        
+        // Check for perfect score
+        const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
+        if (isPerfectScore) {
+          // For perfect scores, keep the modal closed
+          console.log("Perfect score detected - keeping modal closed");
+        } else {
+          // For non-perfect scores, reopen the modal for the summary screen
+          console.log("Non-perfect score - reopening modal for summary");
+          
+          // Store transition time for debugging
+          const transitionTime = Date.now();
+          console.log(`TRANSITION: Modal closed at ${transitionTime}, scheduling reopen with delay`);
+          
+          // CRITICAL: Use setTimeout with a LONGER delay to ensure complete DOM updates
+          setTimeout(() => {
+            console.log(`TRANSITION: Reopening modal after ${Date.now() - transitionTime}ms delay`);
+            
+            // Make sure pointer events are enabled before showing summary
+            document.body.style.removeProperty('pointer-events');
+            
+            // This will reopen the modal with the summary screen
+            setIsModalOpen(true);
+          }, 800);
+        }
       } else {
         // CRITICAL: Immediately advance to next question index
         console.log(`Advancing to question ${nextQuestionIndex + 1}`);
@@ -49,5 +74,5 @@ export const useModalTransition = (
         }, 800); // Significantly increased delay for more reliable transition
       }
     }
-  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
+  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, correctAnswers, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
 };

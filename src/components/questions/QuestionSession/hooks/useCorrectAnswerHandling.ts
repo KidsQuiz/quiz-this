@@ -54,18 +54,18 @@ export const useCorrectAnswerHandling = (
         if (isLastQuestion(prevIndex)) {
           // If perfect score (all questions answered correctly)
           if (newCorrectAnswers === questions.length && questions.length > 0) {
-            console.log("🎉🎉🎉 PERFECT SCORE after last question! Adding delay before showing boom effect");
+            console.log("🎉🎉🎉 PERFECT SCORE after last question!");
+            
+            // Immediately hide the modal to skip summary screen
+            console.log("Immediately hiding modal to prevent summary screen from showing");
+            setIsModalOpen(false);
+            
+            // Mark session as complete for proper cleanup
             setSessionComplete(true);
             
-            // Add a 2-second delay before showing the boom effect
-            setTimeout(() => {
-              console.log("Showing boom effect after 2-second delay");
-              setShowBoomEffect(true);
-              
-              // Hide the dialog/modal when showing boom effect
-              // This will skip the summary screen
-              setIsModalOpen(false);
-            }, 2000);
+            // Show boom effect immediately without delay
+            console.log("Showing boom effect immediately");
+            setShowBoomEffect(true);
             
             return prevIndex + 1;
           } else {

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
@@ -77,12 +78,13 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [isOpen, showBoomEffect, handleDialogClose]);
 
-  // IMPORTANT: We now directly use the isOpen prop to control the dialog
-  // This should prevent the immediate closing issue by maintaining parent control
+  // For perfect scores, we want to completely skip the dialog
+  const isPerfectScore = correctAnswers === questions.length && questions.length > 0 && sessionComplete;
+
   return (
     <>
       <Dialog 
-        open={isOpen && isModalOpen} 
+        open={isOpen && isModalOpen && !isPerfectScore} 
         onOpenChange={(open) => {
           if (!open) {
             // When dialog is closing, call our custom close handler which ensures cleanup
@@ -135,7 +137,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
             />
           )}
           
-          {!isConfiguring && sessionComplete && (
+          {!isConfiguring && sessionComplete && !isPerfectScore && (
             <CompletionScreen
               kidName={kidName}
               totalPoints={totalPoints}
