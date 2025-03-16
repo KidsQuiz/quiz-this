@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
 import { useSessionState } from './useSessionState';
@@ -8,9 +8,11 @@ import { useToastAndLanguage } from './useToastAndLanguage';
 import { useSessionEffects } from './useSessionEffects';
 import { useAnswerProcessing } from './useAnswerProcessing';
 import { supabase } from '@/integrations/supabase/client';
+import { Question } from '@/hooks/questionsTypes';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast, t } = useToastAndLanguage();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   
   // Use session state hook for state management
   const {
@@ -61,6 +63,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   useEffect(() => {
     const fetchPackagesAndStartSession = async () => {
       try {
+        setIsConfiguring(false);
+        
+        console.log(`Starting to fetch packages for kid ${kidId}`);
         // Get all packages assigned to this kid
         const { data: assignedPackages, error: assignmentsError } = await supabase
           .from('kid_packages')
@@ -85,8 +90,18 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
         const packageIds = assignedPackages.map(p => p.package_id);
         await loadQuestions(packageIds);
         
-        // Move to the first question
-        setCurrentQuestionIndex(0);
+        // Move to the first question if we have questions
+        if (questions.length > 0) {
+          setCurrentQuestionIndex(0);
+          
+          // Force set the first question
+          if (questions[0]) {
+            setCurrentQuestion(questions[0] as Question);
+            await loadAnswerOptions(questions[0].id);
+          }
+        }
+        
+        setInitialLoadComplete(true);
         
       } catch (error: any) {
         console.error('Error loading assigned packages:', error.message);
@@ -101,6 +116,18 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     
     fetchPackagesAndStartSession();
   }, [kidId, loadQuestions, onClose, toast, t, setCurrentQuestionIndex]);
+
+  // Additional effect to ensure currentQuestion is set when questions are loaded
+  useEffect(() => {
+    if (questions.length > 0 && currentQuestionIndex >= 0 && !currentQuestion) {
+      const question = questions[currentQuestionIndex];
+      if (question) {
+        console.log(`Setting current question to index ${currentQuestionIndex}:`, question);
+        setCurrentQuestion(question);
+        loadAnswerOptions(question.id);
+      }
+    }
+  }, [questions, currentQuestionIndex, currentQuestion, setCurrentQuestion, loadAnswerOptions]);
 
   // Process answers and handle submissions
   const {
@@ -167,7 +194,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   );
 
   return {
-    isLoading,
+    isLoading: isLoading || !initialLoadComplete,
     currentQuestion,
     answerOptions,
     questions,

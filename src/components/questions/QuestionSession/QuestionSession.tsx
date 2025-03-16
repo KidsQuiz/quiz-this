@@ -6,12 +6,7 @@ import QuestionDisplay from './QuestionDisplay';
 import CompletionScreen from './CompletionScreen';
 import BoomEffect from './components/BoomEffect';
 import RelaxAnimation from './components/RelaxAnimation';
-
-interface QuestionSessionProps {
-  kidId: string;
-  kidName: string;
-  onClose: () => void;
-}
+import { QuestionSessionProps } from './types';
 
 const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClose }) => {
   const {
@@ -35,6 +30,9 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     handleDialogClose
   } = useQuestionSession(kidId, kidName, onClose);
 
+  // Render a loading state if currentQuestion is null but we're not at the completion screen
+  const isLoadingOrMissingQuestion = isLoading || (!sessionComplete && !currentQuestion);
+
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={handleDialogClose}>
@@ -47,7 +45,12 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
               totalPoints={totalPoints}
               onClose={onClose}
             />
-          ) : (
+          ) : isLoadingOrMissingQuestion ? (
+            <div className="flex flex-col items-center justify-center p-12 h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+              <p className="mt-4 text-lg">Loading questions...</p>
+            </div>
+          ) : currentQuestion && (
             <QuestionDisplay
               currentQuestion={currentQuestion}
               answerOptions={answerOptions}

@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export const useQuestionLoading = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answerOptions, setAnswerOptions] = useState<AnswerOption[]>([]);
@@ -17,6 +17,7 @@ export const useQuestionLoading = () => {
     
     try {
       setIsLoading(true);
+      console.log(`Loading questions for package IDs:`, selectedPackageIds);
       
       let allQuestions: Question[] = [];
       let packagePresentationOrders: Record<string, 'sequential' | 'shuffle'> = {};
@@ -50,6 +51,8 @@ export const useQuestionLoading = () => {
         if (error) throw error;
         
         if (data && data.length > 0) {
+          console.log(`Loaded ${data.length} questions for package ${packageId}`);
+          
           // Apply the correct ordering based on package configuration
           let packageQuestions = [...data];
           
@@ -82,6 +85,8 @@ export const useQuestionLoading = () => {
       // Convert back to array
       const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
       
+      console.log(`Loaded ${uniqueQuestions.length} unique questions across all packages`);
+      
       // Always shuffle questions across different packages
       // This ensures that questions from different packages are mixed
       // but the order within each package respects its configuration
@@ -104,6 +109,8 @@ export const useQuestionLoading = () => {
   // Load answer options for the current question
   const loadAnswerOptions = useCallback(async (questionId: string) => {
     try {
+      console.log(`Loading answer options for question ID: ${questionId}`);
+      
       const { data, error } = await supabase
         .from('answer_options')
         .select('*')
@@ -111,6 +118,12 @@ export const useQuestionLoading = () => {
         .order('id');
         
       if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        console.warn(`No answer options found for question ${questionId}`);
+      } else {
+        console.log(`Loaded ${data.length} answer options for question ${questionId}`);
+      }
       
       // Randomize the order of answers
       const shuffledAnswers = [...(data || [])].sort(() => Math.random() - 0.5);

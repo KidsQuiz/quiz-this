@@ -1,4 +1,4 @@
 
-import QuestionSessionComponent from './QuestionSession';
+import QuestionSession from './QuestionSession';
 
-export default QuestionSessionComponent;
+export default QuestionSession;
