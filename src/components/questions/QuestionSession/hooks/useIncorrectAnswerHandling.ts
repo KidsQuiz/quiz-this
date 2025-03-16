@@ -21,6 +21,7 @@ export const useIncorrectAnswerHandling = (
     setShowRelaxAnimation(true);
     
     // Wait a moment to show the relaxation animation, then move to next question
+    // The progress bar will show in the FeedbackMessage component for 5 seconds
     setTimeout(() => {
       console.log("Relaxation animation timeout complete, resetting state");
       setShowRelaxAnimation(false);
