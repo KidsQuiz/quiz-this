@@ -2,7 +2,7 @@
 import { useSessionTransition } from './useSessionTransition';
 import { useQuestionPreparation } from './useQuestionPreparation';
 import { useTimeoutEffects } from './useTimeoutEffects';
-import { Question } from '@/hooks/questionsTypes';
+import { Question, AnswerOption } from '@/hooks/questionsTypes';
 
 export const useSessionEffects = (
   kidId: string,
@@ -18,6 +18,7 @@ export const useSessionEffects = (
   timeRemaining: number,
   currentQuestion: Question | null,
   showBoomEffect: boolean,
+  answerOptions: AnswerOption[],
   setCurrentQuestion: React.Dispatch<React.SetStateAction<Question | null>>,
   setTimeRemaining: React.Dispatch<React.SetStateAction<number>>,
   setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
@@ -66,8 +67,12 @@ export const useSessionEffects = (
     answerSubmitted,
     currentQuestionIndex,
     questions,
+    answerOptions,
     setAnswerSubmitted,
     setSessionComplete,
-    setIsModalOpen
+    setIsModalOpen,
+    setIsCorrect,
+    setSelectedAnswerId,
+    setCurrentQuestionIndex
   );
 };

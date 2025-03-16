@@ -13,7 +13,6 @@ import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
 import RelaxAnimation from './components/RelaxAnimation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
 
 interface QuestionDisplayProps {
   currentQuestion: Question;
@@ -44,13 +43,13 @@ const QuestionDisplay = ({
 }: QuestionDisplayProps) => {
   // Play sound effect when time runs out
   useEffect(() => {
-    if (answerSubmitted && selectedAnswerId === null && timeRemaining === 0) {
+    if (answerSubmitted && timeRemaining === 0) {
       playSound('incorrect');
     }
-  }, [answerSubmitted, selectedAnswerId, timeRemaining]);
+  }, [answerSubmitted, timeRemaining]);
 
   // Check if time ran out
-  const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
+  const timeRanOut = timeRemaining === 0 && answerSubmitted;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -81,18 +80,12 @@ const QuestionDisplay = ({
                 
                 {answerSubmitted && (
                   <div className="mt-4">
-                    {timeRanOut ? (
-                      <div className="bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-red-500" />
-                        <p className="text-red-700 dark:text-red-400 font-medium">Time's up! Moving to next question...</p>
-                      </div>
-                    ) : (
-                      <FeedbackMessage 
-                        isCorrect={isCorrect}
-                        points={currentQuestion.points}
-                        answerSubmitted={answerSubmitted}
-                      />
-                    )}
+                    <FeedbackMessage 
+                      isCorrect={isCorrect}
+                      points={currentQuestion.points}
+                      answerSubmitted={answerSubmitted}
+                      timeRanOut={timeRanOut}
+                    />
                   </div>
                 )}
               </div>

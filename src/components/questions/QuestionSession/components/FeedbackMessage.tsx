@@ -2,21 +2,37 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Clock, AlertTriangle } from 'lucide-react';
 
 interface FeedbackMessageProps {
   isCorrect: boolean;
   points: number;
   answerSubmitted: boolean;
+  timeRanOut?: boolean;
 }
 
 const FeedbackMessage = ({ 
   isCorrect, 
   points, 
-  answerSubmitted 
+  answerSubmitted,
+  timeRanOut = false
 }: FeedbackMessageProps) => {
   const { t } = useLanguage();
   
   if (!answerSubmitted) return null;
+  
+  // Handle time ran out scenario
+  if (timeRanOut) {
+    return (
+      <div className="bg-amber-50 border-2 border-amber-500 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300 p-3 rounded-xl text-lg shadow-md animate-fade-in flex items-center gap-2">
+        <Clock className="h-5 w-5 flex-shrink-0" />
+        <div>
+          <p className="font-medium">{t('timeUp') || "Time's up!"}</p>
+          <p className="text-sm">{t('correctAnswerShown') || "The correct answer is highlighted. Next question in 5 seconds..."}</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div 
