@@ -69,7 +69,7 @@ const QuestionDisplay = ({
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <DialogHeader className="mb-2 flex-shrink-0">
+      <DialogHeader className="mb-4 flex-shrink-0 p-6">
         <div className="flex justify-between items-center">
           <DialogTitle className="text-3xl font-bold">
             Question {currentQuestionIndex + 1}/{questionsTotal}
@@ -77,16 +77,16 @@ const QuestionDisplay = ({
         </div>
       </DialogHeader>
       
-      <Card className="flex-grow flex flex-col overflow-hidden mb-2">
-        <CardContent className="p-4 flex flex-col h-full">
-          <div className="flex flex-col h-full gap-4">
+      <Card className="flex-grow flex flex-col overflow-hidden mx-6 mb-6">
+        <CardContent className="p-6 flex flex-col h-full">
+          <div className="flex flex-col h-full gap-6">
             <ProgressTimer 
               timeRemaining={timeRemaining} 
               timeLimit={currentQuestion.time_limit} 
             />
             
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-grow overflow-hidden">
-              <div className="md:col-span-2 flex flex-col">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 flex-grow overflow-hidden">
+              <div className="md:col-span-5 flex flex-col">
                 <QuestionCard question={currentQuestion} showWowEffect={showWowEffect}>
                   <CelebrationEffect 
                     showEffect={showWowEffect} 
@@ -106,7 +106,7 @@ const QuestionDisplay = ({
                 )}
               </div>
               
-              <div className="md:col-span-3">
+              <div className="md:col-span-7">
                 <AnswerOptionsList 
                   answerOptions={answerOptions}
                   selectedAnswerId={selectedAnswerId}

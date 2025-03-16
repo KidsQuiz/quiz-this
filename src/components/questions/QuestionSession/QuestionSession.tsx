@@ -75,7 +75,7 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-[600px] p-0 gap-0 border-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[800px] md:max-w-[900px] lg:max-w-[1000px] p-0 gap-0 border-0 overflow-hidden min-h-[600px]">
           {isLoadingOrMissingQuestion && (
             <DialogTitle asChild>
               <VisuallyHidden>Loading Questions</VisuallyHidden>

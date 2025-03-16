@@ -38,7 +38,7 @@ const QuestionForm = ({ isOpen, onClose, onSave, questionId, packageId }: Questi
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] md:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditMode ? t('editQuestion') : t('addQuestion')}</DialogTitle>
         </DialogHeader>
