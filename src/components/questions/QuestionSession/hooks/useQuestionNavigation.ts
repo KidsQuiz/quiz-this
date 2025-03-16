@@ -24,10 +24,11 @@ export const useQuestionNavigation = () => {
     return () => clearInterval(timer);
   }, [timerActive, timeRemaining]);
 
-  // Handle when time is up - this function is now simplified since the 
-  // timeout effect is handled in useTimeoutEffects
+  // Handle when time is up - this ensures the timer is properly stopped
   const handleTimeUp = () => {
+    console.log('handleTimeUp called, current timer active state:', timerActive);
     if (timerActive) {
+      console.log('Stopping timer due to time up');
       setTimerActive(false);
       return true; // Time up event processed
     }

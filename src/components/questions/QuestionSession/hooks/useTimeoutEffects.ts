@@ -23,11 +23,12 @@ export const useTimeoutEffects = (
 ) => {
   // Handle when time runs out for a question
   useEffect(() => {
+    // Skip if any of these conditions are met
     if (!currentQuestion || isConfiguring || sessionComplete) return;
     
     // Only process if timer reaches zero and answer is not already submitted
     if (timeRemaining === 0 && !answerSubmitted) {
-      console.log('Time ran out for current question');
+      console.log('Time ran out for current question - preparing to advance');
       
       // Mark as submitted with no selection
       setAnswerSubmitted(true);
@@ -42,18 +43,25 @@ export const useTimeoutEffects = (
       
       // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
       const timeoutId = setTimeout(() => {
+        console.log('Timeout completed, ready to advance question');
         if (currentQuestionIndex >= questions.length - 1) {
           // Last question, complete the session
           console.log('Last question timed out, completing session');
           setSessionComplete(true);
         } else {
           // Move to the next question
-          console.log('Time expired - advancing to next question');
-          setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+          console.log('Time expired - advancing to next question now');
+          setCurrentQuestionIndex(prevIndex => {
+            console.log(`Advancing from question ${prevIndex} to ${prevIndex + 1}`);
+            return prevIndex + 1;
+          });
         }
       }, 5000); // 5 seconds delay
       
-      return () => clearTimeout(timeoutId);
+      return () => {
+        console.log('Clearing timeout for question advancement');
+        clearTimeout(timeoutId);
+      };
     }
   }, [
     timeRemaining, 

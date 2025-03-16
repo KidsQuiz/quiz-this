@@ -43,13 +43,21 @@ const QuestionDisplay = ({
 }: QuestionDisplayProps) => {
   // Play sound effect when time runs out
   useEffect(() => {
-    if (timeRemaining === 0 && !isCorrect) {
+    if (timeRemaining === 0 && !isCorrect && !showWowEffect) {
+      console.log('Playing incorrect sound due to time expiration');
       playSound('incorrect');
     }
-  }, [timeRemaining, isCorrect]);
+  }, [timeRemaining, isCorrect, showWowEffect]);
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted;
+  
+  // Log for debugging
+  useEffect(() => {
+    if (timeRanOut) {
+      console.log('Time ran out state detected in QuestionDisplay');
+    }
+  }, [timeRanOut]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
