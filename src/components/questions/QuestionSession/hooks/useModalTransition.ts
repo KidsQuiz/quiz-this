@@ -28,11 +28,19 @@ export const useModalTransition = (
         console.log(`Advancing to question ${nextQuestionIndex + 1}`);
         setCurrentQuestionIndex(nextQuestionIndex);
         
-        // Re-open the modal with a longer delay to ensure state updates properly
+        // Store transition time for debugging
+        const transitionTime = Date.now();
+        console.log(`Starting modal transition at time: ${transitionTime}`);
+        
+        // Re-open the modal with a significant delay to ensure state updates properly
         setTimeout(() => {
-          console.log('Re-opening modal for next question');
+          console.log(`Re-opening modal for next question at ${Date.now() - transitionTime}ms after transition start`);
+          
+          // Make sure pointer events are enabled before showing next question
+          document.body.style.removeProperty('pointer-events');
+          
           setIsModalOpen(true);
-        }, 200); // Increased delay for more reliable state update
+        }, 500); // Significantly increased delay for more reliable state update
       }
     }
   }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);

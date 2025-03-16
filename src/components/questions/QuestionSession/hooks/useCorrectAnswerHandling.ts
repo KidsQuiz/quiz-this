@@ -75,15 +75,21 @@ export const useCorrectAnswerHandling = (
           // Important: Force DOM update with state reset before modal change
           document.body.style.pointerEvents = 'none';
           
-          // Add a small delay before closing the modal to ensure everything is reset
+          // Store transition time for debugging
+          const transitionTime = Date.now();
+          console.log(`Starting correct answer transition at time: ${transitionTime}`);
+          
+          // Add a delay before closing the modal to ensure everything is reset
           setTimeout(() => {
             console.log("Closing current question dialog to advance to next question");
             setIsModalOpen(false); // Close this question to advance to next
             
+            // Re-enable pointer events after a delay
             setTimeout(() => {
               document.body.style.removeProperty('pointer-events');
-            }, 300);
-          }, 200); // Increased delay for more reliable transition
+              console.log(`Re-enabled pointer events at ${Date.now() - transitionTime}ms after transition start`);
+            }, 400);
+          }, 300); // Increased delay for more reliable transition
         }
         return prevIndex;
       });
