@@ -23,14 +23,17 @@ export const useCurrentQuestion = (
       // Check if we've reached the end of questions
       if (currentQuestionIndex >= questions.length) return;
       
-      const question = questions[currentQuestionIndex];
-      setCurrentQuestion(question);
-      setTimeRemaining(question.time_limit);
+      // Reset all question state before loading the new question
       setAnswerSubmitted(false);
       setSelectedAnswerId(null);
       setIsCorrect(false);
       setShowWowEffect(false);
       
+      const question = questions[currentQuestionIndex];
+      setCurrentQuestion(question);
+      setTimeRemaining(question.time_limit);
+      
+      // Load answer options for the new question
       await loadAnswerOptions(question.id);
       
       // Start the timer for this question
