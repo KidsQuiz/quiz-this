@@ -56,7 +56,7 @@ const FeedbackMessage = ({
   
   if (!answerSubmitted) return null;
   
-  // Handle time ran out scenario
+  // Handle time ran out scenario - now integrated into the main feedback
   if (timeRanOut) {
     return (
       <div className="bg-amber-50 border-2 border-amber-500 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300 p-3 rounded-xl text-lg shadow-md animate-fade-in flex flex-col gap-2">

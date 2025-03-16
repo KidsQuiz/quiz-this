@@ -12,7 +12,6 @@ import AnswerOptionsList from './components/AnswerOptionsList';
 import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
 import RelaxAnimation from './components/RelaxAnimation';
-import TimeUpFeedback from './components/TimeUpFeedback';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface QuestionDisplayProps {
@@ -118,10 +117,7 @@ const QuestionDisplay = ({
         </CardContent>
       </Card>
       
-      {/* Show time-up feedback overlay when timer expires */}
-      {showingTimeUpFeedback && (
-        <TimeUpFeedback show={showingTimeUpFeedback} />
-      )}
+      {/* Removed TimeUpFeedback component from here */}
       
       <AnimationStyles />
       

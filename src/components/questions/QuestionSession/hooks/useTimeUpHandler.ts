@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -64,7 +65,8 @@ export const useTimeUpHandler = ({
     
     // Update UI states
     setIsTimeUp(true);
-    setShowingTimeUpFeedback(true);
+    // Do not show the time up feedback overlay
+    setShowingTimeUpFeedback(false);
     setAnswerSubmitted(true);
     setIsCorrect(false);
     
