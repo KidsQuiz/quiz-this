@@ -5,26 +5,14 @@ import { useKidsData } from '@/hooks/useKidsData';
 import { DropResult } from 'react-beautiful-dnd';
 import { useKidsDialogs } from '@/hooks/useKidsDialogs';
 import { useKidsDragDrop } from '@/hooks/useKidsDragDrop';
+import { useKidsAdditionalDialogs } from '@/hooks/useKidsAdditionalDialogs';
 import KidsHeader from './kids/KidsHeader';
 import KidsDialogs from './kids/KidsDialogs';
-import MilestonesDialog from './milestones/MilestonesDialog';
-import WrongAnswersDashboard from './wrong-answers';
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/contexts/LanguageContext';
+import KidsAdditionalDialogs from './kids/KidsAdditionalDialogs';
 
 const KidsManager = () => {
   const { kids, isLoading, fetchKids, deleteKid, reorderKids } = useKidsData();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { toast } = useToast();
-  const { t } = useLanguage();
-  
-  // Milestone dialog state
-  const [isMilestoneDialogOpen, setIsMilestoneDialogOpen] = useState(false);
-  const [selectedKidForMilestones, setSelectedKidForMilestones] = useState<{ id: string; name: string; points: number } | null>(null);
-  
-  // Wrong answers dialog state
-  const [isWrongAnswersDialogOpen, setIsWrongAnswersDialogOpen] = useState(false);
-  const [selectedKidForWrongAnswers, setSelectedKidForWrongAnswers] = useState<{ id: string; name: string } | null>(null);
   
   const {
     // Kid form
@@ -53,6 +41,21 @@ const KidsManager = () => {
     closeResetPointsDialog
   } = useKidsDialogs();
   
+  const {
+    // Milestone dialog
+    isMilestoneDialogOpen,
+    selectedKidForMilestones,
+    openMilestoneDialog,
+    closeMilestoneDialog,
+    
+    // Wrong answers dialog
+    isWrongAnswersDialogOpen,
+    selectedKidForWrongAnswers,
+    openWrongAnswersDialog,
+    closeWrongAnswersDialog,
+    handleResetWrongAnswers
+  } = useKidsAdditionalDialogs();
+  
   const { handleDragEnd } = useKidsDragDrop(fetchKids);
   
   useEffect(() => {
@@ -75,35 +78,16 @@ const KidsManager = () => {
     fetchKids();
   };
   
-  // Milestone management functions
-  const openMilestoneDialog = (id: string, name: string, points: number) => {
-    setSelectedKidForMilestones({ id, name, points });
-    setIsMilestoneDialogOpen(true);
-  };
-  
-  const closeMilestoneDialog = () => {
-    setIsMilestoneDialogOpen(false);
-    setSelectedKidForMilestones(null);
+  const handleMilestoneDialogClose = () => {
+    closeMilestoneDialog();
     // Refresh kids to update milestones on the card
     fetchKids();
   };
   
-  // Wrong answers management functions
-  const openWrongAnswersDialog = (id: string, name: string) => {
-    setSelectedKidForWrongAnswers({ id, name });
-    setIsWrongAnswersDialogOpen(true);
-  };
-  
-  const closeWrongAnswersDialog = () => {
-    setIsWrongAnswersDialogOpen(false);
-    setSelectedKidForWrongAnswers(null);
+  const handleWrongAnswersDialogClose = () => {
+    closeWrongAnswersDialog();
     // Refresh kids data to reflect any changes
     fetchKids();
-  };
-  
-  // This function just opens the WrongAnswersDashboard where the actual reset happens
-  const handleResetWrongAnswers = (id: string, name: string) => {
-    openWrongAnswersDialog(id, name);
   };
   
   return (
@@ -151,26 +135,17 @@ const KidsManager = () => {
         onPointsReset={fetchKids}
       />
       
-      {/* Milestones Dialog */}
-      {selectedKidForMilestones && (
-        <MilestonesDialog
-          isOpen={isMilestoneDialogOpen}
-          onClose={closeMilestoneDialog}
-          kidId={selectedKidForMilestones.id}
-          kidName={selectedKidForMilestones.name}
-          kidPoints={selectedKidForMilestones.points}
-        />
-      )}
-      
-      {/* Wrong Answers Dashboard */}
-      {selectedKidForWrongAnswers && (
-        <WrongAnswersDashboard
-          isOpen={isWrongAnswersDialogOpen}
-          onClose={closeWrongAnswersDialog}
-          kidId={selectedKidForWrongAnswers.id}
-          kidName={selectedKidForWrongAnswers.name}
-        />
-      )}
+      <KidsAdditionalDialogs
+        // Milestones Dialog props
+        isMilestoneDialogOpen={isMilestoneDialogOpen}
+        selectedKidForMilestones={selectedKidForMilestones}
+        closeMilestoneDialog={handleMilestoneDialogClose}
+        
+        // Wrong Answers Dashboard props
+        isWrongAnswersDialogOpen={isWrongAnswersDialogOpen}
+        selectedKidForWrongAnswers={selectedKidForWrongAnswers}
+        closeWrongAnswersDialog={handleWrongAnswersDialogClose}
+      />
     </div>
   );
 };
