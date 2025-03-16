@@ -10,7 +10,7 @@ interface KidAnswer {
 }
 
 export const useSessionState = () => {
-  const [isConfiguring, setIsConfiguring] = useState(true);
+  const [isConfiguring, setIsConfiguring] = useState(false); // Set to false by default now
   const [sessionComplete, setSessionComplete] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);

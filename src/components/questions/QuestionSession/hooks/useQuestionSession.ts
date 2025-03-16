@@ -1,14 +1,13 @@
 
 import { useEffect } from 'react';
-import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
 import { useSessionState } from './useSessionState';
 import { useDialogManagement } from './useDialogManagement';
 import { useToastAndLanguage } from './useToastAndLanguage';
-import { useSessionConfig } from './useSessionConfig';
 import { useSessionEffects } from './useSessionEffects';
 import { useAnswerProcessing } from './useAnswerProcessing';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast, t } = useToastAndLanguage();
@@ -35,17 +34,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowRelaxAnimation
   } = useSessionState();
 
-  // Load packages and get session configuration
-  const {
-    questionPackages,
-    selectedPackageIds,
-    togglePackageSelection,
-    selectAllPackages,
-    deselectAllPackages,
-    handleStartSession,
-    initializeSessionFunctions
-  } = useSessionConfig(kidId, kidName, onClose);
-
   // Load questions and answer options
   const {
     isLoading,
@@ -69,14 +57,50 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Initialize session config functions
+  // Automatically load all assigned packages for this kid
   useEffect(() => {
-    initializeSessionFunctions(
-      loadQuestions,
-      setIsConfiguring,
-      setCurrentQuestionIndex
-    );
-  }, [initializeSessionFunctions, loadQuestions, setIsConfiguring, setCurrentQuestionIndex]);
+    const fetchPackagesAndStartSession = async () => {
+      try {
+        // Get all packages assigned to this kid
+        const { data: assignedPackages, error: assignmentsError } = await supabase
+          .from('kid_packages')
+          .select('package_id')
+          .eq('kid_id', kidId);
+          
+        if (assignmentsError) throw assignmentsError;
+        
+        console.log(`Assigned packages for kid ${kidId}:`, assignedPackages);
+        
+        if (!assignedPackages || assignedPackages.length === 0) {
+          toast({
+            title: t("noPackages"),
+            description: t("assignPackagesFirst"),
+            variant: "destructive"
+          });
+          onClose();
+          return;
+        }
+        
+        // Extract package IDs and load questions
+        const packageIds = assignedPackages.map(p => p.package_id);
+        await loadQuestions(packageIds);
+        
+        // Move to the first question
+        setCurrentQuestionIndex(0);
+        
+      } catch (error: any) {
+        console.error('Error loading assigned packages:', error.message);
+        toast({
+          variant: "destructive",
+          title: t("error"),
+          description: t("somethingWentWrong")
+        });
+        onClose();
+      }
+    };
+    
+    fetchPackagesAndStartSession();
+  }, [kidId, loadQuestions, onClose, toast, t, setCurrentQuestionIndex]);
 
   // Process answers and handle submissions
   const {
@@ -143,12 +167,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   );
 
   return {
-    isConfiguring,
     isLoading,
     currentQuestion,
     answerOptions,
-    questionPackages,
-    selectedPackageIds,
     questions,
     currentQuestionIndex,
     timeRemaining,
@@ -164,10 +185,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowBoomEffect,
     isModalOpen,
     kidAnswers,
-    togglePackageSelection,
-    selectAllPackages,
-    deselectAllPackages,
-    handleStartSession,
     handleSelectAnswer,
     handleDialogClose
   };
