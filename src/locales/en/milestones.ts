@@ -9,4 +9,12 @@ export const milestones = {
   milestoneName: 'Milestone Name',
   pointsRequired: 'Points Required',
   currentMilestone: 'Current milestone',
+  confirmDeleteMilestone: 'Are you sure you want to delete this milestone?',
+  milestonesDescription: 'Set achievements for your child to unlock as they earn points',
+  currentStatus: 'Current Status',
+  noMilestoneReached: 'No milestone reached yet',
+  pointsToNextMilestone: 'points to next milestone',
+  allMilestones: 'All Milestones',
+  noMilestones: 'No milestones added yet',
+  addFirstMilestone: 'Add First Milestone',
 } as const;

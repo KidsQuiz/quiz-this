@@ -9,4 +9,12 @@ export const milestones = {
   milestoneName: 'Име на постижение',
   pointsRequired: 'Необходими точки',
   currentMilestone: 'Текущо постижение',
+  confirmDeleteMilestone: 'Сигурни ли сте, че искате да изтриете това постижение?',
+  milestonesDescription: 'Задайте постижения, които детето ви може да отключи, докато печели точки',
+  currentStatus: 'Текущ статус',
+  noMilestoneReached: 'Все още няма достигнато постижение',
+  pointsToNextMilestone: 'точки до следващото постижение',
+  allMilestones: 'Всички постижения',
+  noMilestones: 'Все още няма добавени постижения',
+  addFirstMilestone: 'Добавете първо постижение',
 } as const;

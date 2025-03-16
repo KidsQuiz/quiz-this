@@ -17,4 +17,8 @@ export const general = {
   success: 'Успех',
   points: 'точки',
   somethingWentWrong: 'Нещо се обърка',
+  package: 'Пакет',
+  notEnoughData: 'Недостатъчно данни за визуализация',
+  seconds: 'секунди',
+  users: 'потребители',
 } as const;

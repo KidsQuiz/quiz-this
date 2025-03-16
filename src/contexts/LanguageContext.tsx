@@ -10,14 +10,14 @@ export type SupportedLanguage = 'en' | 'bg';
 
 // Type for the language pack dictionaries - using typeof en to get the keys, but not the values
 export type LanguagePackKeys = keyof typeof en;
-export type LanguagePack = Record<LanguagePackKeys, string>;
+export type LanguagePack = Record<string, string>;
 
 // Type for the language context
 interface LanguageContextType {
   currentLanguage: SupportedLanguage;
   languagePack: LanguagePack;
   changeLanguage: (lang: SupportedLanguage) => void;
-  t: (key: LanguagePackKeys) => string;
+  t: (key: string, replacements?: Record<string, string | number>) => string;
 }
 
 // Available language packs
@@ -120,9 +120,18 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     document.documentElement.lang = currentLanguage;
   }, [currentLanguage]);
 
-  // Translation function
-  const t = (key: LanguagePackKeys): string => {
-    return languagePack[key] || key.toString();
+  // Translation function with string interpolation support
+  const t = (key: string, replacements?: Record<string, string | number>): string => {
+    const text = languagePack[key] || key;
+    
+    if (replacements) {
+      return Object.entries(replacements).reduce(
+        (acc, [placeholder, value]) => acc.replace(`{${placeholder}}`, String(value)),
+        text
+      );
+    }
+    
+    return text;
   };
 
   // Create a memoized context value to prevent unnecessary re-renders

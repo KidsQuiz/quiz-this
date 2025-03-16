@@ -15,4 +15,10 @@ export const general = {
   error: 'Error',
   clone: 'Clone',
   success: 'Success',
+  points: 'points',
+  somethingWentWrong: 'Something went wrong',
+  package: 'Package',
+  notEnoughData: 'Not enough data to display chart',
+  seconds: 'seconds',
+  users: 'users',
 } as const;
