@@ -31,7 +31,9 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     handleSelectAnswer,
     handleDialogClose,
     setShowBoomEffect,
-    loadQuestions
+    loadQuestions,
+    isTimeUp,
+    showingTimeUpFeedback
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Render a loading state if currentQuestion is null but we're not at the completion screen
@@ -108,6 +110,8 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
               showWowEffect={showWowEffect}
               showRelaxAnimation={showRelaxAnimation}
               handleSelectAnswer={handleSelectAnswer}
+              isTimeUp={isTimeUp}
+              showingTimeUpFeedback={showingTimeUpFeedback}
             />
           )}
         </DialogContent>

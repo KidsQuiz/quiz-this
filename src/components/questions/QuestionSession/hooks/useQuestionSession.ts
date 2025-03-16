@@ -176,6 +176,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     kidAnswers,
     handleSelectAnswer,
     handleDialogClose,
-    loadQuestions
+    loadQuestions,
+    // Add isTimeUp and showingTimeUpFeedback to the return values
+    isTimeUp,
+    showingTimeUpFeedback
   };
 };

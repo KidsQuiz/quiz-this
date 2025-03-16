@@ -1,6 +1,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
+import { playSound } from '@/utils/soundEffects';
 
 interface UseTimeUpHandlerProps {
   timeUpTriggered: boolean;
@@ -45,6 +46,9 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
     if (timeUpTriggered && !answerSubmitted) {
       console.log("Handling time-up event");
       
+      // Play 'incorrect' sound
+      playSound('incorrect');
+      
       // Mark the answer as submitted
       setAnswerSubmitted(true);
       
@@ -59,6 +63,8 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
       if (correctAnswerId) {
         console.log("Time's up - highlighting correct answer:", correctAnswerId);
         setSelectedAnswerId(correctAnswerId);
+      } else {
+        console.warn("Could not find correct answer to highlight");
       }
       
       // Show the time-up feedback
