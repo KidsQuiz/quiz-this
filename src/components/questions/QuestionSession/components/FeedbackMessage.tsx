@@ -20,20 +20,12 @@ const FeedbackMessage = ({
 }: FeedbackMessageProps) => {
   const { t } = useLanguage();
   
-  if (!answerSubmitted) return null;
-  
-  // Handle time ran out scenario - simplified since we no longer show countdown
+  // If time ran out, don't show any feedback
   if (timeRanOut) {
-    return (
-      <div className="bg-amber-50 border-2 border-amber-500 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300 p-3 rounded-xl text-lg shadow-md animate-fade-in flex items-center gap-2">
-        <Clock className="h-5 w-5 flex-shrink-0" />
-        <div>
-          <p className="font-medium">{t('timeUp')}</p>
-          <p className="text-sm">{t('correctAnswerShown')}</p>
-        </div>
-      </div>
-    );
+    return null;
   }
+  
+  if (!answerSubmitted) return null;
   
   return (
     <div 
