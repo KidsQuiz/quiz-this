@@ -1,3 +1,4 @@
+
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -170,5 +171,10 @@ export const bg = {
   // Relaxation messages
   "dontWorry": "Не се притеснявайте!",
   "learningTakesTime": "Ученето отнема време.",
-  "tryNextQuestion": "Нека опитаме следващия въпрос!"
+  "tryNextQuestion": "Нека опитаме следващия въпрос!",
+  
+  // Debug messages
+  "sessionFunctionsNotInitialized": "Функциите на сесията не са инициализирани",
+  "boomEffectVisible": "🎉 BoomEffect състоянието е вярно, трябва да се вижда сега",
+  "boomEffectComplete": "🎉 BoomEffect onComplete е извикан, скриване на ефекта"
 } as const;

@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -182,5 +183,10 @@ export const en = {
   // Relaxation messages
   "dontWorry": "Don't worry!",
   "learningTakesTime": "Learning takes time.",
-  "tryNextQuestion": "Let's try the next question!"
+  "tryNextQuestion": "Let's try the next question!",
+  
+  // Debug messages
+  "sessionFunctionsNotInitialized": "Session functions not initialized",
+  "boomEffectVisible": "🎉 BoomEffect state is true, should be visible now",
+  "boomEffectComplete": "🎉 BoomEffect onComplete called, hiding effect"
 } as const;
