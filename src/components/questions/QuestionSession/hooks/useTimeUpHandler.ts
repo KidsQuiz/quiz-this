@@ -15,18 +15,19 @@ interface UseTimeUpHandlerProps {
   setSelectedAnswerId: (value: string | null) => void;
 }
 
-export const useTimeUpHandler = ({
-  timeUpTriggered,
-  setTimeUpTriggered,
-  answerSubmitted,
-  setAnswerSubmitted,
-  setIsCorrect,
-  setIsTimeUp,
-  setShowingTimeUpFeedback,
-  currentQuestion,
-  goToNextQuestion,
-  setSelectedAnswerId
-}: UseTimeUpHandlerProps) => {
+export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
+  const {
+    timeUpTriggered,
+    setTimeUpTriggered,
+    answerSubmitted,
+    setAnswerSubmitted,
+    setIsCorrect,
+    setIsTimeUp,
+    setShowingTimeUpFeedback,
+    currentQuestion,
+    goToNextQuestion,
+    setSelectedAnswerId
+  } = props;
   
   // Find the correct answer ID when time is up
   const findCorrectAnswerId = useCallback(() => {
