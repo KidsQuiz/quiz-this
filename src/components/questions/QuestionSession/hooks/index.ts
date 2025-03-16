@@ -2,6 +2,10 @@
 export { useQuestionSession } from './useQuestionSession';
 export { usePackageSelection } from './usePackageSelection';
 export { useQuestionLoading } from './useQuestionLoading';
+export { useQuestionCache } from './useQuestionCache';
+export { usePrefetchOptions } from './usePrefetchOptions';
+export { useQuestionFetching } from './useQuestionFetching';
+export { useAnswerOptionLoading } from './useAnswerOptionLoading';
 export { useQuestionNavigation } from './useQuestionNavigation';
 export { useAnswerHandling } from './useAnswerHandling';
 export { useSessionState } from './useSessionState';
