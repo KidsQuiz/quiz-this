@@ -69,7 +69,6 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       >
         <DialogContent 
           className="sm:max-w-[95vw] md:max-w-[92vw] lg:max-w-[1100px] h-[92vh] max-h-[800px] p-4 flex flex-col overflow-hidden"
-          // Don't trap the focus inside the dialog when it's closing
           onEscapeKeyDown={() => {
             handleDialogClose();
           }}

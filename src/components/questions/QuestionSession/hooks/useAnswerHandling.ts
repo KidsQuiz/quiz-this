@@ -52,13 +52,13 @@ export const useAnswerHandling = (
       setShowWowEffect(true);
       
       // Check if this was the last question AND if all answers were correct
-      const isLastQuestion = currentQuestionIndex => currentQuestionIndex + 1 >= questions.length;
+      const isLastQuestion = (currentIdx: number) => currentIdx + 1 >= questions.length;
       
       // Show celebration effect for a short duration
       setTimeout(() => {
         setShowWowEffect(false);
         
-        if (isLastQuestion(currentQuestionIndex => currentQuestionIndex)) {
+        if (isLastQuestion(currentQuestionIndex)) {
           // If perfect score (all questions answered correctly)
           if (newCorrectAnswers === questions.length) {
             console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
@@ -68,12 +68,10 @@ export const useAnswerHandling = (
           } else {
             // Move to completion screen if not perfect score
             setCurrentQuestionIndex(prev => prev + 1);
-            setIsModalOpen(true);
           }
         } else {
           // Not the last question, move to next
           setCurrentQuestionIndex(prev => prev + 1);
-          setIsModalOpen(true);
         }
       }, 1500);
     } else {
@@ -87,7 +85,6 @@ export const useAnswerHandling = (
       setTimeout(() => {
         setShowRelaxAnimation(false);
         setCurrentQuestionIndex(prev => prev + 1);
-        setIsModalOpen(true);
       }, 5000);
     }
     
