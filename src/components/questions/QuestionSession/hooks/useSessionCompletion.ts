@@ -32,7 +32,10 @@ export const useSessionCompletion = (
       try {
         // Update kid's points in the database
         if (totalPoints > 0) {
+          console.log(`Updating points for kid ${kidName}: Adding ${totalPoints} points`);
           await updateKidPoints(kidId, kidName, totalPoints, toast);
+        } else {
+          console.log(`No points to add for kid ${kidName}`);
         }
         
         // Record session results in database using kid_answers table

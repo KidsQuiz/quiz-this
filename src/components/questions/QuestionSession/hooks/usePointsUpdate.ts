@@ -1,12 +1,12 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast as toastFunction } from '@/hooks/use-toast';
 
 export const updateKidPoints = async (
   kidId: string, 
   kidName: string, 
   earnedPoints: number,
-  toast: any
+  toast: any = toastFunction
 ) => {
   if (earnedPoints <= 0) return;
   
