@@ -33,7 +33,7 @@ const AnswerOptionsList = ({
             "w-full p-4 text-left rounded-xl border-2 text-lg transition-all",
             // Standard states (not submitted)
             isSelected && !answerSubmitted && "border-primary bg-primary/10 shadow-md",
-            // After submission
+            // After submission - always highlight correct answer
             showCorrectHighlight && "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-md",
             isIncorrectSelection && "border-red-500 bg-red-50 dark:bg-red-950/30 shadow-md",
             // Not selected and not submitted

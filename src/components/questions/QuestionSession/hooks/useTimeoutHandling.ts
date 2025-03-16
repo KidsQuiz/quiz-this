@@ -29,7 +29,7 @@ export const useTimeoutHandling = (
           // Close current question dialog to trigger opening the next one
           setIsModalOpen(false);
         }
-      }, 5000); // 5 seconds to show the correct answer
+      }, 5000); // Exactly 5 seconds to show the correct answer
       
       return () => clearTimeout(timer);
     }

@@ -72,7 +72,7 @@ export const useAnswerHandling = (
       setCorrectAnswers(prev => prev + 1);
       setTotalPoints(prev => prev + (currentQuestion.points || 0));
     } else {
-      // Show relaxation animation for wrong answers
+      // Show relaxation animation for wrong answers immediately
       console.log('Showing relaxation animation for wrong answer');
       setShowRelaxAnimation(true);
     }
@@ -109,9 +109,9 @@ export const useAnswerHandling = (
     }
     
     // Set different delays based on correct/incorrect:
-    // - Correct: move to next question after 3 seconds
+    // - Correct: move to next question after 2.5 seconds (to show animation)
     // - Incorrect: move to next question after 5 seconds (to show the correct answer)
-    const delayTime = isAnswerCorrect ? 3000 : 5000;
+    const delayTime = isAnswerCorrect ? 2500 : 5000;
     
     // Add a delay before moving to the next question after answer
     setTimeout(() => {
