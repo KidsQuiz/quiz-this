@@ -58,21 +58,25 @@ export const useAnswerHandling = (
       setTimeout(() => {
         setShowWowEffect(false);
         
-        if (isLastQuestion(currentQuestionIndex)) {
-          // If perfect score (all questions answered correctly)
-          if (newCorrectAnswers === questions.length) {
-            console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
-            setSessionComplete(true);
-            setShowBoomEffect(true);
-            // Dialog will close automatically in useSessionCompletion
+        // Get current question index value to check if it's the last question
+        setCurrentQuestionIndex(prevIndex => {
+          if (isLastQuestion(prevIndex)) {
+            // If perfect score (all questions answered correctly)
+            if (newCorrectAnswers === questions.length) {
+              console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
+              setSessionComplete(true);
+              setShowBoomEffect(true);
+              // Dialog will close automatically in useSessionCompletion
+            } else {
+              // Move to completion screen if not perfect score
+              return prevIndex + 1;
+            }
           } else {
-            // Move to completion screen if not perfect score
-            setCurrentQuestionIndex(prev => prev + 1);
+            // Not the last question, move to next
+            return prevIndex + 1;
           }
-        } else {
-          // Not the last question, move to next
-          setCurrentQuestionIndex(prev => prev + 1);
-        }
+          return prevIndex;
+        });
       }, 1500);
     } else {
       // Play incorrect sound effect
