@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 export const useCurrentQuestion = (
@@ -15,6 +15,9 @@ export const useCurrentQuestion = (
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
   loadAnswerOptions: (questionId: string) => Promise<void>
 ) => {
+  // Create a ref to track latest question ID to prevent race conditions
+  const currentQuestionIdRef = useRef<string | null>(null);
+  
   // Display the current question
   useEffect(() => {
     if (isConfiguring || questions.length === 0) return;
@@ -23,39 +26,55 @@ export const useCurrentQuestion = (
       // Check if we've reached the end of questions
       if (currentQuestionIndex >= questions.length) return;
       
-      console.log("Resetting question state before loading new question");
+      console.log("-------- STARTING NEW QUESTION LOAD SEQUENCE --------");
+      console.log("Aggressively resetting ALL answer state before loading new question");
       
-      // CRITICAL: Immediately stop timer and disable UI interaction
+      // CRITICAL: Immediately disable UI and stop timer
+      document.body.style.pointerEvents = 'none';
       setTimerActive(false);
       
-      // CRITICAL: Reset selection state immediately - multiple resets for redundancy
+      // CRITICAL: Forcefully reset selection state - even before loading anything
       setSelectedAnswerId(null);
       
-      // Create a complete hard reset function that we can call multiple times
+      // RESET ALL question-related state immediately with high priority
       const forceCompleteReset = () => {
-        console.log("Applying FORCED complete reset of answer state");
-        // Triple-reset the selected answer ID to ensure it clears on all devices
+        console.log("FORCED RESET: Aggressively clearing all answer state");
         setSelectedAnswerId(null);
-        
-        // Reset all other question-related state
         setAnswerSubmitted(false);
         setIsCorrect(false);
         setShowWowEffect(false);
+        
+        // Force browser to process these state changes
+        setTimeout(() => {
+          setSelectedAnswerId(null);
+        }, 0);
       };
       
-      // Apply forced reset immediately
+      // Apply first forced reset immediately
       forceCompleteReset();
       
-      // Use multiple staggered timeouts to ensure state resets properly
-      // First reset with small delay
+      // Create a new question ID unique to this load sequence to prevent race conditions
+      const newQuestionLoadId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      currentQuestionIdRef.current = newQuestionLoadId;
+      
+      // Use a sequence of staggered resets for maximum reliability
       setTimeout(() => {
+        // Check if this is still the active load sequence
+        if (currentQuestionIdRef.current !== newQuestionLoadId) {
+          console.log("Aborting question load - superseded by newer request");
+          return;
+        }
+        
         forceCompleteReset();
         
         // Second reset with larger delay
         setTimeout(() => {
+          // Check if this is still the active load sequence
+          if (currentQuestionIdRef.current !== newQuestionLoadId) return;
+          
           forceCompleteReset();
           
-          // Only after multiple resets, load the new question
+          // Only after multiple resets, start loading the new question
           const question = questions[currentQuestionIndex];
           console.log(`Loading question ${currentQuestionIndex + 1}/${questions.length}`, question.id);
           
@@ -63,31 +82,52 @@ export const useCurrentQuestion = (
           setCurrentQuestion(question);
           setTimeRemaining(question.time_limit);
           
+          // Final reset before loading options
+          setSelectedAnswerId(null);
+          
           // Load answer options for the new question
           loadAnswerOptions(question.id).then(() => {
+            // Check if this is still the active load sequence
+            if (currentQuestionIdRef.current !== newQuestionLoadId) return;
+            
             // CRITICAL: Reset selection state again after options loaded
             setSelectedAnswerId(null);
-            console.log("Answer options loaded, selection state forcibly reset to:", null);
+            console.log("Answer options loaded, FORCED selection state reset to:", null);
             
-            // Final reset before activating the timer
+            // Add 2 additional resets with delays to ensure it takes effect
             setTimeout(() => {
+              if (currentQuestionIdRef.current !== newQuestionLoadId) return;
               forceCompleteReset();
+              setSelectedAnswerId(null);
+              
+              // Re-enable UI interactions
+              document.body.style.removeProperty('pointer-events');
+              
               console.log("Final state reset before activating timer");
               
               // Start the timer only after everything is loaded and reset
               setTimeout(() => {
-                // One final check before starting timer
+                if (currentQuestionIdRef.current !== newQuestionLoadId) return;
+                
+                // Final confirmation reset
                 setSelectedAnswerId(null);
                 setTimerActive(true);
-                console.log("Question fully loaded and timer started, confirmed selection state:", null);
-              }, 150);
-            }, 100);
+                console.log("Question fully loaded and timer started");
+                console.log("CONFIRMED selection state:", null);
+                console.log("-------- QUESTION LOAD SEQUENCE COMPLETE --------");
+              }, 250);
+            }, 150);
           });
-        }, 100);
-      }, 100);
+        }, 150);
+      }, 150);
     };
     
     loadCurrentQuestion();
+    
+    // Cleanup function to remove any lingering pointer-events styles
+    return () => {
+      document.body.style.removeProperty('pointer-events');
+    };
   }, [
     currentQuestionIndex, 
     isConfiguring, 

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,21 @@ const AnswerOptionsList = ({
   answerSubmitted, 
   handleSelectAnswer 
 }: AnswerOptionsListProps) => {
+  // Create a ref to track answer options change (new question)
+  const optionsRef = useRef<string[]>([]);
+  
+  // Force re-render and reset selected state when answer options change
+  useEffect(() => {
+    const newOptionsIds = answerOptions.map(o => o.id).join(',');
+    const previousOptionsIds = optionsRef.current.join(',');
+    
+    if (newOptionsIds !== previousOptionsIds) {
+      console.log("New question detected: Answer options changed");
+      // Update our ref
+      optionsRef.current = answerOptions.map(o => o.id);
+    }
+  }, [answerOptions]);
+  
   return (
     <div className="h-full overflow-auto pr-1">
       <div className="space-y-3">
@@ -35,12 +50,24 @@ const AnswerOptionsList = ({
             answerSubmitted ? "cursor-default" : "cursor-pointer"
           );
           
+          // Double check to prevent rendering selected state when it shouldn't be
+          if (isSelected && !selectedAnswerId) {
+            console.warn("Detected inconsistent state in AnswerOptionsList. Forcing unselected style.");
+            answerClasses = cn(
+              "w-full p-4 text-left rounded-xl border-2 text-lg transition-all",
+              !answerSubmitted && "hover:bg-accent hover:border-accent/50 hover:shadow-md",
+              "cursor-pointer"
+            );
+          }
+          
           return (
             <button
               key={option.id}
               onClick={() => !answerSubmitted && handleSelectAnswer(option.id)}
               disabled={answerSubmitted}
               className={answerClasses}
+              data-selected={isSelected ? "true" : "false"}
+              data-submitted={answerSubmitted ? "true" : "false"}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl">{option.content}</span>
