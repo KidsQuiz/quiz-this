@@ -45,11 +45,16 @@ export const useTimeoutEffects = (
       const timeoutId = setTimeout(() => {
         console.log('Timeout completed, ready to advance question');
         
-        // CRITICAL FIX: Force advancement regardless of answer state
+        // CRITICAL FIX: Create a direct update that forces the next question to load
+        // Store current index in local variable to ensure we're working with the right value
+        const nextIndex = currentQuestionIndex + 1;
+        console.log(`CRITICAL: Forcefully advancing from question ${currentQuestionIndex + 1} to ${nextIndex + 1}`);
+        
         if (currentQuestionIndex < questions.length - 1) {
-          console.log('Advancing to next question after timeout, from index', currentQuestionIndex, 'to', currentQuestionIndex + 1);
-          // Use the functional update to ensure we're working with the latest state
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
+          // Force the state update with the exact next index value, not using a function updater
+          // This ensures we don't have stale state issues
+          setCurrentQuestionIndex(nextIndex);
+          console.log(`Question advancement triggered: ${nextIndex}`);
         } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');

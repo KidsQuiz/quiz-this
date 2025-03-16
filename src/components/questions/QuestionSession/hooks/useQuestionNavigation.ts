@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export const useQuestionNavigation = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -26,7 +26,7 @@ export const useQuestionNavigation = () => {
   }, [timerActive, timeRemaining]);
 
   // Handle when time is up - this ensures the timer is properly stopped
-  const handleTimeUp = () => {
+  const handleTimeUp = useCallback(() => {
     console.log('handleTimeUp called, current timer active state:', timerActive);
     if (timerActive) {
       console.log('Stopping timer due to time up');
@@ -34,22 +34,24 @@ export const useQuestionNavigation = () => {
       return true; // Time up event processed
     }
     return false;
-  };
+  }, [timerActive]);
 
   // Handle user-initiated termination of the quiz session
-  const handleTerminateSession = (onClose: () => void) => {
+  const handleTerminateSession = useCallback((onClose: () => void) => {
     // Stop the timer immediately
     setTimerActive(false);
     
     // Call the onClose callback to close the dialog
     onClose();
-  };
+  }, []);
 
-  // Force advance to next question
-  const forceAdvanceQuestion = () => {
+  // Force advance to next question - improved with additional logging
+  const forceAdvanceQuestion = useCallback(() => {
     console.log("Forcing advancement to next question");
-    setCurrentQuestionIndex(prev => prev + 1);
-  };
+    const newIndex = currentQuestionIndex + 1;
+    console.log(`Advancing from question ${currentQuestionIndex + 1} to ${newIndex + 1}`);
+    setCurrentQuestionIndex(newIndex);
+  }, [currentQuestionIndex]);
 
   return {
     currentQuestionIndex,

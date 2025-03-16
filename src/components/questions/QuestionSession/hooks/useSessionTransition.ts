@@ -30,6 +30,10 @@ export const useSessionTransition = (
   const advanceToNextQuestion = useCallback(() => {
     console.log("Advancing to next question directly");
     
+    // CRITICAL: Log the current and next question index to debug transitions
+    const nextIndex = currentQuestionIndex + 1;
+    console.log(`Transition: from question ${currentQuestionIndex + 1} to ${nextIndex + 1}`);
+    
     // Forcibly reset any selected buttons in the DOM first
     const allButtons = document.querySelectorAll('[data-answer-option]');
     allButtons.forEach(button => {
@@ -40,12 +44,15 @@ export const useSessionTransition = (
     // Briefly disable pointer events to prevent race conditions
     document.body.style.pointerEvents = 'none';
     
-    // Instead of closing the modal, just increment the question index
-    // This will trigger the useCurrentQuestion hook to load the next question
-    setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+    // Force the exact next index - not using function updater to avoid potential stale state
+    setCurrentQuestionIndex(nextIndex);
+    console.log(`Question index updated to: ${nextIndex}`);
     
-    // Re-enable pointer events after a delay (will be controlled by useCurrentQuestion)
-  }, [setCurrentQuestionIndex]);
+    // Re-enable pointer events after a delay
+    setTimeout(() => {
+      document.body.style.removeProperty('pointer-events');
+    }, 100);
+  }, [currentQuestionIndex, setCurrentQuestionIndex]);
   
   return { advanceToNextQuestion };
 };
