@@ -23,26 +23,33 @@ export const useCurrentQuestion = (
       // Check if we've reached the end of questions
       if (currentQuestionIndex >= questions.length) return;
       
-      // Complete reset of all question-related state before loading the new question
-      // This ensures no highlight persists between questions
-      setAnswerSubmitted(false);
-      setSelectedAnswerId(null); // Explicitly set to null to clear any previous selection
-      setIsCorrect(false);
-      setShowWowEffect(false);
+      console.log("Resetting question state before loading new question");
       
-      const question = questions[currentQuestionIndex];
-      setCurrentQuestion(question);
-      setTimeRemaining(question.time_limit);
+      // Force a complete reset of all question-related state
+      // The order matters here - reset selection first
+      setSelectedAnswerId(null);
       
-      // Load answer options for the new question
-      // Make sure to reset states before answer options are loaded
-      await loadAnswerOptions(question.id);
-      
-      // Start the timer for this question
-      setTimerActive(true);
+      // Add a small delay to ensure state updates properly
+      // This helps with the tablet/mobile issue where state persists
+      setTimeout(() => {
+        setAnswerSubmitted(false);
+        setIsCorrect(false);
+        setShowWowEffect(false);
+        
+        const question = questions[currentQuestionIndex];
+        console.log(`Loading question ${currentQuestionIndex + 1}/${questions.length}`, question.id);
+        setCurrentQuestion(question);
+        setTimeRemaining(question.time_limit);
+        
+        // Load answer options for the new question
+        loadAnswerOptions(question.id).then(() => {
+          // Start the timer only after everything is loaded and reset
+          setTimerActive(true);
+          console.log("Question fully loaded and timer started");
+        });
+      }, 50); // Small delay to ensure state updates properly
     };
     
-    // Ensure we have a clean slate for the next question
     loadCurrentQuestion();
   }, [
     currentQuestionIndex, 
