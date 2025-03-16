@@ -20,6 +20,13 @@ export const useSessionData = () => {
   // Get navigation state and functions
   const navigationState = useQuestionNavigation();
   
+  // Create a resetAnswerState function that combines multiple reset functions
+  const resetAnswerState = () => {
+    if (sessionState.resetAllAnswerState) {
+      sessionState.resetAllAnswerState();
+    }
+  };
+  
   return {
     // Toast and language
     toast, 
@@ -33,5 +40,8 @@ export const useSessionData = () => {
     
     // Navigation state
     ...navigationState,
+    
+    // Add the resetAnswerState function
+    resetAnswerState
   };
 };

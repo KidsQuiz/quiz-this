@@ -12,7 +12,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   const sessionHandlers = useSessionHandlers({
     ...sessionData,
     kidId,
-    onClose
+    onClose,
+    resetAnswerState: sessionData.resetAnswerState // Add the missing property
   });
   
   // Use setup effect for initialization logic
@@ -20,7 +21,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     kidId,
     onClose,
     ...sessionData,
-    ...sessionHandlers
+    ...sessionHandlers,
+    resetAnswerState: sessionData.resetAnswerState, // Add the missing property
+    navigationTimeUpTriggered: false // Add the missing property
   });
   
   // Handle UI effects like animations
