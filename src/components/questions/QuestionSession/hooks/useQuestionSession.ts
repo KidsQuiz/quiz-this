@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -14,7 +13,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
   const { toast, t } = useToastAndLanguage();
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   
-  // Use session state hook for state management
   const {
     isConfiguring,
     setIsConfiguring,
@@ -36,7 +34,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowRelaxAnimation
   } = useSessionState();
 
-  // Load questions and answer options
   const {
     isLoading,
     questions,
@@ -47,7 +44,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadAnswerOptions
   } = useQuestionLoading();
 
-  // Handle question navigation and timers
   const {
     currentQuestionIndex,
     timeRemaining,
@@ -59,14 +55,12 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Automatically load all assigned packages for this kid
   useEffect(() => {
     const fetchPackagesAndStartSession = async () => {
       try {
         setIsConfiguring(false);
         
         console.log(`Starting to fetch packages for kid ${kidId}`);
-        // Get all packages assigned to this kid
         const { data: assignedPackages, error: assignmentsError } = await supabase
           .from('kid_packages')
           .select('package_id')
@@ -86,15 +80,12 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
           return;
         }
         
-        // Extract package IDs and load questions
         const packageIds = assignedPackages.map(p => p.package_id);
         await loadQuestions(packageIds);
         
-        // Move to the first question if we have questions
         if (questions.length > 0) {
           setCurrentQuestionIndex(0);
           
-          // Force set the first question
           if (questions[0]) {
             setCurrentQuestion(questions[0] as Question);
             await loadAnswerOptions(questions[0].id);
@@ -117,7 +108,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     fetchPackagesAndStartSession();
   }, [kidId, loadQuestions, onClose, toast, t, setCurrentQuestionIndex]);
 
-  // Additional effect to ensure currentQuestion is set when questions are loaded
   useEffect(() => {
     if (questions.length > 0 && currentQuestionIndex >= 0 && !currentQuestion) {
       const question = questions[currentQuestionIndex];
@@ -129,7 +119,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     }
   }, [questions, currentQuestionIndex, currentQuestion, setCurrentQuestion, loadAnswerOptions]);
 
-  // Process answers and handle submissions
   const {
     selectedAnswerId,
     answerSubmitted,
@@ -153,7 +142,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers
   );
 
-  // Apply session effects (modal transitions, current question, completion, timeouts)
   useSessionEffects(
     kidId,
     kidName,
@@ -183,7 +171,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadAnswerOptions
   );
 
-  // Handle dialog closing
   const { handleDialogClose } = useDialogManagement(
     setIsModalOpen,
     onClose,

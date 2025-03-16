@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Sparkles, PartyPopper, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -48,7 +47,7 @@ const BoomEffect = ({ isVisible, onComplete, totalPoints = 0 }: BoomEffectProps)
       
       setParticles(newParticles);
       
-      // Call onComplete after animation ends
+      // Call onComplete after animation ends - ensure we call it only once
       const timer = setTimeout(() => {
         if (onComplete) {
           console.log("🎉 BoomEffect animation complete, calling onComplete");

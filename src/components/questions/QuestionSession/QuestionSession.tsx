@@ -27,11 +27,18 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     showRelaxAnimation,
     isModalOpen,
     handleSelectAnswer,
-    handleDialogClose
+    handleDialogClose,
+    setShowBoomEffect // Make sure to extract this from the hook
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Render a loading state if currentQuestion is null but we're not at the completion screen
   const isLoadingOrMissingQuestion = isLoading || (!sessionComplete && !currentQuestion);
+
+  // Handler for when the boom effect is complete or dismissed
+  const handleBoomEffectComplete = () => {
+    console.log("Boom effect complete, hiding animation");
+    setShowBoomEffect(false);
+  };
 
   return (
     <>
@@ -71,7 +78,7 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
       {showBoomEffect && (
         <BoomEffect 
           isVisible={showBoomEffect} 
-          onComplete={() => {}} 
+          onComplete={handleBoomEffectComplete} 
           totalPoints={totalPoints}
         />
       )}
