@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
@@ -98,32 +97,28 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTimerActive
   );
 
-  // Use question change effects hook with our new resetAndStartTimer function
-  useQuestionChangeEffects(
-    currentQuestionIndex,
-    initialLoadComplete,
-    questions,
-    sessionComplete,
-    setCurrentQuestion,
-    resetAnswerState,
-    setAnswerSubmitted,
-    setSelectedAnswerId,
-    setIsCorrect,
-    loadAnswerOptions,
-    setTimeRemaining,
-    setTimerActive,
-    updateTimeLimit,
-    resetAndStartTimer
-  );
-
   // Create a function to go to the next question
   const goToNextQuestion = () => {
     console.log("Going to next question, current index:", currentQuestionIndex);
+    // Ensure we're in a clean state for the next question
+    resetAnswerState();
+    
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      // Get the next index value directly
+      const nextIndex = currentQuestionIndex + 1;
+      console.log(`Setting question index to ${nextIndex}`);
+      
+      // CRITICAL: Set the index directly
+      setCurrentQuestionIndex(nextIndex);
+      
+      // Ensure the modal stays open
+      setIsModalOpen(true);
     } else {
       console.log("This was the last question, completing session");
       setSessionComplete(true);
+      
+      // Keep modal open for completion screen
+      setIsModalOpen(true);
     }
   };
 
@@ -141,6 +136,24 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setSelectedAnswerId,
     answerOptions
   });
+
+  // Use question change effects hook with our new resetAndStartTimer function
+  useQuestionChangeEffects(
+    currentQuestionIndex,
+    initialLoadComplete,
+    questions,
+    sessionComplete,
+    setCurrentQuestion,
+    resetAnswerState,
+    setAnswerSubmitted,
+    setSelectedAnswerId,
+    setIsCorrect,
+    loadAnswerOptions,
+    setTimeRemaining,
+    setTimerActive,
+    updateTimeLimit,
+    resetAndStartTimer
+  );
 
   // Sync timeUpTriggered from navigation to the main state
   useEffect(() => {

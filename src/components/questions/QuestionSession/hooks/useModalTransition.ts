@@ -13,7 +13,8 @@ export const useModalTransition = (
 ) => {
   // Advance to the next question when modal is closed
   useEffect(() => {
-    if (!isModalOpen && !sessionComplete && currentQuestionIndex < questions.length) {
+    // Only process if modal is closed, session is not complete, and we have valid questions
+    if (!isModalOpen && !sessionComplete && questions.length > 0 && currentQuestionIndex < questions.length) {
       console.log(`Modal closed, current question index: ${currentQuestionIndex}, total questions: ${questions.length}`);
       
       // Move to the next question
@@ -57,21 +58,17 @@ export const useModalTransition = (
         const transitionTime = Date.now();
         console.log(`TRANSITION: Modal closed at ${transitionTime}, scheduling reopen with delay`);
         
-        // CRITICAL: Use setTimeout with a LONGER delay to ensure complete DOM updates
-        // and proper React rendering cycle completion before reopening
+        // CRITICAL: Ensure the modal reopens with the next question
+        // Use setTimeout with a longer delay to ensure complete DOM updates
         setTimeout(() => {
           console.log(`TRANSITION: Reopening modal after ${Date.now() - transitionTime}ms delay`);
           
           // Make sure pointer events are enabled before showing next question
           document.body.style.removeProperty('pointer-events');
           
-          // CRITICAL: Force clean state before reopening modal
-          setTimeout(() => {
-            console.log("TRANSITION: Final state reset before reopening modal");
-            // This will reopen the modal with the next question
-            setIsModalOpen(true);
-          }, 50);
-        }, 800); // Significantly increased delay for more reliable transition
+          // Reopen the modal with the next question
+          setIsModalOpen(true);
+        }, 800);
       }
     }
   }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, correctAnswers, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);

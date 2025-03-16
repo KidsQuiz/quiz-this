@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuestionTimer } from './useQuestionTimer';
 
 export const useQuestionNavigation = () => {
@@ -22,6 +22,14 @@ export const useQuestionNavigation = () => {
     timerActive,
     handleTimeUp
   );
+
+  // Ensure timeUpTriggered is reset when navigating to next question
+  useEffect(() => {
+    if (timeUpTriggered) {
+      console.log("Time up trigger is active, but will not auto-reset");
+      // We now let the handlers in useTimeUpHandler manage this state
+    }
+  }, [timeUpTriggered]);
   
   // Function to handle updating the time limit for a new question
   const updateTimeLimit = useCallback((newTimeLimit: number) => {

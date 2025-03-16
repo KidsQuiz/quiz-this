@@ -18,6 +18,7 @@ export const useQuestionTimer = (
     // Reset the timeUpCalled flag when timer becomes active
     if (isActive) {
       timeUpCalledRef.current = false;
+      console.log("Timer active, resetting timeUpCalled flag");
     }
   }, [isActive]);
   
@@ -57,6 +58,8 @@ export const useQuestionTimer = (
         
         // Time's up
         if (newTime <= 0) {
+          console.log("Timer reached zero!");
+          
           // Immediately stop the timer
           if (timerRef.current) {
             clearInterval(timerRef.current);
