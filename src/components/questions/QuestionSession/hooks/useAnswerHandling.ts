@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { Question } from '@/hooks/questionsTypes';
 import { useAnswerState } from './useAnswerState';
+import { useVisualEffectsState } from './useVisualEffectsState';
 import { playSound } from '@/utils/soundEffects';
 
 export const useAnswerHandling = (
@@ -17,19 +18,30 @@ export const useAnswerHandling = (
   setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>
-) => {
+) {
   // Get answer state from our hook
   const {
     selectedAnswerId,
     answerSubmitted,
     isCorrect,
-    showRelaxAnimation,
     setSelectedAnswerId,
     setAnswerSubmitted,
     setIsCorrect,
-    setShowRelaxAnimation,
-    resetAnswerState
+    resetAnswerSelectionState
   } = useAnswerState();
+
+  // Get visual effects state from our hook
+  const {
+    showRelaxAnimation,
+    setShowRelaxAnimation,
+    resetVisualEffects
+  } = useVisualEffectsState();
+
+  // Combined reset function
+  const resetAnswerState = () => {
+    resetAnswerSelectionState();
+    resetVisualEffects();
+  };
 
   // Handle selecting an answer
   const handleSelectAnswer = useCallback((answerId: string) => {

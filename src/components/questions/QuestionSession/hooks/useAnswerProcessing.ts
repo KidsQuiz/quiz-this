@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { AnswerOption, Question } from '@/hooks/questionsTypes';
 import { useAnswerState } from './useAnswerState';
+import { useVisualEffectsState } from './useVisualEffectsState';
 import { useAnswerRecording } from './useAnswerRecording';
 import { useCorrectAnswerHandling } from './useCorrectAnswerHandling';
 import { useIncorrectAnswerHandling } from './useIncorrectAnswerHandling';
@@ -33,14 +34,24 @@ export const useAnswerProcessing = (
     selectedAnswerId,
     answerSubmitted,
     isCorrect,
-    showRelaxAnimation,
     setSelectedAnswerId,
     setAnswerSubmitted,
     setIsCorrect,
-    setShowRelaxAnimation,
-    resetAnswerState,
-    isMountedRef
+    resetAnswerSelectionState
   } = useAnswerState();
+
+  // Use the visual effects state hook
+  const {
+    showRelaxAnimation,
+    setShowRelaxAnimation,
+    resetVisualEffects
+  } = useVisualEffectsState();
+
+  // Combined reset function
+  const resetAnswerState = () => {
+    resetAnswerSelectionState();
+    resetVisualEffects();
+  };
 
   // Use the answer recording hook
   const { recordAnswer } = useAnswerRecording(kidId, setKidAnswers);
