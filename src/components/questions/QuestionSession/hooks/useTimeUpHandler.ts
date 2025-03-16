@@ -15,6 +15,7 @@ interface TimeUpHandlerProps {
   goToNextQuestion: () => void;
   setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
   answerOptions: AnswerOption[];
+  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const useTimeUpHandler = ({
@@ -28,7 +29,8 @@ export const useTimeUpHandler = ({
   currentQuestion,
   goToNextQuestion,
   setSelectedAnswerId,
-  answerOptions
+  answerOptions,
+  setTimerActive
 }: TimeUpHandlerProps) => {
   // Keep a ref to track ongoing time-up processing
   const isProcessingTimeUpRef = useRef(false);
@@ -59,6 +61,11 @@ export const useTimeUpHandler = ({
 
     // Set processing flag
     isProcessingTimeUpRef.current = true;
+    
+    // Stop the timer first
+    if (setTimerActive) {
+      setTimerActive(false);
+    }
     
     // Play incorrect sound
     playSound('incorrect');
@@ -123,7 +130,8 @@ export const useTimeUpHandler = ({
     setSelectedAnswerId,
     setTimeUpTriggered,
     goToNextQuestion,
-    answerOptions
+    answerOptions,
+    setTimerActive
   ]);
 
   const handleTimeUp = () => {

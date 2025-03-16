@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -11,6 +10,7 @@ export const useQuestionTimer = (
   const activeRef = useRef(isActive);
   const initialTimeRef = useRef(initialTime);
   const timeUpCalledRef = useRef(false);
+  const pendingResetRef = useRef<number | null>(null);
   
   // Keep refs updated with latest values
   useEffect(() => {
@@ -19,6 +19,13 @@ export const useQuestionTimer = (
     if (isActive) {
       timeUpCalledRef.current = false;
       console.log("Timer active, resetting timeUpCalled flag");
+      
+      // Apply any pending reset when timer becomes active
+      if (pendingResetRef.current !== null) {
+        console.log(`Applying pending time reset to ${pendingResetRef.current} now that timer is active`);
+        setTimeRemaining(pendingResetRef.current);
+        pendingResetRef.current = null;
+      }
     }
   }, [isActive]);
   
@@ -38,10 +45,8 @@ export const useQuestionTimer = (
       timerRef.current = null;
     }
     
-    // Reset time when initialTime changes or when turning inactive
+    // Don't start timer if inactive
     if (!isActive) {
-      console.log("Timer stopped, resetting to:", initialTimeRef.current);
-      setTimeRemaining(initialTimeRef.current);
       return;
     }
     
@@ -54,7 +59,6 @@ export const useQuestionTimer = (
         if (!activeRef.current) return prev;
         
         const newTime = prev - 1;
-        console.log(`Timer tick: ${prev} -> ${newTime}`);
         
         // Time's up
         if (newTime <= 0) {
@@ -102,11 +106,19 @@ export const useQuestionTimer = (
     }
     
     const timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
-    console.log("Resetting timer to:", timeToSet);
-    setTimeRemaining(timeToSet);
+    
+    if (isActive) {
+      console.log("Timer active, immediately setting time to:", timeToSet);
+      setTimeRemaining(timeToSet);
+    } else {
+      // Store the reset for when the timer becomes active again
+      console.log("Timer inactive, storing pending reset to:", timeToSet);
+      pendingResetRef.current = timeToSet;
+    }
+    
     // Reset the timeUpCalled flag when manually resetting the timer
     timeUpCalledRef.current = false;
-  }, []);
+  }, [isActive]);
   
   return {
     timeRemaining,

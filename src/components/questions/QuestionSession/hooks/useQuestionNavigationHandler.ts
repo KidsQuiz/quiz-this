@@ -14,6 +14,7 @@ interface NavigationHandlerProps {
   setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>;
+  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const useQuestionNavigationHandler = ({
@@ -28,11 +29,17 @@ export const useQuestionNavigationHandler = ({
   setShowingTimeUpFeedback,
   setTimeUpTriggered,
   setIsModalOpen,
-  setSessionComplete
+  setSessionComplete,
+  setTimerActive
 }: NavigationHandlerProps) => {
   // Create a function to go to the next question
   const goToNextQuestion = useCallback(() => {
     console.log("Going to next question, current index:", currentQuestionIndex);
+    
+    // First pause the timer if available
+    if (setTimerActive) {
+      setTimerActive(false);
+    }
     
     // Ensure the document is interactive
     document.body.style.pointerEvents = '';
@@ -77,11 +84,17 @@ export const useQuestionNavigationHandler = ({
     setIsCorrect,
     setIsTimeUp,
     setShowingTimeUpFeedback,
-    setTimeUpTriggered
+    setTimeUpTriggered,
+    setTimerActive
   ]);
 
   // Reset answer state function for navigation
   const prepareForNavigation = useCallback(() => {
+    // First pause the timer if available
+    if (setTimerActive) {
+      setTimerActive(false);
+    }
+    
     setAnswerSubmitted(false);
     setSelectedAnswerId(null);
     setIsCorrect(false);
@@ -94,7 +107,8 @@ export const useQuestionNavigationHandler = ({
     setIsCorrect, 
     setIsTimeUp,
     setShowingTimeUpFeedback,
-    setTimeUpTriggered
+    setTimeUpTriggered,
+    setTimerActive
   ]);
 
   return {
