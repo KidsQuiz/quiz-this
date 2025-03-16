@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Sparkles, PartyPopper, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BoomEffectProps {
   isVisible: boolean;
@@ -10,6 +11,7 @@ interface BoomEffectProps {
 
 const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
   const [particles, setParticles] = useState<React.ReactNode[]>([]);
+  const { t } = useLanguage();
   
   useEffect(() => {
     if (isVisible) {
@@ -110,7 +112,7 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
       {/* Center content */}
       <div className="relative flex flex-col items-center animate-[boom-scale_0.5s_forwards]">
         <div className="text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-transparent bg-clip-text drop-shadow-lg">
-          FANTASTIC!
+          {t('fantastic')}
         </div>
         
         <div className="flex gap-6 justify-center animate-[boom-rotate_2s_linear_infinite]">
@@ -120,7 +122,7 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
         </div>
         
         <div className="mt-6 text-2xl font-medium text-white text-center drop-shadow-md">
-          You answered all questions correctly!
+          {t('allCorrectAnswers')}
         </div>
       </div>
     </div>

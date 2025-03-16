@@ -1,4 +1,3 @@
-
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -85,7 +84,7 @@ export const bg = {
   importQuestions: 'Импортирай въпроси',
   importQuestionsInstructions: 'Импортирайте въпроси от CSV файл със следната структура:',
   csvMustContain: 'CSV трябва да съдържа колони: question, answer1, answer2, answer3, answer4, correctAnswer, points, timelimit (по избор)',
-  csvExample: 'Пример: correctAnswer трябва да е 1, 2, 3 или 4, за да покаже кой отговор е пра��илен',
+  csvExample: 'Пример: correctAnswer трябва да е 1, 2, 3 или 4, за да покаже ��ой отговор е пра��илен',
   csvCorrectAnswerNote: 'correctAnswer трябва да е число (1-4), съответстващо на правилния отговор',
   clickToSelectCSV: 'Кликнете, за да изберете CSV файл',
   onlyCSVSupported: 'Поддържат се само CSV файлове',
@@ -116,6 +115,8 @@ export const bg = {
   noPackagesSelected: 'Няма избрани пакети',
   pleaseSelectPackages: 'Моля, изберете поне един пакет с въпроси, за да започнете.',
   autoClosingIn: 'Автоматично затваряне след момент',
+  fantastic: 'ФАНТАСТИЧНО!',
+  allCorrectAnswers: 'Отговори правилно на всички въпроси!',
   
   language: 'Език',
   english: 'Английски',
@@ -150,7 +151,7 @@ export const bg = {
   noWrongAnswers: "Няма грешни отговори за показване. Браво!",
   noWrongAnswersStats: "Все още няма грешни отговори за анализ.",
   mostFrequentWrongAnswers: "Най-чести грешни отговори",
-  wrongAnswersByTime: "Грешни отговори във вр��мето",
+  wrongAnswersByTime: "Гре��ни отговори във вр��мето",
   topWrongAnswersDistribution: "Разпределение на грешните отговори",
   wrongCount: "Брой грешки",
   notEnoughData: "Недостатъчно данни за показване на статистика",
