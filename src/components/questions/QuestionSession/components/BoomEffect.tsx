@@ -74,8 +74,20 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
   
   if (!isVisible) return null;
   
+  // Handle click to dismiss
+  const handleClick = () => {
+    console.log("BoomEffect clicked, dismissing...");
+    document.body.style.removeProperty('pointer-events');
+    if (onComplete) {
+      onComplete();
+    }
+  };
+  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
+      onClick={handleClick}
+    >
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes boom-particle {
@@ -125,6 +137,10 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
         
         <div className="mt-6 text-2xl font-medium text-white text-center drop-shadow-md">
           {t('allCorrectAnswers')}
+        </div>
+        
+        <div className="mt-8 text-white/80 text-sm animate-pulse">
+          {t('clickToDismiss')}
         </div>
       </div>
     </div>
