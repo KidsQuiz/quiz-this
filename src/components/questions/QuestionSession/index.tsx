@@ -7,8 +7,11 @@ import QuestionDisplay from './QuestionDisplay';
 import CompletionScreen from './CompletionScreen';
 import BoomEffect from './components/BoomEffect';
 import { QuestionSessionProps } from './types';
+import { useToastAndLanguage } from './hooks/useToastAndLanguage';
 
 const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionProps) => {
+  const { t } = useToastAndLanguage();
+  
   const {
     isConfiguring,
     isLoading,
@@ -49,9 +52,9 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Log boom effect state for debugging
   useEffect(() => {
     if (showBoomEffect) {
-      console.log("🎉 BoomEffect state is true, should be visible now");
+      console.log(t('boomEffectVisible'));
     }
-  }, [showBoomEffect]);
+  }, [showBoomEffect, t]);
 
   // Determine effective open state as a combination of parent control and internal state
   const effectiveOpenState = isOpen && isModalOpen;
@@ -126,7 +129,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       <BoomEffect 
         isVisible={showBoomEffect} 
         onComplete={() => {
-          console.log("🎉 BoomEffect onComplete called, hiding effect");
+          console.log(t('boomEffectComplete'));
           setShowBoomEffect(false);
         }} 
       />

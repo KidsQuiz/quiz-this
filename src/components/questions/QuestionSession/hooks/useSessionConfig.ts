@@ -43,7 +43,7 @@ export const useSessionConfig = (
       setIsConfiguringFn(false);
       setCurrentQuestionIndexFn(0);
     } else {
-      console.error('Session functions not initialized');
+      console.error(t('sessionFunctionsNotInitialized'));
     }
   }, [loadQuestionsFn, selectedPackageIds, setIsConfiguringFn, setCurrentQuestionIndexFn, toast, t]);
 
