@@ -26,7 +26,13 @@ export const useSessionState = () => {
     showWowEffect,
     setShowWowEffect,
     showBoomEffect,
-    setShowBoomEffect
+    setShowBoomEffect,
+    isTimeUp,
+    setIsTimeUp,
+    showingTimeUpFeedback,
+    setShowingTimeUpFeedback,
+    timeUpTriggered,
+    setTimeUpTriggered
   } = useAnswerStateManagement();
 
   const {
@@ -66,7 +72,14 @@ export const useSessionState = () => {
     answerSubmitted,
     setAnswerSubmitted,
     isCorrect,
-    setIsCorrect
+    setIsCorrect,
+    // New time-up related properties
+    isTimeUp,
+    setIsTimeUp,
+    showingTimeUpFeedback,
+    setShowingTimeUpFeedback,
+    timeUpTriggered,
+    setTimeUpTriggered
   };
 };
 
