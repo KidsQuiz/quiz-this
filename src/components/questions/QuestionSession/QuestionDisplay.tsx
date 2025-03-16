@@ -49,7 +49,7 @@ const QuestionDisplay = ({
     }
   }, [timeRemaining, isCorrect, showWowEffect]);
 
-  // Check if time ran out
+  // Check if time ran out - the key check for triggering feedback
   const timeRanOut = timeRemaining === 0 && answerSubmitted;
   
   // Log for debugging

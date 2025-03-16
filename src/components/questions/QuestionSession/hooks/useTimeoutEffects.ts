@@ -44,17 +44,15 @@ export const useTimeoutEffects = (
       // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
       const timeoutId = setTimeout(() => {
         console.log('Timeout completed, ready to advance question');
-        if (currentQuestionIndex >= questions.length - 1) {
+        
+        // Directly force the question index increment to ensure advancement
+        if (currentQuestionIndex < questions.length - 1) {
+          console.log('Advancing to next question after timeout');
+          setCurrentQuestionIndex(prev => prev + 1);
+        } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');
           setSessionComplete(true);
-        } else {
-          // Move to the next question
-          console.log('Time expired - advancing to next question now');
-          setCurrentQuestionIndex(prevIndex => {
-            console.log(`Advancing from question ${prevIndex} to ${prevIndex + 1}`);
-            return prevIndex + 1;
-          });
         }
       }, 5000); // 5 seconds delay
       
