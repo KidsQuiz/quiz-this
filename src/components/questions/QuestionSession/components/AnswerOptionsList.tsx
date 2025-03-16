@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { cn } from '@/lib/utils';
@@ -19,12 +19,6 @@ const AnswerOptionsList = ({
 }: AnswerOptionsListProps) => {
   // Create a ref to track answer options change (new question)
   const optionsRef = useRef<string[]>([]);
-  const selectedIdRef = useRef<string | null>(null);
-  
-  // Update selectedIdRef whenever selectedAnswerId changes
-  useEffect(() => {
-    selectedIdRef.current = selectedAnswerId;
-  }, [selectedAnswerId]);
   
   // Force re-render and reset selected state when answer options change
   useEffect(() => {
@@ -32,17 +26,13 @@ const AnswerOptionsList = ({
     const previousOptionsIds = optionsRef.current.join(',');
     
     if (newOptionsIds !== previousOptionsIds) {
-      console.log("New question detected: Answer options changed");
+      console.log("New question detected: Answer options changed", newOptionsIds);
       // Update our ref
       optionsRef.current = answerOptions.map(o => o.id);
       
-      // Force complete reset of any visual selection state
-      // This ensures no answer appears selected when a new question loads
-      selectedIdRef.current = null;
-      
       // Clear DOM selection state immediately
       setTimeout(() => {
-        console.log("Aggressively clearing any visual selection state");
+        console.log("Clearing any visual selection state");
         const allButtons = document.querySelectorAll('[data-answer-option]');
         allButtons.forEach(button => {
           button.setAttribute('data-selected', 'false');
@@ -56,34 +46,6 @@ const AnswerOptionsList = ({
       }, 0);
     }
   }, [answerOptions]);
-  
-  // Create a safe select handler that double-checks state
-  const safeSelectAnswer = useCallback((answerId: string) => {
-    if (answerSubmitted) {
-      console.log("Answer already submitted, ignoring selection");
-      return;
-    }
-    
-    // Additional sanity check
-    if (selectedIdRef.current) {
-      console.log("Selection already exists, clearing before new selection");
-      selectedIdRef.current = null;
-      
-      // Force quick DOM update
-      const allButtons = document.querySelectorAll('[data-answer-option]');
-      allButtons.forEach(button => {
-        button.setAttribute('data-selected', 'false');
-      });
-      
-      // Small delay before allowing new selection
-      setTimeout(() => {
-        console.log("Applying new selection:", answerId);
-        handleSelectAnswer(answerId);
-      }, 50);
-    } else {
-      handleSelectAnswer(answerId);
-    }
-  }, [answerSubmitted, handleSelectAnswer]);
   
   return (
     <div className="h-full overflow-auto pr-1">
@@ -103,20 +65,10 @@ const AnswerOptionsList = ({
             answerSubmitted ? "cursor-default" : "cursor-pointer"
           );
           
-          // Double check to prevent rendering selected state when it shouldn't be
-          if (isSelected && !selectedAnswerId) {
-            console.warn("Detected inconsistent state in AnswerOptionsList. Forcing unselected style.");
-            answerClasses = cn(
-              "w-full p-4 text-left rounded-xl border-2 text-lg transition-all",
-              !answerSubmitted && "hover:bg-accent hover:border-accent/50 hover:shadow-md",
-              "cursor-pointer"
-            );
-          }
-          
           return (
             <button
               key={option.id}
-              onClick={() => !answerSubmitted && safeSelectAnswer(option.id)}
+              onClick={() => !answerSubmitted && handleSelectAnswer(option.id)}
               disabled={answerSubmitted}
               className={answerClasses}
               data-selected={isSelected ? "true" : "false"}

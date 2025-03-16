@@ -20,33 +20,28 @@ export const useAnswerState = () => {
 
   // Define a reusable function to reset all answer-related state
   const resetAnswerState = useCallback(() => {
-    console.log("CRITICAL: Explicitly resetting ALL answer state");
+    console.log("Resetting answer state");
     // Only update state if component is still mounted
     if (isMountedRef.current) {
-      // Reset in specific order - selection state first
       setSelectedAnswerId(null);
-      
-      // Then reset other states
       setAnswerSubmitted(false);
       setIsCorrect(false);
       
       // Force a DOM update by calling in a timeout
       setTimeout(() => {
         if (isMountedRef.current) {
-          setSelectedAnswerId(null);
-          
           // Aggressive DOM cleanup to ensure no visual state persists
           const allButtons = document.querySelectorAll('[data-answer-option]');
           allButtons.forEach(button => {
             button.setAttribute('data-selected', 'false');
             button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
-                                  'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
-                                  'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
+                                 'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                                 'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
           });
         }
       }, 50);
     }
-  }, [setSelectedAnswerId, setAnswerSubmitted, setIsCorrect]);
+  }, []);
 
   return {
     selectedAnswerId,
