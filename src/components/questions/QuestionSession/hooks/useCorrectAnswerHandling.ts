@@ -74,13 +74,16 @@ export const useCorrectAnswerHandling = (
           
           // Important: Force DOM update with state reset before modal change
           document.body.style.pointerEvents = 'none';
+          
+          // Add a small delay before closing the modal to ensure everything is reset
           setTimeout(() => {
             console.log("Closing current question dialog to advance to next question");
             setIsModalOpen(false); // Close this question to advance to next
+            
             setTimeout(() => {
               document.body.style.removeProperty('pointer-events');
             }, 300);
-          }, 100);
+          }, 200); // Increased delay for more reliable transition
         }
         return prevIndex;
       });

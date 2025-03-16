@@ -31,7 +31,7 @@ export const useIncorrectAnswerHandling = (
       setTimeout(() => {
         console.log("Closing question dialog after incorrect answer");
         setIsModalOpen(false); // This will trigger the modal transition to the next question
-      }, 100);
+      }, 150);
     }, 2000);
   }, [setShowRelaxAnimation, setIsModalOpen, resetAnswerState]);
   

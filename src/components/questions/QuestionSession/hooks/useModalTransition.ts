@@ -28,11 +28,11 @@ export const useModalTransition = (
         console.log(`Advancing to question ${nextQuestionIndex + 1}`);
         setCurrentQuestionIndex(nextQuestionIndex);
         
-        // Re-open the modal with a slight delay to ensure state updates properly
+        // Re-open the modal with a longer delay to ensure state updates properly
         setTimeout(() => {
           console.log('Re-opening modal for next question');
           setIsModalOpen(true);
-        }, 50);
+        }, 200); // Increased delay for more reliable state update
       }
     }
   }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
