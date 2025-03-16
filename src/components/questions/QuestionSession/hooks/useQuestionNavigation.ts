@@ -1,14 +1,17 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 export const useQuestionNavigation = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
-  // Use ref to track if advancement is already in progress
   const advancementInProgressRef = useRef(false);
+  const currentIndexRef = useRef(0);
+  
+  useEffect(() => {
+    currentIndexRef.current = currentQuestionIndex;
+    console.log(`Navigation: currentQuestionIndex updated to ${currentQuestionIndex}`);
+  }, [currentQuestionIndex]);
 
-  // Timer logic
   useEffect(() => {
     if (!timerActive || timeRemaining <= 0) return;
     
@@ -27,7 +30,6 @@ export const useQuestionNavigation = () => {
     return () => clearInterval(timer);
   }, [timerActive, timeRemaining]);
 
-  // Handle when time is up - this ensures the timer is properly stopped
   const handleTimeUp = useCallback(() => {
     console.log('handleTimeUp called, current timer active state:', timerActive);
     if (timerActive) {
@@ -38,44 +40,51 @@ export const useQuestionNavigation = () => {
     return false;
   }, [timerActive]);
 
-  // Handle user-initiated termination of the quiz session
   const handleTerminateSession = useCallback((onClose: () => void) => {
-    // Stop the timer immediately
     setTimerActive(false);
-    
-    // Call the onClose callback to close the dialog
     onClose();
   }, []);
 
-  // Force advance to next question - improved with direct state setting
+  const safeSetCurrentQuestionIndex = useCallback((newIndex: number) => {
+    console.log(`SAFE SETTER: Updating question index from ${currentIndexRef.current} to ${newIndex}`);
+    
+    currentIndexRef.current = newIndex;
+    
+    setCurrentQuestionIndex(newIndex);
+    
+    document.body.classList.toggle('force-reflow');
+    document.body.classList.toggle('force-reflow');
+    
+    console.log(`SAFE SETTER: Index update completed to ${newIndex}`);
+  }, []);
+
   const forceAdvanceQuestion = useCallback(() => {
-    // Prevent multiple simultaneous advancements
     if (advancementInProgressRef.current) {
       console.log("Advancement already in progress, ignoring duplicate request");
       return;
     }
     
-    // Set flag to prevent multiple advancements
     advancementInProgressRef.current = true;
     
+    document.body.style.pointerEvents = 'none';
+    
     console.log("Forcing advancement to next question");
-    const newIndex = currentQuestionIndex + 1;
-    console.log(`DIRECT ADVANCEMENT: from question ${currentQuestionIndex + 1} to ${newIndex + 1}`);
+    const newIndex = currentIndexRef.current + 1;
+    console.log(`DIRECT ADVANCEMENT: from question ${currentIndexRef.current + 1} to ${newIndex + 1}`);
     
-    // Set the index directly, not using a function to avoid closure issues
-    setCurrentQuestionIndex(newIndex);
+    safeSetCurrentQuestionIndex(newIndex);
     
-    // Reset flag after a short delay
     setTimeout(() => {
       advancementInProgressRef.current = false;
+      document.body.style.removeProperty('pointer-events');
     }, 100);
-  }, [currentQuestionIndex]);
+  }, [safeSetCurrentQuestionIndex]);
 
   return {
     currentQuestionIndex,
     timeRemaining,
     timerActive,
-    setCurrentQuestionIndex,
+    setCurrentQuestionIndex: safeSetCurrentQuestionIndex,
     setTimeRemaining,
     setTimerActive,
     handleTimeUp,

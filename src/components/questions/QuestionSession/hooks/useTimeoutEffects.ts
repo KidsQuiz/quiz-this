@@ -49,51 +49,51 @@ export const useTimeoutEffects = (
       
       // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
       const timeoutId = setTimeout(() => {
-        console.log('Timeout completed, ready to advance question');
+        console.log('TIMEOUT COMPLETE: Now advancing to next question');
         
-        // Log advancement attempt for debugging
-        console.log(`FORCEFULLY ADVANCING: Timeout advancement from question ${currentQuestionIndex + 1} to ${currentQuestionIndex + 2}`);
+        // Reset any lingering DOM state
+        const clearDomState = () => {
+          const allButtons = document.querySelectorAll('[data-answer-option]');
+          allButtons.forEach(button => {
+            button.setAttribute('data-selected', 'false');
+            button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
+                                  'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                                  'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
+          });
+        };
         
-        // Directly manipulate the DOM to reset any lingering state
-        const allButtons = document.querySelectorAll('[data-answer-option]');
-        allButtons.forEach(button => {
-          button.setAttribute('data-selected', 'false');
-          button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
-                                'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
-                                'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
-        });
+        // Clear DOM state
+        clearDomState();
         
-        // Reset document pointer events in case they were disabled
-        document.body.style.removeProperty('pointer-events');
+        // Briefly disable all pointer events to prevent race conditions
+        document.body.style.pointerEvents = 'none';
         
         if (currentQuestionIndex < questions.length - 1) {
-          // CRITICAL FIX: Force a direct state update, not using function form
-          // Capture next index in a local variable to avoid closure issues
+          // Critical: Force update the index directly with the new value
           const nextIndex = currentQuestionIndex + 1;
-          console.log(`CRITICAL NAVIGATION: Setting question index to ${nextIndex}`);
+          console.log(`ADVANCING: Timeout advancement, setting question index from ${currentQuestionIndex} to ${nextIndex}`);
           
-          // Directly set currentQuestionIndex to the new value
+          // CRITICAL FIX: Using direct value instead of function form
           setCurrentQuestionIndex(nextIndex);
-          
-          // Log for debugging
-          console.log('Question advancement triggered', { from: currentQuestionIndex, to: nextIndex });
-          
-          // Reset advancement flag after a short delay to ensure state updates complete
-          setTimeout(() => {
-            advancementScheduledRef.current = false;
-          }, 100);
         } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');
           setSessionComplete(true);
-          advancementScheduledRef.current = false;
         }
+        
+        // Re-enable pointer events after a short delay
+        setTimeout(() => {
+          document.body.style.removeProperty('pointer-events');
+          advancementScheduledRef.current = false;
+          console.log('Question advancement process complete, advancement flag reset');
+        }, 100);
       }, 5000); // 5 seconds delay
       
       return () => {
         console.log('Clearing timeout for question advancement');
         clearTimeout(timeoutId);
         advancementScheduledRef.current = false;
+        document.body.style.removeProperty('pointer-events');
       };
     }
   }, [

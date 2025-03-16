@@ -29,6 +29,7 @@ const FeedbackMessage = ({
     if (!isCorrect || timeRanOut) {
       // Reset progress
       setProgressValue(0);
+      console.log("Starting 5-second countdown animation before auto-advancing");
       
       // Animate progress over 5 seconds (same as the timeout duration)
       const startTime = Date.now();
@@ -41,6 +42,7 @@ const FeedbackMessage = ({
         setProgressValue(newProgress);
         
         if (elapsed >= duration) {
+          console.log("5-second countdown animation complete");
           clearInterval(progressInterval);
         }
       }, 50); // Update frequently for smooth animation
@@ -60,6 +62,7 @@ const FeedbackMessage = ({
           <div>
             <p className="font-medium">{t('timeUp') || "Time's up!"}</p>
             <p className="text-sm">{t('correctAnswerShown') || "The correct answer is highlighted."}</p>
+            <p className="text-sm">{t('nextQuestionSoon') || "Next question in 5 seconds..."}</p>
           </div>
         </div>
         <Progress 
@@ -83,7 +86,15 @@ const FeedbackMessage = ({
       <p className="font-medium text-lg text-center">
         {isCorrect 
           ? t('correctFeedback').replace('{points}', points.toString())
-          : t('incorrectFeedback')}
+          : (
+            <>
+              {t('incorrectFeedback')}
+              <span className="block text-sm mt-1">
+                {t('nextQuestionSoon') || "Next question in 5 seconds..."}
+              </span>
+            </>
+          )
+        }
       </p>
       
       {/* Only show progress for incorrect answers */}

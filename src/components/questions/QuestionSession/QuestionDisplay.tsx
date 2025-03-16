@@ -56,13 +56,16 @@ const QuestionDisplay = ({
   useEffect(() => {
     if (timeRanOut) {
       console.log('Time ran out state detected in QuestionDisplay');
+      console.log(`Current question index: ${currentQuestionIndex}, question: ${currentQuestion.id}`);
+      console.log('Timer status:', { timeRemaining, answerSubmitted, isCorrect });
     }
-  }, [timeRanOut]);
+  }, [timeRanOut, currentQuestionIndex, currentQuestion.id, timeRemaining, answerSubmitted, isCorrect]);
 
   // Additional logging for index tracking (for debugging)
   useEffect(() => {
-    console.log(`Current question index: ${currentQuestionIndex}, total questions: ${questionsTotal}`);
-  }, [currentQuestionIndex, questionsTotal]);
+    console.log(`QuestionDisplay rendering - question index: ${currentQuestionIndex}, total questions: ${questionsTotal}`);
+    console.log(`Question ID: ${currentQuestion.id}, Time limit: ${currentQuestion.time_limit}`);
+  }, [currentQuestionIndex, questionsTotal, currentQuestion]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
