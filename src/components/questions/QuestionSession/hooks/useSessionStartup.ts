@@ -23,9 +23,20 @@ export const useSessionStartup = (
       return;
     }
     
-    await loadQuestions(selectedPackageIds);
-    setIsConfiguring(false);
-    setCurrentQuestionIndex(0);
+    try {
+      await loadQuestions(selectedPackageIds);
+      setIsConfiguring(false);
+      setCurrentQuestionIndex(0);
+    } catch (error) {
+      // Only show toast for unexpected errors
+      if (error && (error as any).message !== 'no_packages') {
+        toast({
+          title: t('error'),
+          description: t('somethingWentWrong'),
+          variant: "destructive"
+        });
+      }
+    }
   }, [loadQuestions, selectedPackageIds, setCurrentQuestionIndex, setIsConfiguring, toast, t]);
 
   return { handleStartSession };

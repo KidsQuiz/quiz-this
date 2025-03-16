@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from '@/hooks/use-translation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useSessionInitialization = (
   kidId: string,
@@ -12,7 +12,7 @@ export const useSessionInitialization = (
 ) => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   // Initial setup - fetch questions
   useEffect(() => {
@@ -26,14 +26,17 @@ export const useSessionInitialization = (
         setInitialLoadComplete(true);
       } catch (error) {
         console.error("Error loading questions:", error);
-        toast({
-          variant: "destructive",
-          title: t('error'),
-          description: t('somethingWentWrong')
-        });
-        
-        // Close the session on error
-        onClose();
+        // Only show the toast for actual errors, not expected conditions
+        if (error && (error as any).message !== 'no_packages') {
+          toast({
+            variant: "destructive",
+            title: t('error'),
+            description: t('somethingWentWrong')
+          });
+          
+          // Close the session on error
+          onClose();
+        }
       }
     };
     

@@ -17,6 +17,7 @@ export const useSessionSetup = (
   onClose: () => void
 ) => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [hasShownError, setHasShownError] = useState(false);
 
   // Initial setup effect
   useEffect(() => {
@@ -33,11 +34,8 @@ export const useSessionSetup = (
         console.log(`Assigned packages for kid ${kidId}:`, assignedPackages);
         
         if (!assignedPackages || assignedPackages.length === 0) {
-          toast({
-            title: t("noPackages"),
-            description: t("assignPackagesFirst"),
-            variant: "destructive"
-          });
+          // No need to show toast here if there are no packages
+          // We'll just close the session quietly
           onClose();
           return;
         }
@@ -58,17 +56,21 @@ export const useSessionSetup = (
         
       } catch (error: any) {
         console.error('Error loading assigned packages:', error.message);
-        toast({
-          variant: "destructive",
-          title: t("error"),
-          description: t("somethingWentWrong")
-        });
-        onClose();
+        // Only show one error toast
+        if (!hasShownError) {
+          setHasShownError(true);
+          toast({
+            variant: "destructive",
+            title: t("error"),
+            description: t("somethingWentWrong")
+          });
+          onClose();
+        }
       }
     };
     
     fetchPackagesAndStartSession();
-  }, [kidId, loadQuestions, onClose, toast, t, setCurrentQuestionIndex]);
+  }, [kidId, loadQuestions, onClose, toast, t, setCurrentQuestionIndex, questions, setCurrentQuestion, loadAnswerOptions, hasShownError]);
 
   // Handle loading current question when index changes
   useEffect(() => {
