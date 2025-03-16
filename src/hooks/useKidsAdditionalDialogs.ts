@@ -40,11 +40,6 @@ export const useKidsAdditionalDialogs = () => {
     setIsWrongAnswersDialogOpen(false);
     setSelectedKidForWrongAnswers(null);
   };
-  
-  // This function just opens the WrongAnswersDashboard where the actual reset happens
-  const handleResetWrongAnswers = (id: string, name: string) => {
-    openWrongAnswersDialog(id, name);
-  };
 
   return {
     // Milestone dialog
@@ -57,7 +52,6 @@ export const useKidsAdditionalDialogs = () => {
     isWrongAnswersDialogOpen,
     selectedKidForWrongAnswers,
     openWrongAnswersDialog,
-    closeWrongAnswersDialog,
-    handleResetWrongAnswers
+    closeWrongAnswersDialog
   };
 };

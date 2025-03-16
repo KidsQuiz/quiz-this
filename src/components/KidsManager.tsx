@@ -52,8 +52,7 @@ const KidsManager = () => {
     isWrongAnswersDialogOpen,
     selectedKidForWrongAnswers,
     openWrongAnswersDialog,
-    closeWrongAnswersDialog,
-    handleResetWrongAnswers
+    closeWrongAnswersDialog
   } = useKidsAdditionalDialogs();
   
   const { handleDragEnd } = useKidsDragDrop(fetchKids);
@@ -106,7 +105,6 @@ const KidsManager = () => {
         onResetPoints={openResetPointsDialog}
         onManageMilestones={openMilestoneDialog}
         onViewWrongAnswers={openWrongAnswersDialog}
-        onResetWrongAnswers={handleResetWrongAnswers}
       />
       
       <KidsDialogs

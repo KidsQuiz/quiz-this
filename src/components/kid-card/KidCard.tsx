@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +21,6 @@ interface KidCardProps {
   onResetPoints?: (id: string, name: string) => void;
   onManageMilestones?: (id: string, name: string, points: number) => void;
   onViewWrongAnswers?: (id: string, name: string) => void;
-  onResetWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidCard = ({ 
@@ -37,8 +35,7 @@ const KidCard = ({
   onStartQuestions,
   onResetPoints,
   onManageMilestones,
-  onViewWrongAnswers,
-  onResetWrongAnswers
+  onViewWrongAnswers
 }: KidCardProps) => {
   const [packageCount, setPackageCount] = useState<number>(0);
   const { 
@@ -53,7 +50,6 @@ const KidCard = ({
   const [nextMilestone, setNextMilestone] = useState<any>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
-  // Add refs to prevent multiple fetches
   const isFetchingPackages = useRef(false);
   
   useEffect(() => {
@@ -80,7 +76,6 @@ const KidCard = ({
         console.error('Error fetching package count:', error);
         setPackageCount(0);
       } finally {
-        // Reset the flag after a delay to allow subsequent fetch attempts
         setTimeout(() => {
           isFetchingPackages.current = false;
         }, 500);
@@ -90,7 +85,6 @@ const KidCard = ({
     fetchPackageCount();
   }, [id]);
   
-  // Effect to update milestone data
   useEffect(() => {
     if (milestones.length > 0) {
       setCurrentMilestone(getCurrentMilestone(points));
@@ -120,7 +114,6 @@ const KidCard = ({
               onDelete={onDelete}
               onResetPoints={onResetPoints}
               onViewWrongAnswers={onViewWrongAnswers}
-              onResetWrongAnswers={onResetWrongAnswers}
             />
           </div>
           

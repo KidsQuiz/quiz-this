@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import KidCard from './kid-card/KidCard';
@@ -29,7 +28,6 @@ interface KidsListProps {
   onResetPoints?: (id: string, name: string) => void;
   onManageMilestones?: (id: string, name: string, points: number) => void;
   onViewWrongAnswers?: (id: string, name: string) => void;
-  onResetWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidsList = ({ 
@@ -43,8 +41,7 @@ const KidsList = ({
   onStartQuestions,
   onResetPoints,
   onManageMilestones,
-  onViewWrongAnswers,
-  onResetWrongAnswers
+  onViewWrongAnswers
 }: KidsListProps) => {
   const { t } = useLanguage();
   const sortedKids = [...kids].sort((a, b) => a.position - b.position);
@@ -108,7 +105,6 @@ const KidsList = ({
                       onResetPoints={onResetPoints}
                       onManageMilestones={onManageMilestones}
                       onViewWrongAnswers={onViewWrongAnswers}
-                      onResetWrongAnswers={onResetWrongAnswers}
                     />
                   </div>
                 )}
