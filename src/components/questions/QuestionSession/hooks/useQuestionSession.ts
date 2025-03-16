@@ -5,13 +5,14 @@ import { useSessionHandlers } from './useSessionHandlers';
 import { useSessionSetupEffect } from './useSessionSetupEffect';
 import { useSessionUIEffects } from './useSessionUIEffects';
 import { useSessionConfig } from './useSessionConfig';
+import { usePackageAutoLoader } from './usePackageAutoLoader';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   // Use a dedicated hook for all session state data
   const sessionData = useSessionData();
   
-  // State to track if we're in configuration mode
-  const [isConfiguring, setIsConfiguring] = useState(true);
+  // We'll set isConfiguring to false by default now
+  const [isConfiguring, setIsConfiguring] = useState(false);
   
   // Use session configuration hook
   const sessionConfig = useSessionConfig(kidId, kidName, onClose);
@@ -23,7 +24,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     onClose,
     resetAnswerState: sessionData.resetAnswerState
   });
-  
+
   // Initialize session configuration functions (only once)
   useEffect(() => {
     if (sessionConfig.initializeSessionFunctions) {
@@ -38,6 +39,13 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionData.loadQuestions, 
     sessionData.setCurrentQuestionIndex
   ]);
+  
+  // Use the auto loader hook to load all assigned packages on init
+  usePackageAutoLoader(
+    kidId,
+    sessionData.loadQuestions,
+    sessionData.setCurrentQuestionIndex
+  );
   
   // Use setup effect for initialization logic
   useSessionSetupEffect({

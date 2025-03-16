@@ -1,12 +1,18 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 
 export const usePackageAutoLoader = (
   kidId: string,
-  loadQuestions: (packageIds: string[]) => Promise<void>
+  loadQuestions: (packageIds: string[]) => Promise<void>,
+  setCurrentQuestionIndex: (index: number) => void
 ) => {
-  // Auto-load all assigned packages for the kid
+  const { toast } = useToast();
+  const { t } = useTranslation();
+
+  // Auto-load all assigned packages for the kid and start the session
   useEffect(() => {
     const loadAssignedPackages = async () => {
       try {
@@ -23,16 +29,31 @@ export const usePackageAutoLoader = (
         if (assignedPackages && assignedPackages.length > 0) {
           const packageIds = assignedPackages.map(p => p.package_id);
           console.log(`Found ${packageIds.length} assigned packages, loading questions:`, packageIds);
+          
+          // Load the questions from all assigned packages
           await loadQuestions(packageIds);
+          
+          // Start the session at the first question
+          setCurrentQuestionIndex(0);
         } else {
           console.warn(`No packages assigned to kid ${kidId}`);
-          // Don't show error here - it will be handled by the session setup
+          toast({
+            variant: "destructive",
+            title: t('noPackages'),
+            description: t('assignPackagesFirst')
+          });
         }
       } catch (error) {
         console.error('Error auto-loading assigned packages:', error);
+        toast({
+          variant: "destructive",
+          title: t('error'),
+          description: t('somethingWentWrong')
+        });
       }
     };
     
+    // Execute the function right away
     loadAssignedPackages();
-  }, [kidId, loadQuestions]);
+  }, [kidId, loadQuestions, setCurrentQuestionIndex, toast, t]);
 };
