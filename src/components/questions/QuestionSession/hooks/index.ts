@@ -22,3 +22,6 @@ export { useAnswerState } from './useAnswerState';
 export { useAnswerRecording } from './useAnswerRecording';
 export { useCorrectAnswerHandling } from './useCorrectAnswerHandling';
 export { useIncorrectAnswerHandling } from './useIncorrectAnswerHandling';
+export { useSessionTransition } from './useSessionTransition';
+export { useQuestionPreparation } from './useQuestionPreparation';
+export { useTimeoutEffects } from './useTimeoutEffects';

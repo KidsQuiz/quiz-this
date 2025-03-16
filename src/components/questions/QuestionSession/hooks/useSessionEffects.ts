@@ -1,8 +1,7 @@
 
-import { useModalTransition } from './useModalTransition';
-import { useCurrentQuestion } from './useCurrentQuestion';
-import { useSessionCompletion } from './useSessionCompletion';
-import { useTimeoutHandling } from './useTimeoutHandling';
+import { useSessionTransition } from './useSessionTransition';
+import { useQuestionPreparation } from './useQuestionPreparation';
+import { useTimeoutEffects } from './useTimeoutEffects';
 import { Question } from '@/hooks/questionsTypes';
 
 export const useSessionEffects = (
@@ -33,8 +32,8 @@ export const useSessionEffects = (
   loadAnswerOptions: (questionId: string) => Promise<void>
 ) => {
   // Handle modal transitions between questions
-  useModalTransition(
-    isModalOpen,
+  const { advanceToNextQuestion } = useSessionTransition(
+    isConfiguring,
     sessionComplete,
     currentQuestionIndex,
     questions,
@@ -44,7 +43,7 @@ export const useSessionEffects = (
   );
 
   // Handle current question loading and setup
-  useCurrentQuestion(
+  useQuestionPreparation(
     isConfiguring,
     questions,
     currentQuestionIndex,
@@ -58,22 +57,8 @@ export const useSessionEffects = (
     loadAnswerOptions
   );
 
-  // Handle session completion
-  useSessionCompletion(
-    kidId,
-    kidName,
-    sessionComplete,
-    currentQuestionIndex,
-    questions,
-    totalPoints,
-    correctAnswers,
-    setSessionComplete,
-    setShowBoomEffect,
-    setIsModalOpen
-  );
-
   // Handle timeouts
-  useTimeoutHandling(
+  useTimeoutEffects(
     timeRemaining,
     currentQuestion,
     isConfiguring,
