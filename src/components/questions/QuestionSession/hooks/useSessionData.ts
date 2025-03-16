@@ -22,8 +22,9 @@ export const useSessionData = () => {
   
   // Create a resetAnswerState function that combines multiple reset functions
   const resetAnswerState = () => {
-    if (sessionState.resetAllAnswerState) {
-      sessionState.resetAllAnswerState();
+    // Use the resetSessionState function which should reset all necessary state
+    if (sessionState.resetSessionState) {
+      sessionState.resetSessionState();
     }
   };
   
