@@ -83,7 +83,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
       console.log("Setting up question session for kid:", kidId);
       
       try {
-        await loadQuestions(kidId);
+        // Fix: Pass an array with the kidId
+        await loadQuestions([kidId]);
         setCurrentQuestionIndex(0);
         setInitialLoadComplete(true);
       } catch (error) {

@@ -88,7 +88,7 @@ export const useAnswerHandling = (
       setShowRelaxAnimation(false);
       
       // Move to the next question
-      const nextQuestionIndex = (prevIndex: number) => {
+      setCurrentQuestionIndex(prevIndex => {
         const next = prevIndex + 1;
         
         // Check if we've reached the end
@@ -101,19 +101,21 @@ export const useAnswerHandling = (
         
         // Move to next question
         return next;
-      };
+      });
       
       // Reset the answer state for the next question
       resetAnswerState();
       
-      // Proceed to next question or end the session
-      setCurrentQuestionIndex(nextQuestionIndex);
-      
       // Only restart the timer if we're not at the end
-      const isLastQuestion = (index: number) => (index + 1) >= questions.length;
-      if (!isLastQuestion(nextQuestionIndex(currentQuestionIndex => currentQuestionIndex))) {
-        setTimerActive(true);
-      }
+      setCurrentQuestionIndex(prevIndex => {
+        const isLastQuestion = (index: number) => (index + 1) >= questions.length;
+        if (!isLastQuestion(prevIndex)) {
+          // We need to use setTimeout here because setState doesn't happen immediately
+          setTimeout(() => setTimerActive(true), 0);
+        }
+        return prevIndex; // Don't change the index, just check it
+      });
+      
     }, 2500); // Wait 2.5 seconds before advancing
     
   }, [
