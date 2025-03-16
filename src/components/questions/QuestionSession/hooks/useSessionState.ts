@@ -32,7 +32,8 @@ export const useSessionState = () => {
     showingTimeUpFeedback,
     setShowingTimeUpFeedback,
     timeUpTriggered,
-    setTimeUpTriggered
+    setTimeUpTriggered,
+    resetAllAnswerState
   } = useAnswerStateManagement();
 
   const {
@@ -47,7 +48,19 @@ export const useSessionState = () => {
     setKidAnswers
   } = useKidAnswersState();
 
+  const resetSessionState = () => {
+    setIsConfiguring(false);
+    setSessionComplete(false);
+    setCorrectAnswers(0);
+    setTotalPoints(0);
+    resetAllAnswerState();
+    setIsModalOpen(true);
+    setShowRelaxAnimation(false);
+    setKidAnswers([]);
+  };
+
   return {
+    // Session progress state
     isConfiguring,
     setIsConfiguring,
     sessionComplete,
@@ -56,30 +69,41 @@ export const useSessionState = () => {
     setCorrectAnswers,
     totalPoints,
     setTotalPoints,
-    showWowEffect,
-    setShowWowEffect,
-    showBoomEffect,
-    setShowBoomEffect,
-    isModalOpen,
-    setIsModalOpen,
-    kidAnswers,
-    setKidAnswers,
-    showRelaxAnimation,
-    setShowRelaxAnimation,
-    // Add these to maintain API compatibility with existing code
+    
+    // Answer state
     selectedAnswerId,
     setSelectedAnswerId,
     answerSubmitted,
     setAnswerSubmitted,
     isCorrect,
     setIsCorrect,
-    // New time-up related properties
+    
+    // Visual effects
+    showWowEffect,
+    setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect,
+    showRelaxAnimation,
+    setShowRelaxAnimation,
+    
+    // UI state
+    isModalOpen,
+    setIsModalOpen,
+    
+    // Kid answers
+    kidAnswers,
+    setKidAnswers,
+    
+    // Time-up related state
     isTimeUp,
     setIsTimeUp,
     showingTimeUpFeedback,
     setShowingTimeUpFeedback,
     timeUpTriggered,
-    setTimeUpTriggered
+    setTimeUpTriggered,
+    
+    // Reset functions
+    resetSessionState
   };
 };
 
