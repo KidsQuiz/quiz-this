@@ -26,12 +26,14 @@ export const useSessionCompletion = (
       console.log(`Session completed for ${kidName}. Score: ${correctAnswers}/${questions.length}`);
       
       try {
-        // Record session results in database
-        await supabase.from('question_sessions').insert({
+        // Record session results in database using kid_answers table
+        // We'll create a summary record by inserting a special answer record
+        await supabase.from('kid_answers').insert({
           kid_id: kidId,
-          total_questions: questions.length,
-          correct_answers: correctAnswers,
-          total_points: totalPoints,
+          question_id: questions.length > 0 ? questions[0].id : '00000000-0000-0000-0000-000000000000',
+          answer_id: '00000000-0000-0000-0000-000000000000', // Special placeholder for session summary
+          is_correct: true, // This is a summary record, not an actual answer
+          points_earned: totalPoints,
           created_at: new Date().toISOString()
         });
         
@@ -41,13 +43,14 @@ export const useSessionCompletion = (
         if (correctAnswers === questions.length && questions.length > 0) {
           console.log('Perfect score achieved! Recording milestone.');
           
-          // Record this milestone
-          await supabase.from('kid_milestones').insert({
+          // Record this milestone using the milestones table
+          await supabase.from('milestones').insert({
             kid_id: kidId,
-            milestone_type: 'perfect_score',
-            description: `Got all ${questions.length} questions right!`,
-            points: totalPoints,
-            created_at: new Date().toISOString()
+            name: 'Perfect Score', // Using name field for milestone type
+            points_required: 0, // Not relevant for this usage
+            image_url: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           });
         }
       } catch (error) {
