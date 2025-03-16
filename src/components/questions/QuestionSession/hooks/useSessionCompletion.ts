@@ -28,19 +28,21 @@ export const useSessionCompletion = (
     
     const completeSession = async () => {
       console.log(`Session completed for ${kidName}. Score: ${correctAnswers}/${questions.length}`);
+      console.log(`Total points earned: ${totalPoints}`);
       
       try {
         // Update kid's points in the database
         if (totalPoints > 0) {
-          console.log(`Updating points for kid ${kidName}: Adding ${totalPoints} points`);
-          await updateKidPoints(kidId, kidName, totalPoints, toast);
+          console.log(`CRITICAL: Updating points for kid ${kidName}: Adding ${totalPoints} points`);
+          const newTotalPoints = await updateKidPoints(kidId, kidName, totalPoints, toast);
+          console.log(`Points update complete. New total: ${newTotalPoints}`);
         } else {
           console.log(`No points to add for kid ${kidName}`);
         }
         
         // Record session results in database using kid_answers table
         // We'll create a summary record by inserting a special answer record
-        await supabase.from('kid_answers').insert({
+        const { error: sessionError } = await supabase.from('kid_answers').insert({
           kid_id: kidId,
           question_id: questions.length > 0 ? questions[0].id : '00000000-0000-0000-0000-000000000000',
           answer_id: '00000000-0000-0000-0000-000000000000', // Special placeholder for session summary
@@ -49,7 +51,11 @@ export const useSessionCompletion = (
           created_at: new Date().toISOString()
         });
         
-        console.log('Session results recorded in database');
+        if (sessionError) {
+          console.error('Error recording session results:', sessionError);
+        } else {
+          console.log('Session results recorded in database');
+        }
         
         // Check for a perfect score
         if (correctAnswers === questions.length && questions.length > 0) {

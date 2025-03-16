@@ -13,6 +13,7 @@ export const updateKidPoints = async (
   try {
     console.log(`Updating points for kid ${kidName} (${kidId}): +${earnedPoints} points`);
     
+    // First fetch the current points
     const { data: kidData, error: kidError } = await supabase
       .from('kids')
       .select('points')
@@ -24,6 +25,9 @@ export const updateKidPoints = async (
     const currentPoints = kidData?.points || 0;
     const newTotalPoints = currentPoints + earnedPoints;
     
+    console.log(`Current points: ${currentPoints}, New total: ${newTotalPoints}`);
+    
+    // Now update with the new total
     const { error: updateError } = await supabase
       .from('kids')
       .update({ points: newTotalPoints })
