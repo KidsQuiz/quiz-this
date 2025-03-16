@@ -11,7 +11,11 @@ interface QuestionCardProps {
 
 const QuestionCard = ({ question, showWowEffect, children }: QuestionCardProps) => {
   return (
-    <div className="bg-gradient-to-r from-primary/15 to-primary/5 p-4 rounded-xl shadow-sm relative overflow-hidden h-full flex flex-col">
+    <div 
+      className="bg-gradient-to-r from-primary/15 to-primary/5 p-4 rounded-xl shadow-sm relative overflow-hidden h-full flex flex-col question-card" 
+      tabIndex={0} // Make the card focusable
+      aria-label={`Question: ${question.content}`} // Improve accessibility
+    >
       <div className="flex-grow overflow-auto">
         <p className="text-xl sm:text-2xl font-medium leading-relaxed mb-4">{question.content}</p>
       </div>

@@ -133,6 +133,15 @@ export const useCurrentQuestion = (
                 // Final confirmation reset
                 setSelectedAnswerId(null);
                 clearDomState();
+                
+                // Focus on the question content to ensure keyboard focus is not on any answer
+                const questionCard = document.querySelector('.question-card');
+                if (questionCard) {
+                  // Force focus on the question card
+                  (questionCard as HTMLElement).focus();
+                  console.log("Focus set to question card");
+                }
+                
                 setTimerActive(true);
                 console.log("Question fully loaded and timer started");
                 console.log("CONFIRMED selection state:", null);
