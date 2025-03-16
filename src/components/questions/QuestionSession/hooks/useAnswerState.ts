@@ -34,6 +34,15 @@ export const useAnswerState = () => {
       setTimeout(() => {
         if (isMountedRef.current) {
           setSelectedAnswerId(null);
+          
+          // Aggressive DOM cleanup to ensure no visual state persists
+          const allButtons = document.querySelectorAll('[data-answer-option]');
+          allButtons.forEach(button => {
+            button.setAttribute('data-selected', 'false');
+            button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
+                                  'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                                  'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
+          });
         }
       }, 50);
     }

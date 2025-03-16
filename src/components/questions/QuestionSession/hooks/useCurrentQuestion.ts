@@ -36,6 +36,20 @@ export const useCurrentQuestion = (
       // CRITICAL: Forcefully reset selection state - even before loading anything
       setSelectedAnswerId(null);
       
+      // Clear any lingering visual styling in the DOM
+      const clearDomState = () => {
+        const allButtons = document.querySelectorAll('[data-answer-option]');
+        allButtons.forEach(button => {
+          button.setAttribute('data-selected', 'false');
+          button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
+                               'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                               'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
+        });
+      };
+      
+      // Apply first visual state reset immediately
+      clearDomState();
+      
       // RESET ALL question-related state immediately with high priority
       const forceCompleteReset = () => {
         console.log("FORCED RESET: Aggressively clearing all answer state");
@@ -43,10 +57,12 @@ export const useCurrentQuestion = (
         setAnswerSubmitted(false);
         setIsCorrect(false);
         setShowWowEffect(false);
+        clearDomState();
         
         // Force browser to process these state changes
         setTimeout(() => {
           setSelectedAnswerId(null);
+          clearDomState();
         }, 0);
       };
       
@@ -66,6 +82,7 @@ export const useCurrentQuestion = (
         }
         
         forceCompleteReset();
+        clearDomState();
         
         // Second reset with larger delay
         setTimeout(() => {
@@ -73,6 +90,7 @@ export const useCurrentQuestion = (
           if (currentQuestionIdRef.current !== newQuestionLoadId) return;
           
           forceCompleteReset();
+          clearDomState();
           
           // Only after multiple resets, start loading the new question
           const question = questions[currentQuestionIndex];
@@ -84,6 +102,7 @@ export const useCurrentQuestion = (
           
           // Final reset before loading options
           setSelectedAnswerId(null);
+          clearDomState();
           
           // Load answer options for the new question
           loadAnswerOptions(question.id).then(() => {
@@ -92,6 +111,7 @@ export const useCurrentQuestion = (
             
             // CRITICAL: Reset selection state again after options loaded
             setSelectedAnswerId(null);
+            clearDomState();
             console.log("Answer options loaded, FORCED selection state reset to:", null);
             
             // Add 2 additional resets with delays to ensure it takes effect
@@ -99,6 +119,7 @@ export const useCurrentQuestion = (
               if (currentQuestionIdRef.current !== newQuestionLoadId) return;
               forceCompleteReset();
               setSelectedAnswerId(null);
+              clearDomState();
               
               // Re-enable UI interactions
               document.body.style.removeProperty('pointer-events');
@@ -111,6 +132,7 @@ export const useCurrentQuestion = (
                 
                 // Final confirmation reset
                 setSelectedAnswerId(null);
+                clearDomState();
                 setTimerActive(true);
                 console.log("Question fully loaded and timer started");
                 console.log("CONFIRMED selection state:", null);

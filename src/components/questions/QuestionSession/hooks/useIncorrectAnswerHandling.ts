@@ -35,6 +35,9 @@ export const useIncorrectAnswerHandling = (
         // Re-enable pointer events
         document.body.style.removeProperty('pointer-events');
         
+        // Force additional state reset to ensure clean state
+        resetAnswerState();
+        
         // Instead of closing the modal, just advance the question index
         // The currentQuestionIndex will be updated in the parent component
         setCurrentQuestionIndex(prevIndex => prevIndex + 1);

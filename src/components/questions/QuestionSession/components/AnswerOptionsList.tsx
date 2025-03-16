@@ -36,18 +36,24 @@ const AnswerOptionsList = ({
       // Update our ref
       optionsRef.current = answerOptions.map(o => o.id);
       
-      // Force re-render by using a slight delay
-      if (selectedIdRef.current !== null) {
-        console.log("Detected state mismatch - forcing unselected state");
-        // A small timeout ensures the DOM has time to update
-        setTimeout(() => {
-          const allButtons = document.querySelectorAll('[data-answer-option]');
-          allButtons.forEach(button => {
-            button.setAttribute('data-selected', 'false');
-            button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md');
-          });
-        }, 50);
-      }
+      // Force complete reset of any visual selection state
+      // This ensures no answer appears selected when a new question loads
+      selectedIdRef.current = null;
+      
+      // Clear DOM selection state immediately
+      setTimeout(() => {
+        console.log("Aggressively clearing any visual selection state");
+        const allButtons = document.querySelectorAll('[data-answer-option]');
+        allButtons.forEach(button => {
+          button.setAttribute('data-selected', 'false');
+          button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
+                                'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                                'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
+          
+          // Reset to default button styles
+          button.classList.add('hover:bg-accent', 'hover:border-accent/50');
+        });
+      }, 0);
     }
   }, [answerOptions]);
   
@@ -117,6 +123,7 @@ const AnswerOptionsList = ({
               data-submitted={answerSubmitted ? "true" : "false"}
               data-answer-option="true"
               data-answer-id={option.id}
+              data-correct={isCorrectAnswer ? "true" : "false"}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl">{option.content}</span>
