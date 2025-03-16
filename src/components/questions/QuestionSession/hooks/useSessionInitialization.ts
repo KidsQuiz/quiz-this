@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Question } from '@/hooks/questionsTypes';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -20,29 +20,48 @@ export const useSessionInitialization = (
       console.log("Setting up question session for kid:", kidId);
       
       try {
-        // Fix: Pass an array with the kidId
-        await loadQuestions([kidId]);
+        // Fetch the kid's assigned packages
+        const { data: assignedPackages, error } = await supabase
+          .from('kid_packages')
+          .select('package_id')
+          .eq('kid_id', kidId);
+          
+        if (error) throw error;
+        
+        if (!assignedPackages || assignedPackages.length === 0) {
+          console.log("No packages assigned to kid", kidId);
+          toast({
+            variant: "destructive",
+            title: t('noPackagesAssigned'),
+            description: t('pleaseAssignPackages')
+          });
+          onClose();
+          return;
+        }
+        
+        // Extract package IDs and load questions
+        const packageIds = assignedPackages.map(p => p.package_id);
+        console.log("Loading questions for packages:", packageIds);
+        await loadQuestions(packageIds);
+        
+        // Initialize the first question
         setCurrentQuestionIndex(0);
         setInitialLoadComplete(true);
       } catch (error) {
         console.error("Error loading questions:", error);
-        // Only show the toast for actual errors, not expected conditions
-        if (error && (error as any).message !== 'no_packages') {
-          toast({
-            variant: "destructive",
-            title: t('error'),
-            description: t('somethingWentWrong')
-          });
-          
-          // Close the session on error
-          onClose();
-        }
+        toast({
+          variant: "destructive",
+          title: t('error'),
+          description: t('somethingWentWrong')
+        });
+        
+        // Close the session on error
+        onClose();
       }
     };
     
     setup();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kidId]);
+  }, [kidId, loadQuestions, setCurrentQuestionIndex, onClose, toast, t]);
 
   return { initialLoadComplete };
 };

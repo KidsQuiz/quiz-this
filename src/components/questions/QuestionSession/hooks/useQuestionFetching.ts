@@ -26,7 +26,14 @@ export const useQuestionFetching = (
   
   // Load questions when packages are selected
   const loadQuestions = useCallback(async (selectedPackageIds: string[]) => {
-    if (!selectedPackageIds.length) return;
+    console.log("loadQuestions called with packages:", selectedPackageIds);
+    
+    if (!selectedPackageIds.length) {
+      console.warn("No package IDs provided to loadQuestions");
+      setQuestions([]);
+      setIsLoading(false);
+      return;
+    }
     
     // Prevent multiple concurrent loading operations
     if (loadingRef.current) {
@@ -67,11 +74,8 @@ export const useQuestionFetching = (
       clearTimeout(timeoutId);
       
       if (questionsData.length === 0) {
-        toast({
-          title: t("error"),
-          description: t("pleaseSelectPackages"),
-          variant: "destructive"
-        });
+        console.warn("No questions found for the selected packages");
+        setQuestions([]);
         setIsLoading(false);
         loadingRef.current = false;
         return;
@@ -83,6 +87,8 @@ export const useQuestionFetching = (
         selectedPackageIds, 
         packageOrderResults
       );
+      
+      console.log(`Processed ${finalQuestions.length} questions successfully`);
       
       // Cache the results
       setCachedQuestions(cacheKey, finalQuestions);
@@ -97,7 +103,7 @@ export const useQuestionFetching = (
         toast({
           variant: "destructive",
           title: t("error"),
-          description: t("somethingWentWrong")
+          description: t("requestTimedOut")
         });
       } else {
         console.error('Error loading questions:', error.message);

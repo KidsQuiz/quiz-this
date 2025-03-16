@@ -74,7 +74,4 @@ export const useSessionSetupEffect = (props: {
       setTimerActive: props.setTimerActive
     });
   }
-
-  // Use package auto loader
-  usePackageAutoLoader(props.kidId, props.loadQuestions);
-};
+}

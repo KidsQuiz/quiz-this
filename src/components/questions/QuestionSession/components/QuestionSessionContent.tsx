@@ -50,9 +50,11 @@ const QuestionSessionContent: React.FC<QuestionSessionContentProps> = ({
   isTimeUp,
   showingTimeUpFeedback
 }) => {
-  // Render a loading state if currentQuestion is null but we're not at the completion screen
+  // Show loading state if questions are still loading or no questions are available
   const isLoadingOrMissingQuestion = isLoading || (!sessionComplete && !currentQuestion);
+  const noQuestionsAvailable = !isLoading && questions.length === 0;
 
+  // Show completion screen if session is complete
   if (sessionComplete) {
     return (
       <CompletionScreen 
@@ -65,6 +67,7 @@ const QuestionSessionContent: React.FC<QuestionSessionContentProps> = ({
     );
   }
   
+  // Show loading indicator while questions are being prepared
   if (isLoadingOrMissingQuestion) {
     return (
       <>
@@ -76,6 +79,22 @@ const QuestionSessionContent: React.FC<QuestionSessionContentProps> = ({
     );
   }
   
+  // If there are no questions available for this session
+  if (noQuestionsAvailable) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 h-64">
+        <p className="text-lg text-center">No questions available for this session.</p>
+        <button 
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
+        >
+          Close
+        </button>
+      </div>
+    );
+  }
+  
+  // Render the question display when everything is ready
   return (
     <QuestionDisplay
       currentQuestion={currentQuestion!}
