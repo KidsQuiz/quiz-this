@@ -62,7 +62,21 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     // Explicitly restore pointer events
     document.body.style.removeProperty('pointer-events');
     setShowBoomEffect(false);
+    
+    // If dialog is already closed, call onClose to ensure complete cleanup
+    if (!isModalOpen) {
+      onClose();
+    }
   };
+
+  // When the dialog is closed externally (by ESC key or clicking outside),
+  // make sure we clean up properly
+  useEffect(() => {
+    if (!isOpen && !showBoomEffect) {
+      // Ensure cleanup happens
+      handleDialogClose();
+    }
+  }, [isOpen, showBoomEffect, handleDialogClose]);
 
   // Determine effective open state as a combination of parent control and internal state
   const effectiveOpenState = isOpen && isModalOpen;
