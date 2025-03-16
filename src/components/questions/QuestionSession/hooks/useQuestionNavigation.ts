@@ -1,10 +1,12 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export const useQuestionNavigation = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  // Use ref to track if advancement is already in progress
+  const advancementInProgressRef = useRef(false);
 
   // Timer logic
   useEffect(() => {
@@ -45,12 +47,28 @@ export const useQuestionNavigation = () => {
     onClose();
   }, []);
 
-  // Force advance to next question - improved with additional logging
+  // Force advance to next question - improved with direct state setting
   const forceAdvanceQuestion = useCallback(() => {
+    // Prevent multiple simultaneous advancements
+    if (advancementInProgressRef.current) {
+      console.log("Advancement already in progress, ignoring duplicate request");
+      return;
+    }
+    
+    // Set flag to prevent multiple advancements
+    advancementInProgressRef.current = true;
+    
     console.log("Forcing advancement to next question");
     const newIndex = currentQuestionIndex + 1;
-    console.log(`Advancing from question ${currentQuestionIndex + 1} to ${newIndex + 1}`);
+    console.log(`DIRECT ADVANCEMENT: from question ${currentQuestionIndex + 1} to ${newIndex + 1}`);
+    
+    // Set the index directly, not using a function to avoid closure issues
     setCurrentQuestionIndex(newIndex);
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      advancementInProgressRef.current = false;
+    }, 100);
   }, [currentQuestionIndex]);
 
   return {

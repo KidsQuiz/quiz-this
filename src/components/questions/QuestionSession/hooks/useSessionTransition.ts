@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 /**
@@ -14,6 +14,9 @@ export const useSessionTransition = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  // Ref to track ongoing transitions
+  const transitionInProgressRef = useRef(false);
+  
   // Handle transition between questions
   useEffect(() => {
     // Don't handle transitions during configuration or when session is complete
@@ -28,29 +31,41 @@ export const useSessionTransition = (
   
   // Advance to next question with more aggressive state reset
   const advanceToNextQuestion = useCallback(() => {
-    console.log("Advancing to next question directly");
+    // Prevent duplicate transitions
+    if (transitionInProgressRef.current) {
+      console.log("Transition already in progress, ignoring duplicate request");
+      return;
+    }
     
-    // CRITICAL: Log the current and next question index to debug transitions
+    // Set transition flag
+    transitionInProgressRef.current = true;
+    
+    console.log("TRANSITION: Advancing to next question directly");
+    
+    // Log transition details
     const nextIndex = currentQuestionIndex + 1;
-    console.log(`Transition: from question ${currentQuestionIndex + 1} to ${nextIndex + 1}`);
+    console.log(`TRANSITION DETAIL: from question ${currentQuestionIndex + 1} to ${nextIndex + 1}`);
     
     // Forcibly reset any selected buttons in the DOM first
     const allButtons = document.querySelectorAll('[data-answer-option]');
     allButtons.forEach(button => {
       button.setAttribute('data-selected', 'false');
-      button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md');
+      button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
+                             'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
+                             'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
     });
     
     // Briefly disable pointer events to prevent race conditions
     document.body.style.pointerEvents = 'none';
     
-    // Force the exact next index - not using function updater to avoid potential stale state
+    // Force the exact next index - using direct value, not function updater
     setCurrentQuestionIndex(nextIndex);
-    console.log(`Question index updated to: ${nextIndex}`);
+    console.log(`TRANSITION COMPLETE: Question index updated to: ${nextIndex}`);
     
     // Re-enable pointer events after a delay
     setTimeout(() => {
       document.body.style.removeProperty('pointer-events');
+      transitionInProgressRef.current = false;
     }, 100);
   }, [currentQuestionIndex, setCurrentQuestionIndex]);
   
