@@ -47,13 +47,26 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
       const timer = setTimeout(() => {
         if (onComplete) {
           console.log("🎉 BoomEffect animation complete, calling onComplete");
+          // Ensure pointer events are re-enabled when animation completes
+          document.body.style.removeProperty('pointer-events');
           onComplete();
         }
       }, 5000); // Increased from 3000 to 5000 for longer visibility
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // Ensure pointer events are restored when component unmounts
+        document.body.style.removeProperty('pointer-events');
+      };
     }
   }, [isVisible, onComplete]);
+  
+  // Cleanup function when component unmounts completely
+  useEffect(() => {
+    return () => {
+      document.body.style.removeProperty('pointer-events');
+    };
+  }, []);
   
   if (!isVisible) return null;
   

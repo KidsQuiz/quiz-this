@@ -56,6 +56,14 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [showBoomEffect, t]);
 
+  // Handle boom effect completion
+  const handleBoomEffectComplete = () => {
+    console.log(t('boomEffectComplete'));
+    // Ensure pointer events are restored
+    document.body.style.removeProperty('pointer-events');
+    setShowBoomEffect(false);
+  };
+
   // Determine effective open state as a combination of parent control and internal state
   const effectiveOpenState = isOpen && isModalOpen;
 
@@ -128,10 +136,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       {/* Boom effect shown when the kid answers all questions correctly - outside Dialog */}
       <BoomEffect 
         isVisible={showBoomEffect} 
-        onComplete={() => {
-          console.log(t('boomEffectComplete'));
-          setShowBoomEffect(false);
-        }} 
+        onComplete={handleBoomEffectComplete} 
       />
     </>
   );
