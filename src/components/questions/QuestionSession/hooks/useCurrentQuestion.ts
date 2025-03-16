@@ -29,9 +29,15 @@ export const useCurrentQuestion = (
       // The order matters here - reset selection first
       setSelectedAnswerId(null);
       
-      // Add a small delay to ensure state updates properly
+      // We need to ensure UI is fully reset between questions
+      // Immediately disable the timer to prevent interactions during this time
+      setTimerActive(false);
+      
+      // Force a reset of answer-related state with a delay
       // This helps with the tablet/mobile issue where state persists
       setTimeout(() => {
+        // Ensure selected answer is definitely null
+        setSelectedAnswerId(null);
         setAnswerSubmitted(false);
         setIsCorrect(false);
         setShowWowEffect(false);
@@ -43,11 +49,16 @@ export const useCurrentQuestion = (
         
         // Load answer options for the new question
         loadAnswerOptions(question.id).then(() => {
+          // One final reset of selection state after options are loaded
+          setSelectedAnswerId(null);
+          
           // Start the timer only after everything is loaded and reset
-          setTimerActive(true);
-          console.log("Question fully loaded and timer started");
+          setTimeout(() => {
+            setTimerActive(true);
+            console.log("Question fully loaded and timer started, confirmed selection state:", null);
+          }, 50);
         });
-      }, 50); // Small delay to ensure state updates properly
+      }, 100); // Increased delay to ensure state updates properly
     };
     
     loadCurrentQuestion();

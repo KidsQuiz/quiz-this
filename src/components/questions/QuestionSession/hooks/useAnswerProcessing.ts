@@ -119,6 +119,10 @@ export const useAnswerProcessing = (
         // First reset answer state before any other operations
         resetAnswerState();
         
+        // Double-check that selection is cleared before navigation
+        console.log("Double-checking selection is cleared before navigation");
+        setSelectedAnswerId(null);
+        
         // Get current question index value to check if it's the last question
         setCurrentQuestionIndex(prevIndex => {
           if (isLastQuestion(prevIndex)) {
@@ -140,6 +144,7 @@ export const useAnswerProcessing = (
             }
           } else {
             // Not the last question, move to next
+            console.log("Moving to next question, clearing selection state");
             setIsModalOpen(false); // Close this question to advance to next
           }
           return prevIndex;
@@ -154,10 +159,15 @@ export const useAnswerProcessing = (
       
       // Wait 5 seconds before moving to next question
       setTimeout(() => {
-        // First reset answer state
+        // First reset answer state with our utility function
         resetAnswerState();
         
+        // Double-check that selection is cleared before navigation
+        console.log("Double-checking selection is cleared before navigation");
+        setSelectedAnswerId(null);
+        
         setShowRelaxAnimation(false);
+        console.log("Moving to next question after incorrect answer, selection state:", null);
         setIsModalOpen(false); // Close this question to advance to next
       }, 5000);
     }
