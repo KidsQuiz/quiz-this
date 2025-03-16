@@ -1,3 +1,4 @@
+
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -187,5 +188,10 @@ export const bg = {
   // Debug messages
   "sessionFunctionsNotInitialized": "Функциите на сесията не са инициализирани",
   "boomEffectVisible": "🎉 BoomEffect състоянието е вярно, трябва да се вижда сега",
-  "boomEffectComplete": "🎉 BoomEffect onComplete е извикан, скриване на ефекта"
+  "boomEffectComplete": "🎉 BoomEffect onComplete е извикан, скриване на ефекта",
+  
+  // Session Error Messages
+  "requestTimedOut": "Заявката изтече. Моля, опитайте отново.",
+  "noPackagesAssigned": "Няма зададени пакети",
+  "pleaseAssignPackages": "Моля, първо задайте пакети на това дете"
 } as const;

@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -199,5 +200,10 @@ export const en = {
   // Debug messages
   "sessionFunctionsNotInitialized": "Session functions not initialized",
   "boomEffectVisible": "🎉 BoomEffect state is true, should be visible now",
-  "boomEffectComplete": "🎉 BoomEffect onComplete called, hiding effect"
+  "boomEffectComplete": "🎉 BoomEffect onComplete called, hiding effect",
+  
+  // Session Error Messages
+  "requestTimedOut": "Request timed out. Please try again.",
+  "noPackagesAssigned": "No packages assigned",
+  "pleaseAssignPackages": "Please assign packages to this kid first"
 } as const;
