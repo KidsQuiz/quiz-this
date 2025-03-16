@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { AnswerOption, Question } from '@/hooks/questionsTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { playSound } from '@/utils/soundEffects';
@@ -30,13 +30,37 @@ export const useAnswerProcessing = (
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
+  
+  // Create a ref to track if component is mounted
+  const isMountedRef = useRef(true);
+  
+  // Setup effect to track component mounted state
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Define a reusable function to reset all answer-related state
   const resetAnswerState = useCallback(() => {
-    console.log("Explicitly resetting answer state");
-    setSelectedAnswerId(null);
-    setAnswerSubmitted(false);
-    setIsCorrect(false);
+    console.log("CRITICAL: Explicitly resetting ALL answer state");
+    // Only update state if component is still mounted
+    if (isMountedRef.current) {
+      // Reset in specific order - selection state first
+      setSelectedAnswerId(null);
+      
+      // Then reset other states
+      setAnswerSubmitted(false);
+      setIsCorrect(false);
+      
+      // Force a DOM update by calling in a timeout
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          setSelectedAnswerId(null);
+        }
+      }, 50);
+    }
   }, [setSelectedAnswerId, setAnswerSubmitted, setIsCorrect]);
 
   // Handle answer selection
@@ -116,12 +140,16 @@ export const useAnswerProcessing = (
       setTimeout(() => {
         setShowWowEffect(false);
         
-        // First reset answer state before any other operations
+        // CRITICAL: Aggressive state reset before navigation
+        console.log("CRITICAL: Resetting all answer state before navigation");
         resetAnswerState();
         
-        // Double-check that selection is cleared before navigation
-        console.log("Double-checking selection is cleared before navigation");
+        // Force multiple resets for redundancy
         setSelectedAnswerId(null);
+        setTimeout(() => setSelectedAnswerId(null), 50);
+        setTimeout(() => setSelectedAnswerId(null), 100);
+        
+        console.log("Multiple forced resets applied, current selection state:", null);
         
         // Get current question index value to check if it's the last question
         setCurrentQuestionIndex(prevIndex => {
@@ -144,8 +172,16 @@ export const useAnswerProcessing = (
             }
           } else {
             // Not the last question, move to next
-            console.log("Moving to next question, clearing selection state");
-            setIsModalOpen(false); // Close this question to advance to next
+            console.log("Moving to next question, CONFIRMED selection state is null");
+            
+            // Important: Force DOM update with state reset before modal change
+            document.body.style.pointerEvents = 'none';
+            setTimeout(() => {
+              setIsModalOpen(false); // Close this question to advance to next
+              setTimeout(() => {
+                document.body.style.removeProperty('pointer-events');
+              }, 300);
+            }, 100);
           }
           return prevIndex;
         });
@@ -159,16 +195,26 @@ export const useAnswerProcessing = (
       
       // Wait 5 seconds before moving to next question
       setTimeout(() => {
-        // First reset answer state with our utility function
+        // CRITICAL: Aggressive state reset before navigation
+        console.log("CRITICAL: Resetting all answer state before incorrect answer navigation");
         resetAnswerState();
         
-        // Double-check that selection is cleared before navigation
-        console.log("Double-checking selection is cleared before navigation");
+        // Force multiple resets for redundancy
         setSelectedAnswerId(null);
+        setTimeout(() => setSelectedAnswerId(null), 50);
+        setTimeout(() => setSelectedAnswerId(null), 100);
         
         setShowRelaxAnimation(false);
-        console.log("Moving to next question after incorrect answer, selection state:", null);
-        setIsModalOpen(false); // Close this question to advance to next
+        console.log("Moving to next question after incorrect answer, CONFIRMED selection state is null");
+        
+        // Important: Force DOM update with state reset before modal change
+        document.body.style.pointerEvents = 'none';
+        setTimeout(() => {
+          setIsModalOpen(false); // Close this question to advance to next
+          setTimeout(() => {
+            document.body.style.removeProperty('pointer-events');
+          }, 300);
+        }, 100);
       }, 5000);
     }
     

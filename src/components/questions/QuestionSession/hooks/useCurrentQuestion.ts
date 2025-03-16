@@ -25,40 +25,66 @@ export const useCurrentQuestion = (
       
       console.log("Resetting question state before loading new question");
       
-      // Force a complete reset of all question-related state
-      // The order matters here - reset selection first
-      setSelectedAnswerId(null);
-      
-      // We need to ensure UI is fully reset between questions
-      // Immediately disable the timer to prevent interactions during this time
+      // CRITICAL: Immediately stop timer and disable UI interaction
       setTimerActive(false);
       
-      // Force a reset of answer-related state with a delay
-      // This helps with the tablet/mobile issue where state persists
-      setTimeout(() => {
-        // Ensure selected answer is definitely null
+      // CRITICAL: Reset selection state immediately - multiple resets for redundancy
+      setSelectedAnswerId(null);
+      
+      // Create a complete hard reset function that we can call multiple times
+      const forceCompleteReset = () => {
+        console.log("Applying FORCED complete reset of answer state");
+        // Triple-reset the selected answer ID to ensure it clears on all devices
         setSelectedAnswerId(null);
+        
+        // Reset all other question-related state
         setAnswerSubmitted(false);
         setIsCorrect(false);
         setShowWowEffect(false);
+      };
+      
+      // Apply forced reset immediately
+      forceCompleteReset();
+      
+      // Use multiple staggered timeouts to ensure state resets properly
+      // First reset with small delay
+      setTimeout(() => {
+        forceCompleteReset();
         
-        const question = questions[currentQuestionIndex];
-        console.log(`Loading question ${currentQuestionIndex + 1}/${questions.length}`, question.id);
-        setCurrentQuestion(question);
-        setTimeRemaining(question.time_limit);
-        
-        // Load answer options for the new question
-        loadAnswerOptions(question.id).then(() => {
-          // One final reset of selection state after options are loaded
-          setSelectedAnswerId(null);
+        // Second reset with larger delay
+        setTimeout(() => {
+          forceCompleteReset();
           
-          // Start the timer only after everything is loaded and reset
-          setTimeout(() => {
-            setTimerActive(true);
-            console.log("Question fully loaded and timer started, confirmed selection state:", null);
-          }, 50);
-        });
-      }, 100); // Increased delay to ensure state updates properly
+          // Only after multiple resets, load the new question
+          const question = questions[currentQuestionIndex];
+          console.log(`Loading question ${currentQuestionIndex + 1}/${questions.length}`, question.id);
+          
+          // Set current question and time limit
+          setCurrentQuestion(question);
+          setTimeRemaining(question.time_limit);
+          
+          // Load answer options for the new question
+          loadAnswerOptions(question.id).then(() => {
+            // CRITICAL: Reset selection state again after options loaded
+            setSelectedAnswerId(null);
+            console.log("Answer options loaded, selection state forcibly reset to:", null);
+            
+            // Final reset before activating the timer
+            setTimeout(() => {
+              forceCompleteReset();
+              console.log("Final state reset before activating timer");
+              
+              // Start the timer only after everything is loaded and reset
+              setTimeout(() => {
+                // One final check before starting timer
+                setSelectedAnswerId(null);
+                setTimerActive(true);
+                console.log("Question fully loaded and timer started, confirmed selection state:", null);
+              }, 150);
+            }, 100);
+          });
+        }, 100);
+      }, 100);
     };
     
     loadCurrentQuestion();
