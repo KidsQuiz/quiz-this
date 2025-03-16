@@ -30,3 +30,6 @@ export { useSessionTransition } from './useSessionTransition';
 export { useQuestionPreparation } from './useQuestionPreparation';
 export { useTimeoutEffects } from './useTimeoutEffects';
 export { useSessionSetup } from './useSessionSetup';
+export { useSessionInitialization } from './useSessionInitialization';
+export { useQuestionChangeEffects } from './useQuestionChangeEffects';
+export { useTimeUpHandler } from './useTimeUpHandler';
