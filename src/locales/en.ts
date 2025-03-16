@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -125,6 +126,7 @@ export const en = {
   autoClosingIn: 'Auto-closing in a moment',
   fantastic: 'FANTASTIC!',
   allCorrectAnswers: 'You answered all questions correctly!',
+  clickToDismiss: 'Click anywhere to dismiss',
   
   // Language
   language: 'Language',

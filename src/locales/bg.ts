@@ -1,3 +1,4 @@
+
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -117,6 +118,7 @@ export const bg = {
   autoClosingIn: 'Автоматично затваряне след момент',
   fantastic: 'ФАНТАСТИЧНО!',
   allCorrectAnswers: 'Отговори правилно на всички въпроси!',
+  clickToDismiss: 'Кликнете където и да е, за да затворите',
   
   language: 'Език',
   english: 'Английски',
