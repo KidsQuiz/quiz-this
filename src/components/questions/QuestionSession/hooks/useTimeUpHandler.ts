@@ -44,7 +44,7 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
   // Handle the time up scenario
   const handleTimeUp = useCallback(() => {
     if (timeUpTriggered && !answerSubmitted) {
-      console.log("Handling time-up event");
+      console.log("Handling time-up event - treating as incorrect answer");
       
       // Play 'incorrect' sound
       playSound('incorrect');

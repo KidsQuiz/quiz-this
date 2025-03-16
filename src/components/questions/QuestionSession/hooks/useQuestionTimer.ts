@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -10,10 +9,15 @@ export const useQuestionTimer = (
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(isActive);
   const initialTimeRef = useRef(initialTime);
+  const timeUpCalledRef = useRef(false);
   
   // Keep refs updated with latest values
   useEffect(() => {
     activeRef.current = isActive;
+    // Reset the timeUpCalled flag when timer becomes active
+    if (isActive) {
+      timeUpCalledRef.current = false;
+    }
   }, [isActive]);
   
   useEffect(() => {
@@ -57,9 +61,14 @@ export const useQuestionTimer = (
             timerRef.current = null;
           }
           
-          // Call the onTimeUp callback
-          console.log("Time's up!");
-          onTimeUp();
+          // Only call onTimeUp once
+          if (!timeUpCalledRef.current) {
+            console.log("Time's up! Calling onTimeUp callback");
+            timeUpCalledRef.current = true;
+            activeRef.current = false; // Force deactivate the timer
+            onTimeUp();
+          }
+          
           return 0;
         }
         
@@ -86,6 +95,8 @@ export const useQuestionTimer = (
     const timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
     console.log("Resetting timer to:", timeToSet);
     setTimeRemaining(timeToSet);
+    // Reset the timeUpCalled flag when manually resetting the timer
+    timeUpCalledRef.current = false;
   }, []);
   
   return {

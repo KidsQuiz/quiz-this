@@ -116,9 +116,11 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
 
   // Create a function to go to the next question
   const goToNextQuestion = () => {
+    console.log("Going to next question, current index:", currentQuestionIndex);
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
+      console.log("This was the last question, completing session");
       setSessionComplete(true);
     }
   };
@@ -138,13 +140,14 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerOptions // Pass answerOptions to the hook
   });
 
-  // React to triggerTimeUp by setting timeUpTriggered
+  // React to timer reaching zero by setting timeUpTriggered
   useEffect(() => {
     if (timeRemaining === 0 && !answerSubmitted && timerActive) {
-      console.log("Time ran out, triggering time up handler");
-      setTimeUpTriggered(true);
+      console.log("Time ran out, triggering time up handler now");
+      setTimerActive(false); // Stop the timer immediately
+      setTimeUpTriggered(true); // Mark that time is up
     }
-  }, [timeRemaining, answerSubmitted, timerActive, setTimeUpTriggered]);
+  }, [timeRemaining, answerSubmitted, timerActive, setTimeUpTriggered, setTimerActive]);
 
   const { handleDialogClose } = useDialogManagement(
     setIsModalOpen,
