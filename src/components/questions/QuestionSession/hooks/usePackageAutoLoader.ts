@@ -26,6 +26,7 @@ export const usePackageAutoLoader = (
           await loadQuestions(packageIds);
         } else {
           console.warn(`No packages assigned to kid ${kidId}`);
+          // Don't show error here - it will be handled by the session setup
         }
       } catch (error) {
         console.error('Error auto-loading assigned packages:', error);

@@ -34,9 +34,10 @@ export const useSessionSetup = (
         console.log(`Assigned packages for kid ${kidId}:`, assignedPackages);
         
         if (!assignedPackages || assignedPackages.length === 0) {
-          // No need to show toast here if there are no packages
-          // We'll just close the session quietly
-          onClose();
+          // We'll close the session quietly only if there are no questions loaded
+          if (questions.length === 0) {
+            onClose();
+          }
           return;
         }
         
@@ -57,7 +58,7 @@ export const useSessionSetup = (
       } catch (error: any) {
         console.error('Error loading assigned packages:', error.message);
         // Only show one error toast
-        if (!hasShownError) {
+        if (!hasShownError && questions.length === 0) {
           setHasShownError(true);
           toast({
             variant: "destructive",
