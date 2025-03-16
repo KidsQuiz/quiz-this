@@ -34,7 +34,7 @@ export const useAnswerHandling = (
     console.log(`Answer selected: ${answerId}`);
     setSelectedAnswer(answerId);
     
-    // Automatically check answer when selected
+    // Explicitly check answer when selected - ensure this is called
     checkAnswer(answerId);
   }, [answerSubmitted]);
   
@@ -65,6 +65,7 @@ export const useAnswerHandling = (
     
     console.log(`Answer is ${isAnswerCorrect ? 'correct' : 'incorrect'}, correct answer ID: ${correctAnswerId}`);
     
+    // Set the answer state immediately
     setIsCorrect(isAnswerCorrect);
     setAnswerSubmitted(true);
     
