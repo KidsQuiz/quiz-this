@@ -19,7 +19,7 @@ export const useQuestionFetching = (
   const [questions, setQuestions] = useState<Question[]>([]);
   
   // Use our new hooks
-  const { loadingRef, createAbortController, cleanup } = useRequestController();
+  const { loadingRef, abortControllerRef, createAbortController, cleanup } = useRequestController();
   const { fetchPackageOrders } = usePackageOrderFetching();
   const { fetchQuestionsData } = useQuestionsDataFetching();
   const { processQuestions } = useQuestionsProcessing();
@@ -68,8 +68,8 @@ export const useQuestionFetching = (
       
       if (questionsData.length === 0) {
         toast({
-          title: t("noQuestionsFound"),
-          description: t("selectedPackagesNoQuestions"),
+          title: t("error"),
+          description: t("pleaseSelectPackages"),
           variant: "destructive"
         });
         setIsLoading(false);
@@ -96,20 +96,20 @@ export const useQuestionFetching = (
         console.error('Question fetch request timed out or was aborted');
         toast({
           variant: "destructive",
-          title: t("connectionIssue"),
-          description: t("requestTimedOut")
+          title: t("error"),
+          description: t("somethingWentWrong")
         });
       } else {
         console.error('Error loading questions:', error.message);
         toast({
           variant: "destructive",
           title: t("error"),
-          description: t("failedToLoadQuestions")
+          description: t("somethingWentWrong")
         });
       }
     } finally {
       setIsLoading(false);
-      if (abortController === loadingRef.current) {
+      if (abortControllerRef.current === abortController) {
         loadingRef.current = false;
       }
     }
@@ -117,7 +117,7 @@ export const useQuestionFetching = (
     toast, t, prefetchNextAnswerOptions, 
     getCachedQuestions, setCachedQuestions,
     fetchPackageOrders, fetchQuestionsData, 
-    processQuestions, createAbortController
+    processQuestions, createAbortController, abortControllerRef
   ]);
 
   return {
