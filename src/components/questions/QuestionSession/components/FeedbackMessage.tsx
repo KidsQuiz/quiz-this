@@ -60,9 +60,8 @@ const FeedbackMessage = ({
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 flex-shrink-0" />
           <div>
-            <p className="font-medium">{t('timeUp') || "Time's up!"}</p>
-            <p className="text-sm">{t('correctAnswerShown') || "The correct answer is highlighted."}</p>
-            <p className="text-sm">{t('nextQuestionSoon') || "Next question in 5 seconds..."}</p>
+            <p className="font-medium">{t('timeUp')}</p>
+            <p className="text-sm">{t('correctAnswerShown')}</p>
           </div>
         </div>
         <Progress 
@@ -90,7 +89,7 @@ const FeedbackMessage = ({
             <>
               {t('incorrectFeedback')}
               <span className="block text-sm mt-1">
-                {t('nextQuestionSoon') || "Next question in 5 seconds..."}
+                {t('correctAnswerShown')}
               </span>
             </>
           )
