@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 
 export const useQuestionNavigationHandler = (
@@ -19,6 +20,14 @@ export const useQuestionNavigationHandler = (
     console.log("Going to next question, current index:", currentQuestionIndex);
     // Ensure we're in a clean state for the next question
     resetAnswerState();
+    
+    // Reset all state variables to ensure a clean transition
+    setAnswerSubmitted(false);
+    setSelectedAnswerId(null);
+    setIsCorrect(false);
+    setIsTimeUp(false);
+    setShowingTimeUpFeedback(false);
+    setTimeUpTriggered(false);
     
     if (currentQuestionIndex < questions.length - 1) {
       // Get the next index value directly
@@ -43,7 +52,13 @@ export const useQuestionNavigationHandler = (
     resetAnswerState, 
     setCurrentQuestionIndex, 
     setIsModalOpen,
-    setSessionComplete
+    setSessionComplete,
+    setAnswerSubmitted,
+    setSelectedAnswerId,
+    setIsCorrect,
+    setIsTimeUp,
+    setShowingTimeUpFeedback,
+    setTimeUpTriggered
   ]);
 
   // Reset answer state function for navigation

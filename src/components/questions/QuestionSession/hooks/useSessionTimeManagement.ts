@@ -39,4 +39,12 @@ export const useSessionTimeManagement = ({
       setTimeUpTriggered(true); // Mark that time is up
     }
   }, [timeRemaining, answerSubmitted, timerActive, setTimeUpTriggered, setTimerActive]);
+  
+  // Ensure we're not stuck with an active timer that's at zero
+  useEffect(() => {
+    if (timeRemaining === 0 && timerActive) {
+      console.log("Safety check: Timer at zero but still active, deactivating");
+      setTimerActive(false);
+    }
+  }, [timeRemaining, timerActive, setTimerActive]);
 };
