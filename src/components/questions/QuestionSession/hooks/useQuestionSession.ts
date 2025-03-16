@@ -134,7 +134,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setShowingTimeUpFeedback,
     currentQuestion,
     goToNextQuestion,
-    setSelectedAnswerId
+    setSelectedAnswerId,
+    answerOptions // Pass answerOptions to the hook
   });
 
   // React to triggerTimeUp by setting timeUpTriggered

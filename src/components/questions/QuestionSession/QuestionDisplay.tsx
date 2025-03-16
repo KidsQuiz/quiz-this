@@ -12,6 +12,7 @@ import AnswerOptionsList from './components/AnswerOptionsList';
 import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
 import RelaxAnimation from './components/RelaxAnimation';
+import TimeUpFeedback from './components/TimeUpFeedback';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface QuestionDisplayProps {
@@ -26,6 +27,8 @@ interface QuestionDisplayProps {
   showWowEffect: boolean;
   showRelaxAnimation: boolean;
   handleSelectAnswer: (answerId: string) => void;
+  isTimeUp?: boolean;
+  showingTimeUpFeedback?: boolean;
 }
 
 const QuestionDisplay = ({
@@ -39,7 +42,9 @@ const QuestionDisplay = ({
   isCorrect,
   showWowEffect,
   showRelaxAnimation,
-  handleSelectAnswer
+  handleSelectAnswer,
+  isTimeUp = false,
+  showingTimeUpFeedback = false
 }: QuestionDisplayProps) => {
   // Play sound effect when time runs out
   useEffect(() => {
@@ -118,6 +123,11 @@ const QuestionDisplay = ({
           </div>
         </CardContent>
       </Card>
+      
+      {/* Show time-up feedback when needed */}
+      {showingTimeUpFeedback && (
+        <TimeUpFeedback show={showingTimeUpFeedback} />
+      )}
       
       <AnimationStyles />
       

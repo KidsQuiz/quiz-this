@@ -1,6 +1,6 @@
 
 import { useEffect, useCallback } from 'react';
-import { Question } from '@/hooks/questionsTypes';
+import { Question, AnswerOption } from '@/hooks/questionsTypes';
 
 interface UseTimeUpHandlerProps {
   timeUpTriggered: boolean;
@@ -13,6 +13,7 @@ interface UseTimeUpHandlerProps {
   currentQuestion: Question | null;
   goToNextQuestion: () => void;
   setSelectedAnswerId: (value: string | null) => void;
+  answerOptions: AnswerOption[]; // Add answerOptions to props
 }
 
 export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
@@ -26,18 +27,18 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
     setShowingTimeUpFeedback,
     currentQuestion,
     goToNextQuestion,
-    setSelectedAnswerId
+    setSelectedAnswerId,
+    answerOptions
   } = props;
   
   // Find the correct answer ID when time is up
   const findCorrectAnswerId = useCallback(() => {
-    if (!currentQuestion) return null;
+    if (!answerOptions || answerOptions.length === 0) return null;
     
-    // We can't access answerOptions directly from Question
-    // We'll need to get the correct answer ID from another source
-    // For now, return null as we'll get this information elsewhere
-    return null;
-  }, [currentQuestion]);
+    // Find the correct answer from answer options
+    const correctAnswer = answerOptions.find(option => option.is_correct);
+    return correctAnswer ? correctAnswer.id : null;
+  }, [answerOptions]);
   
   // Handle the time up scenario
   const handleTimeUp = useCallback(() => {
@@ -53,8 +54,12 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
       // Mark that time is up
       setIsTimeUp(true);
       
-      // We'll set the correct answer ID in the parent component after loading answer options
-      // setSelectedAnswerId will be called there
+      // Find and highlight the correct answer
+      const correctAnswerId = findCorrectAnswerId();
+      if (correctAnswerId) {
+        console.log("Time's up - highlighting correct answer:", correctAnswerId);
+        setSelectedAnswerId(correctAnswerId);
+      }
       
       // Show the time-up feedback
       setShowingTimeUpFeedback(true);
@@ -81,7 +86,8 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
     setSelectedAnswerId, 
     setShowingTimeUpFeedback, 
     setTimeUpTriggered, 
-    goToNextQuestion
+    goToNextQuestion,
+    findCorrectAnswerId
   ]);
   
   // Run the time up handler when needed
