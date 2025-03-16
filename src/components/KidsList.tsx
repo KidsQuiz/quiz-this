@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import KidCard from './kid-card/KidCard';

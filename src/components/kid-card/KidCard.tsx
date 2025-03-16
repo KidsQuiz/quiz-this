@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,7 +50,6 @@ const KidCard = ({
   const [nextMilestone, setNextMilestone] = useState<any>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
   
-  // Add refs to prevent multiple fetches
   const isFetchingPackages = useRef(false);
   
   useEffect(() => {
@@ -78,7 +76,6 @@ const KidCard = ({
         console.error('Error fetching package count:', error);
         setPackageCount(0);
       } finally {
-        // Reset the flag after a delay to allow subsequent fetch attempts
         setTimeout(() => {
           isFetchingPackages.current = false;
         }, 500);
@@ -88,7 +85,6 @@ const KidCard = ({
     fetchPackageCount();
   }, [id]);
   
-  // Effect to update milestone data
   useEffect(() => {
     if (milestones.length > 0) {
       setCurrentMilestone(getCurrentMilestone(points));
