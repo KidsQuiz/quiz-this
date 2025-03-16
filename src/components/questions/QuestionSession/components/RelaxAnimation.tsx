@@ -30,16 +30,16 @@ const RelaxAnimation: React.FC<RelaxAnimationProps> = ({ show }) => {
   
   return (
     <motion.div 
-      className="absolute inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="fixed bottom-4 right-4 z-50 max-w-sm"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
       <motion.div 
-        className="bg-white dark:bg-slate-800 p-6 rounded-xl max-w-md mx-auto shadow-xl"
-        initial={{ scale: 0.8, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
+        className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl border-2 border-primary"
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
         transition={{ 
           type: "spring", 
           stiffness: 300, 
@@ -48,7 +48,7 @@ const RelaxAnimation: React.FC<RelaxAnimationProps> = ({ show }) => {
       >
         <div className="text-center">
           <motion.h3 
-            className="text-2xl font-bold mb-4 text-primary"
+            className="text-xl font-bold mb-2 text-primary"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -57,33 +57,24 @@ const RelaxAnimation: React.FC<RelaxAnimationProps> = ({ show }) => {
           </motion.h3>
           
           <motion.div 
-            className="mb-6 overflow-hidden rounded-lg"
+            className="mb-3 overflow-hidden rounded-lg"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <img 
               src={imageUrl} 
               alt="Relaxing image" 
-              className="w-full h-auto object-cover rounded-lg transform transition-all duration-500 hover:scale-105"
+              className="w-full h-auto max-h-32 object-cover rounded-lg"
             />
           </motion.div>
           
           <motion.p 
-            className="text-lg mb-2"
+            className="text-sm mb-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
             {t('learningTakesTime')}
-          </motion.p>
-          
-          <motion.p 
-            className="text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            {t('tryNextQuestion')}
           </motion.p>
         </div>
       </motion.div>
