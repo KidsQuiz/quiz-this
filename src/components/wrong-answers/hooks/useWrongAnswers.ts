@@ -68,6 +68,8 @@ export const useWrongAnswers = (kidId: string, isOpen: boolean) => {
     setIsLoading(true);
     try {
       console.log('Resetting wrong answers for kid:', kidId);
+      
+      // Make the database call to delete wrong answers
       const { error } = await supabase
         .from('kid_wrong_answers')
         .delete()
@@ -83,6 +85,7 @@ export const useWrongAnswers = (kidId: string, isOpen: boolean) => {
         throw error;
       }
       
+      // Display success message
       toast({
         title: t('success'),
         description: t('wrongAnswersResetSuccess')
