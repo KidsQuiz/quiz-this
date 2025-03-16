@@ -1,4 +1,3 @@
-
 import React from 'react';
 import KidForm from '../KidForm';
 import KidPackagesForm from '../packages/KidPackagesForm';
@@ -29,25 +28,21 @@ interface KidsDialogsProps {
 }
 
 const KidsDialogs = ({
-  // Kid Form
   isFormOpen,
   selectedKidId,
   closeKidForm,
   onKidSaved,
   
-  // Package Form
   isPackageFormOpen,
   selectedKidForPackages,
   closePackageForm,
   onPackageAssignmentChange,
   
-  // Question Session
   isQuestionSessionOpen,
   selectedKidForQuestions,
   closeQuestionSession,
   onQuestionSessionEnd,
   
-  // Reset Points Dialog
   isResetPointsDialogOpen,
   kidToResetPoints,
   closeResetPointsDialog,
@@ -72,12 +67,11 @@ const KidsDialogs = ({
         />
       )}
       
-      {selectedKidForQuestions && (
+      {selectedKidForQuestions && isQuestionSessionOpen && (
         <QuestionSession
-          isOpen={isQuestionSessionOpen}
-          onClose={closeQuestionSession}
           kidId={selectedKidForQuestions.id}
           kidName={selectedKidForQuestions.name}
+          onClose={closeQuestionSession}
         />
       )}
       
