@@ -18,6 +18,7 @@ export const useAnswerHandling = (
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
 
   // Handle answer selection
   const handleSelectAnswer = async (answerId: string) => {
@@ -51,40 +52,44 @@ export const useAnswerHandling = (
       setShowWowEffect(true);
       
       // Check if this was the last question AND if all answers were correct
-      const isLastQuestion = currentQuestionIndex => currentQuestionIndex + 1 >= questions.length;
+      const isLastQuestion = (currentIdx: number) => currentIdx + 1 >= questions.length;
       
       // Show celebration effect for a short duration
       setTimeout(() => {
         setShowWowEffect(false);
         
-        if (isLastQuestion(currentQuestionIndex => currentQuestionIndex)) {
-          // If perfect score (all questions answered correctly)
-          if (newCorrectAnswers === questions.length) {
-            console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
-            setSessionComplete(true);
-            setShowBoomEffect(true);
-            // Dialog will close automatically in useSessionCompletion
+        // Get current question index value to check if it's the last question
+        setCurrentQuestionIndex(prevIndex => {
+          if (isLastQuestion(prevIndex)) {
+            // If perfect score (all questions answered correctly)
+            if (newCorrectAnswers === questions.length) {
+              console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
+              setSessionComplete(true);
+              setShowBoomEffect(true);
+              // Dialog will close automatically in useSessionCompletion
+            } else {
+              // Move to completion screen if not perfect score
+              return prevIndex + 1;
+            }
           } else {
-            // Move to completion screen if not perfect score
-            setCurrentQuestionIndex(prev => prev + 1);
-            setIsModalOpen(true);
+            // Not the last question, move to next
+            return prevIndex + 1;
           }
-        } else {
-          // Not the last question, move to next
-          setCurrentQuestionIndex(prev => prev + 1);
-          setIsModalOpen(true);
-        }
+          return prevIndex;
+        });
       }, 1500);
     } else {
       // Play incorrect sound effect
       playSound('incorrect');
       
-      // For incorrect answers, wait 5 seconds before moving to next question
-      // to give the kid time to see the correct answer
+      // Show the relaxing animation directly in the question dialog
+      setShowRelaxAnimation(true);
+      
+      // Wait 5 seconds before moving to next question
       setTimeout(() => {
+        setShowRelaxAnimation(false);
         setCurrentQuestionIndex(prev => prev + 1);
-        setIsModalOpen(true);
-      }, 5000); // Changed from 1000 to 5000 (5 seconds)
+      }, 5000);
     }
     
     return wasCorrect;
@@ -94,9 +99,11 @@ export const useAnswerHandling = (
     selectedAnswerId,
     answerSubmitted,
     isCorrect,
+    showRelaxAnimation,
     setSelectedAnswerId,
     setAnswerSubmitted,
     setIsCorrect,
+    setShowRelaxAnimation,
     handleSelectAnswer
   };
 };

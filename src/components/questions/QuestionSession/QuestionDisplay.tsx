@@ -11,6 +11,7 @@ import CelebrationEffect from './components/CelebrationEffect';
 import AnswerOptionsList from './components/AnswerOptionsList';
 import FeedbackMessage from './components/FeedbackMessage';
 import AnimationStyles from './components/AnimationStyles';
+import RelaxAnimation from './components/RelaxAnimation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 
@@ -24,6 +25,7 @@ interface QuestionDisplayProps {
   selectedAnswerId: string | null;
   isCorrect: boolean;
   showWowEffect: boolean;
+  showRelaxAnimation: boolean;
   handleSelectAnswer: (answerId: string) => void;
 }
 
@@ -37,19 +39,15 @@ const QuestionDisplay = ({
   selectedAnswerId,
   isCorrect,
   showWowEffect,
+  showRelaxAnimation,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
-  // Play sound effect when answer is submitted or time runs out
+  // Play sound effect when time runs out
   useEffect(() => {
-    if (answerSubmitted) {
-      // If time ran out (no selection made) play the incorrect sound
-      if (selectedAnswerId === null && timeRemaining === 0) {
-        playSound('incorrect');
-      } else if (selectedAnswerId !== null) {
-        playSound(isCorrect ? 'correct' : 'incorrect');
-      }
+    if (answerSubmitted && selectedAnswerId === null && timeRemaining === 0) {
+      playSound('incorrect');
     }
-  }, [answerSubmitted, isCorrect, selectedAnswerId, timeRemaining]);
+  }, [answerSubmitted, selectedAnswerId, timeRemaining]);
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
@@ -113,6 +111,9 @@ const QuestionDisplay = ({
       </Card>
       
       <AnimationStyles />
+      
+      {/* Show relaxing animation directly in the dialog when answer is incorrect */}
+      <RelaxAnimation show={showRelaxAnimation} />
     </div>
   );
 };

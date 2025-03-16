@@ -179,4 +179,14 @@ export const en = {
   activeUsers: 'Active Users',
   usersWithActiveKids: 'Users with active kids (answered questions)',
   ofAllUsers: 'of all users',
-};
+  
+  // Relaxation messages
+  "dontWorry": "Don't worry!",
+  "learningTakesTime": "Learning takes time.",
+  "tryNextQuestion": "Let's try the next question!",
+  
+  // Debug messages
+  "sessionFunctionsNotInitialized": "Session functions not initialized",
+  "boomEffectVisible": "🎉 BoomEffect state is true, should be visible now",
+  "boomEffectComplete": "🎉 BoomEffect onComplete called, hiding effect"
+} as const;

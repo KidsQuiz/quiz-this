@@ -1,22 +1,17 @@
 
+import { useEffect } from 'react';
 import { usePackageSelection } from './usePackageSelection';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
-import { useAnswerHandling } from './useAnswerHandling';
 import { useSessionState } from './useSessionState';
-import { useSessionStartup } from './useSessionStartup';
-import { useModalTransition } from './useModalTransition';
-import { useCurrentQuestion } from './useCurrentQuestion';
-import { useSessionCompletion } from './useSessionCompletion';
-import { useEnhancedAnswerHandling } from './useEnhancedAnswerHandling';
-import { useTimeoutHandling } from './useTimeoutHandling';
 import { useDialogManagement } from './useDialogManagement';
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useToastAndLanguage } from './useToastAndLanguage';
+import { useSessionConfig } from './useSessionConfig';
+import { useSessionEffects } from './useSessionEffects';
+import { useAnswerProcessing } from './useAnswerProcessing';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
-  const { toast } = useToast();
-  const { t } = useLanguage();
+  const { toast, t } = useToastAndLanguage();
   
   // Use session state hook for state management
   const {
@@ -35,17 +30,21 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     isModalOpen,
     setIsModalOpen,
     kidAnswers,
-    setKidAnswers
+    setKidAnswers,
+    showRelaxAnimation,
+    setShowRelaxAnimation
   } = useSessionState();
 
-  // Load packages and handle selection
+  // Load packages and get session configuration
   const {
     questionPackages,
     selectedPackageIds,
     togglePackageSelection,
     selectAllPackages,
-    deselectAllPackages
-  } = usePackageSelection(kidId, kidName, onClose, toast);
+    deselectAllPackages,
+    handleStartSession,
+    initializeSessionFunctions
+  } = useSessionConfig(kidId, kidName, onClose);
 
   // Load questions and answer options
   const {
@@ -70,7 +69,16 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Handle answer submission and scoring
+  // Initialize session config functions
+  useEffect(() => {
+    initializeSessionFunctions(
+      loadQuestions,
+      setIsConfiguring,
+      setCurrentQuestionIndex
+    );
+  }, [initializeSessionFunctions, loadQuestions, setIsConfiguring, setCurrentQuestionIndex]);
+
+  // Process answers and handle submissions
   const {
     selectedAnswerId,
     answerSubmitted,
@@ -78,44 +86,37 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setAnswerSubmitted,
     setSelectedAnswerId,
     setIsCorrect,
-    handleSelectAnswer: originalHandleSelectAnswer
-  } = useAnswerHandling(
-    answerOptions,
+    handleSelectAnswer
+  } = useAnswerProcessing(
+    kidId,
     currentQuestion,
+    answerOptions,
+    questions,
     setCorrectAnswers,
     setTotalPoints,
     setShowWowEffect,
     setCurrentQuestionIndex,
     setIsModalOpen,
-    questions,
     setShowBoomEffect,
-    setSessionComplete
+    setSessionComplete,
+    setKidAnswers
   );
 
-  // Handle session startup
-  const { handleStartSession } = useSessionStartup(
-    selectedPackageIds,
-    loadQuestions,
-    setIsConfiguring,
-    setCurrentQuestionIndex
-  );
-
-  // Handle modal transitions between questions
-  useModalTransition(
-    isModalOpen,
+  // Apply session effects (modal transitions, current question, completion, timeouts)
+  useSessionEffects(
+    kidId,
+    kidName,
+    isConfiguring,
     sessionComplete,
     currentQuestionIndex,
     questions,
-    setCurrentQuestionIndex,
-    setIsModalOpen,
-    setSessionComplete
-  );
-
-  // Handle current question loading and setup
-  useCurrentQuestion(
-    isConfiguring,
-    questions,
-    currentQuestionIndex,
+    isModalOpen,
+    correctAnswers,
+    totalPoints,
+    answerSubmitted,
+    timeRemaining,
+    currentQuestion,
+    showBoomEffect,
     setCurrentQuestion,
     setTimeRemaining,
     setAnswerSubmitted,
@@ -123,30 +124,11 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setIsCorrect,
     setShowWowEffect,
     setTimerActive,
-    loadAnswerOptions
-  );
-
-  // Handle session completion
-  useSessionCompletion(
-    kidId,
-    kidName,
-    sessionComplete,
-    currentQuestionIndex,
-    questions,
-    totalPoints,
-    correctAnswers,
+    setCurrentQuestionIndex,
+    setIsModalOpen,
     setSessionComplete,
     setShowBoomEffect,
-    setIsModalOpen
-  );
-
-  // Enhanced answer handling with database recording
-  const { handleSelectAnswer } = useEnhancedAnswerHandling(
-    kidId,
-    currentQuestion,
-    answerOptions,
-    originalHandleSelectAnswer,
-    setKidAnswers
+    loadAnswerOptions
   );
 
   // Handle dialog closing
@@ -157,20 +139,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     sessionComplete,
     correctAnswers,
     questions
-  );
-
-  // Handle timeouts
-  useTimeoutHandling(
-    timeRemaining,
-    currentQuestion,
-    isConfiguring,
-    sessionComplete,
-    answerSubmitted,
-    currentQuestionIndex,
-    questions,
-    setAnswerSubmitted,
-    setSessionComplete,
-    setIsModalOpen
   );
 
   return {
@@ -190,6 +158,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    showRelaxAnimation,
     showBoomEffect,
     setShowBoomEffect,
     isModalOpen,
