@@ -14,6 +14,7 @@ export const bg = {
   user: 'Потребител',
   error: 'Грешка',
   clone: 'Клонирай',
+  success: 'Успех',
   
   signIn: 'Вход',
   signUp: 'Регистрация',
@@ -154,6 +155,10 @@ export const bg = {
   wrongCount: "Брой грешки",
   notEnoughData: "Недостатъчно данни за показване на статистика",
   occurrences: "Брой срещания",
+  resetWrongAnswers: "Нулиране на грешни отговори",
+  resetWrongAnswersConfirmation: "Сигурни ли сте, че искате да нулирате всички грешни отговори за {name}?",
+  wrongAnswersResetSuccess: "Грешните отговори бяха успешно нулирани",
+  errorResettingWrongAnswers: "Възникна грешка при нулирането на грешните отговори",
   
   // Admin translations
   adminDashboard: 'Административен Панел',
