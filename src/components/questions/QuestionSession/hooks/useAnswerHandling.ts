@@ -13,7 +13,8 @@ export const useAnswerHandling = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   questions: Question[],
   setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
+  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
@@ -22,8 +23,18 @@ export const useAnswerHandling = (
 
   // Handle answer selection
   const handleSelectAnswer = async (answerId: string) => {
-    if (answerSubmitted) return;
+    // Skip if answer already submitted
+    if (answerSubmitted) {
+      console.log("Answer already submitted, ignoring selection");
+      return false;
+    }
     
+    console.log(`Answer selected: ${answerId}`);
+    
+    // Immediately stop the timer when an answer is selected
+    setTimerActive(false);
+    
+    // Update state to reflect selection
     setSelectedAnswerId(answerId);
     setAnswerSubmitted(true);
     

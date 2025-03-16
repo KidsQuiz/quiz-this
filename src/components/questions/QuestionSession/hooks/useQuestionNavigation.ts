@@ -6,33 +6,64 @@ export const useQuestionNavigation = () => {
   const [timerActive, setTimerActive] = useState(false);
   const advancementInProgressRef = useRef(false);
   const currentIndexRef = useRef(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Keep currentIndexRef in sync with state
   useEffect(() => {
     currentIndexRef.current = currentQuestionIndex;
     console.log(`Navigation: currentQuestionIndex updated to ${currentQuestionIndex}`);
   }, [currentQuestionIndex]);
 
+  // Handle timer countdown logic
   useEffect(() => {
+    // Clear any existing timer first
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // Skip if timer shouldn't be running
     if (!timerActive || timeRemaining <= 0) return;
     
-    const timer = setInterval(() => {
+    console.log(`Starting timer countdown from ${timeRemaining} seconds`);
+    
+    // Create a new interval to count down time
+    timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
+        // Check if we need to stop the timer
         if (prev <= 1) {
-          clearInterval(timer);
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          
+          console.log("Timer reached zero");
           setTimerActive(false);
-          console.log("Timer reached zero, stopping timer automatically");
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     
-    return () => clearInterval(timer);
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [timerActive, timeRemaining]);
 
+  // Handle time up event
   const handleTimeUp = useCallback(() => {
     console.log('handleTimeUp called, current timer active state:', timerActive);
     if (timerActive) {
+      // Stop the timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      
       console.log('Stopping timer due to time up');
       setTimerActive(false);
       return true; // Time up event processed
@@ -40,24 +71,29 @@ export const useQuestionNavigation = () => {
     return false;
   }, [timerActive]);
 
+  // Handle session termination
   const handleTerminateSession = useCallback((onClose: () => void) => {
+    // Stop the timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
     setTimerActive(false);
     onClose();
   }, []);
 
+  // Safe setter for updating question index
   const safeSetCurrentQuestionIndex = useCallback((newIndex: number) => {
     console.log(`SAFE SETTER: Updating question index from ${currentIndexRef.current} to ${newIndex}`);
     
     currentIndexRef.current = newIndex;
-    
     setCurrentQuestionIndex(newIndex);
-    
-    document.body.classList.toggle('force-reflow');
-    document.body.classList.toggle('force-reflow');
     
     console.log(`SAFE SETTER: Index update completed to ${newIndex}`);
   }, []);
 
+  // Force advancement to next question
   const forceAdvanceQuestion = useCallback(() => {
     if (advancementInProgressRef.current) {
       console.log("Advancement already in progress, ignoring duplicate request");
@@ -65,6 +101,14 @@ export const useQuestionNavigation = () => {
     }
     
     advancementInProgressRef.current = true;
+    
+    // Stop any active timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    setTimerActive(false);
     
     document.body.style.pointerEvents = 'none';
     

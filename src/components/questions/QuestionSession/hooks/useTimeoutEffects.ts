@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
+import { playSound } from '@/utils/soundEffects';
 
 /**
  * Manages timeout effects when time runs out for a question
@@ -23,15 +24,34 @@ export const useTimeoutEffects = (
 ) => {
   // Create a ref to track if advancement is already scheduled
   const advancementScheduledRef = useRef(false);
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
+    };
+  }, []);
   
   // Handle when time runs out for a question
   useEffect(() => {
+    // Clear any existing timeout
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+      timeoutIdRef.current = null;
+    }
+    
     // Skip if any of these conditions are met
     if (!currentQuestion || isConfiguring || sessionComplete) return;
     
     // Only process if timer reaches zero and answer is not already submitted
     if (timeRemaining === 0 && !answerSubmitted && !advancementScheduledRef.current) {
       console.log('Time ran out for current question - preparing to advance');
+      
+      // Play timeout sound
+      playSound('incorrect');
       
       // Set flag to prevent duplicate advancement scheduling
       advancementScheduledRef.current = true;
@@ -48,8 +68,9 @@ export const useTimeoutEffects = (
       }
       
       // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
-      const timeoutId = setTimeout(() => {
+      timeoutIdRef.current = setTimeout(() => {
         console.log('TIMEOUT COMPLETE: Now advancing to next question');
+        timeoutIdRef.current = null;
         
         // Reset any lingering DOM state
         const clearDomState = () => {
@@ -90,8 +111,11 @@ export const useTimeoutEffects = (
       }, 5000); // 5 seconds delay
       
       return () => {
-        console.log('Clearing timeout for question advancement');
-        clearTimeout(timeoutId);
+        if (timeoutIdRef.current) {
+          console.log('Clearing timeout for question advancement');
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
+        }
         advancementScheduledRef.current = false;
         document.body.style.removeProperty('pointer-events');
       };

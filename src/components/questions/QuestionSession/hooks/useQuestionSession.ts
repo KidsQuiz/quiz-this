@@ -6,9 +6,8 @@ import { useSessionState } from './useSessionState';
 import { useDialogManagement } from './useDialogManagement';
 import { useToastAndLanguage } from './useToastAndLanguage';
 import { useSessionEffects } from './useSessionEffects';
-import { useAnswerProcessing } from './useAnswerProcessing';
+import { useAnswerHandling } from './useAnswerHandling';
 import { useSessionSetup } from './useSessionSetup';
-import { Question } from '@/hooks/questionsTypes';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast, t } = useToastAndLanguage();
@@ -55,7 +54,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleTerminateSession
   } = useQuestionNavigation();
 
-  // Use our new session setup hook
+  // Use our session setup hook
   const { initialLoadComplete } = useSessionSetup(
     kidId,
     loadQuestions,
@@ -70,6 +69,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     onClose
   );
 
+  // Use our answer handling hook
   const {
     selectedAnswerId,
     answerSubmitted,
@@ -78,21 +78,21 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setSelectedAnswerId,
     setIsCorrect,
     handleSelectAnswer
-  } = useAnswerProcessing(
-    kidId,
-    currentQuestion,
+  } = useAnswerHandling(
     answerOptions,
-    questions,
+    currentQuestion,
     setCorrectAnswers,
     setTotalPoints,
     setShowWowEffect,
     setCurrentQuestionIndex,
     setIsModalOpen,
+    questions,
     setShowBoomEffect,
     setSessionComplete,
-    setKidAnswers
+    setTimerActive
   );
 
+  // Connect all session effects
   useSessionEffects(
     kidId,
     kidName,
