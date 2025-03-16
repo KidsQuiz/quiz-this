@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -62,7 +63,7 @@ export const useTimeUpHandler = ({
     // Play incorrect sound
     playSound('incorrect');
     
-    // Update UI states
+    // Update UI states - CRITICAL: Force these to execute synchronously
     setIsTimeUp(true);
     setAnswerSubmitted(true);
     setIsCorrect(false);
@@ -77,26 +78,31 @@ export const useTimeUpHandler = ({
     // Briefly pause to show the correct answer (just long enough for the UI to update)
     console.log("Briefly highlighting correct answer before advancing");
     timeoutRef.current = setTimeout(() => {
-      console.log("Immediately advancing to next question after time up");
+      console.log("Timeout completed - now advancing to next question");
       
       // Clean up states
       setIsTimeUp(false);
       setShowingTimeUpFeedback(false);
       setTimeUpTriggered(false);
       
-      // Explicitly force pointer events to be enabled before navigation
+      // Force re-enable pointer events before navigation
       document.body.style.pointerEvents = '';
       
-      // Force-advance to next question
-      goToNextQuestion();
-      
-      // Reset processing flag after a short delay to prevent race conditions
+      // Force-advance to next question with a slightly longer delay
+      // to ensure all state updates are completed
       setTimeout(() => {
-        isProcessingTimeUpRef.current = false;
-        timeoutRef.current = null;
+        console.log("FINAL ADVANCEMENT: Moving to next question now");
+        goToNextQuestion();
+        
+        // Reset processing flag after question advancement
+        setTimeout(() => {
+          isProcessingTimeUpRef.current = false;
+          timeoutRef.current = null;
+          console.log("Time up processing cycle complete");
+        }, 100);
       }, 100);
       
-    }, 500); // Brief 500ms delay to show the correct answer
+    }, 800); // Longer delay to ensure the correct answer is visible
     
     return () => {
       // Clean up if component unmounts during timeout

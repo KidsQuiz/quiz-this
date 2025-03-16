@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -69,7 +70,12 @@ export const useQuestionTimer = (
           if (!timeUpCalledRef.current) {
             console.log("Time's up! Calling onTimeUp callback");
             timeUpCalledRef.current = true;
-            onTimeUp(); // Execute the time up callback
+            
+            // Call onTimeUp with a slight delay to ensure state stability
+            setTimeout(() => {
+              onTimeUp(); // Execute the time up callback
+              console.log("onTimeUp callback executed with short delay");
+            }, 10);
           }
           
           return 0;
@@ -86,7 +92,7 @@ export const useQuestionTimer = (
         timerRef.current = null;
       }
     };
-  }, [isActive, onTimeUp]);
+  }, [isActive, onTimeUp, timeRemaining]);
   
   // Reset the timer
   const resetTimer = useCallback((newTime?: number) => {

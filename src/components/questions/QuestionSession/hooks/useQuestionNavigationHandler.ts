@@ -33,6 +33,10 @@ export const useQuestionNavigationHandler = ({
   // Create a function to go to the next question
   const goToNextQuestion = useCallback(() => {
     console.log("Going to next question, current index:", currentQuestionIndex);
+    
+    // Ensure the document is interactive
+    document.body.style.pointerEvents = '';
+    
     // Ensure we're in a clean state for the next question
     resetAnswerState();
     
@@ -47,9 +51,9 @@ export const useQuestionNavigationHandler = ({
     if (currentQuestionIndex < questions.length - 1) {
       // Get the next index value directly
       const nextIndex = currentQuestionIndex + 1;
-      console.log(`Setting question index to ${nextIndex}`);
+      console.log(`NAVIGATION: Setting question index to ${nextIndex}`);
       
-      // CRITICAL: Set the index directly
+      // Set the index using the direct value
       setCurrentQuestionIndex(nextIndex);
       
       // Ensure the modal stays open

@@ -67,9 +67,9 @@ export const useTimeoutEffects = (
         setSelectedAnswerId(correctAnswer.id);
       }
       
-      // Immediately move to next question after a very brief highlight delay
+      // Wait a moment to show the correct answer, then advance
       timeoutIdRef.current = setTimeout(() => {
-        console.log('TIMEOUT COMPLETE: Now advancing to next question immediately');
+        console.log('TIMEOUT COMPLETE: Now advancing to next question');
         timeoutIdRef.current = null;
         
         // Reset any lingering DOM state
@@ -92,10 +92,14 @@ export const useTimeoutEffects = (
         if (currentQuestionIndex < questions.length - 1) {
           // Critical: Force update the index directly with the new value
           const nextIndex = currentQuestionIndex + 1;
-          console.log(`ADVANCING: Timeout advancement, setting question index from ${currentQuestionIndex} to ${nextIndex}`);
+          console.log(`DIRECT ADVANCEMENT: Setting question index from ${currentQuestionIndex} to ${nextIndex}`);
           
-          // CRITICAL FIX: Using direct value instead of function form
-          setCurrentQuestionIndex(nextIndex);
+          // Use setTimeout to ensure clean state transition
+          setTimeout(() => {
+            // CRITICAL FIX: Using direct value instead of function form
+            setCurrentQuestionIndex(nextIndex);
+            console.log(`Question index updated to ${nextIndex}`);
+          }, 50);
         } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');
@@ -107,8 +111,8 @@ export const useTimeoutEffects = (
           document.body.style.removeProperty('pointer-events');
           advancementScheduledRef.current = false;
           console.log('Question advancement process complete, advancement flag reset');
-        }, 100);
-      }, 500); // Brief 500ms delay to show the correct answer before advancing
+        }, 200);
+      }, 1000); // Slightly longer delay to show the correct answer
       
       return () => {
         if (timeoutIdRef.current) {
