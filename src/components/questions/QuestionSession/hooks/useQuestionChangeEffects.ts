@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 export const useQuestionChangeEffects = (
@@ -15,43 +15,74 @@ export const useQuestionChangeEffects = (
   loadAnswerOptions: (questionId: string) => Promise<void>,
   setTimeRemaining: (newTime: number) => void,
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
-  updateTimeLimit: (newTimeLimit: number) => void
+  updateTimeLimit: (newTimeLimit: number) => void,
+  resetAndStartTimer: (seconds: number) => void
 ) => {
+  // Track the last processed question index to prevent duplicate processing
+  const lastProcessedIndexRef = useRef<number>(-1);
+  const setupInProgressRef = useRef(false);
+  
   // Update current question when index changes
   useEffect(() => {
     if (!questions.length || !initialLoadComplete) return;
     
+    // Skip if index is beyond questions array bounds
     if (currentQuestionIndex >= questions.length) {
       return;
     }
     
-    const question = questions[currentQuestionIndex];
-    console.log("Setting current question:", question?.content);
-    console.log("Question time limit:", question?.time_limit || 30);
-    setCurrentQuestion(question);
+    // Skip if we're already processing this question index
+    if (lastProcessedIndexRef.current === currentQuestionIndex || setupInProgressRef.current) {
+      console.log(`Question ${currentQuestionIndex} is already being processed or was processed, skipping`);
+      return;
+    }
     
-    // Reset answer state when question changes
+    // Mark that we're starting to process this question
+    setupInProgressRef.current = true;
+    lastProcessedIndexRef.current = currentQuestionIndex;
+    
+    const question = questions[currentQuestionIndex];
+    console.log(`Setting up question ${currentQuestionIndex + 1}/${questions.length}: ${question.content}`);
+    console.log("Question time limit:", question.time_limit || 30);
+    
+    // First, stop any existing timer and reset answer state
+    setTimerActive(false);
     resetAnswerState();
     setAnswerSubmitted(false);
     setSelectedAnswerId(null);
     setIsCorrect(false);
     
-    // Load answer options for the new question
-    loadAnswerOptions(question.id);
+    // Set the current question
+    setCurrentQuestion(question);
     
-    // Set the timer based on the question's time limit
-    if (question.time_limit && !sessionComplete) {
-      const timeLimit = question.time_limit || 30;
-      // Update the time limit first
-      updateTimeLimit(timeLimit);
-      // Then reset the timer to this new limit
-      setTimeRemaining(timeLimit);
-      
-      // Start the timer after a short delay to allow the UI to update
-      setTimeout(() => {
-        setTimerActive(true);
-      }, 500);
-    }
+    // Load answer options for the new question
+    const setupQuestion = async () => {
+      try {
+        await loadAnswerOptions(question.id);
+        
+        // Set the timer based on the question's time limit
+        if (!sessionComplete) {
+          const timeLimit = question.time_limit || 30;
+          
+          // Ensure we reset and start the timer with the correct time limit
+          console.log(`Setting up timer for question ${currentQuestionIndex + 1} with ${timeLimit} seconds`);
+          resetAndStartTimer(timeLimit);
+        }
+        
+        // Setup is complete
+        setupInProgressRef.current = false;
+      } catch (error) {
+        console.error("Error loading answer options:", error);
+        setupInProgressRef.current = false;
+      }
+    };
+    
+    setupQuestion();
+    
+    // Cleanup function
+    return () => {
+      setupInProgressRef.current = false;
+    };
   }, [
     currentQuestionIndex,
     initialLoadComplete,
@@ -65,6 +96,7 @@ export const useQuestionChangeEffects = (
     setSelectedAnswerId,
     setTimeRemaining,
     setTimerActive,
-    updateTimeLimit
+    updateTimeLimit,
+    resetAndStartTimer
   ]);
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -17,6 +18,7 @@ export const useQuestionTimer = (
   
   useEffect(() => {
     initialTimeRef.current = initialTime;
+    // Only reset timer when initialTime changes AND timer is not active
     if (!isActive) {
       setTimeRemaining(initialTime);
     }
@@ -30,23 +32,23 @@ export const useQuestionTimer = (
       timerRef.current = null;
     }
     
-    // Reset time when inactive
+    // Reset time when initialTime changes or when turning inactive
     if (!isActive) {
       console.log("Timer stopped, resetting to:", initialTimeRef.current);
       setTimeRemaining(initialTimeRef.current);
       return;
     }
     
-    console.log("Timer started with", initialTimeRef.current, "seconds");
-    setTimeRemaining(initialTimeRef.current);
+    console.log(`Timer started with ${timeRemaining} seconds (initial: ${initialTimeRef.current})`);
     
-    // Start the timer
+    // Start the timer - CRITICAL: use setInterval for continuous countdown
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
         // If timer is no longer active, don't decrement
         if (!activeRef.current) return prev;
         
         const newTime = prev - 1;
+        console.log(`Timer tick: ${prev} -> ${newTime}`);
         
         // Time's up
         if (newTime <= 0) {
@@ -72,7 +74,7 @@ export const useQuestionTimer = (
         timerRef.current = null;
       }
     };
-  }, [initialTime, isActive, onTimeUp]);
+  }, [isActive, onTimeUp]);
   
   // Reset the timer
   const resetTimer = useCallback((newTime?: number) => {

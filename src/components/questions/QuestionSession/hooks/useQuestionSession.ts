@@ -52,6 +52,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setCurrentQuestionIndex,
     setTimeRemaining,
     updateTimeLimit,
+    resetAndStartTimer,
     handleTimeUp,
     handleTerminateSession
   } = useQuestionNavigation();
@@ -88,7 +89,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTimerActive
   );
 
-  // Use question change effects hook
+  // Use question change effects hook with our new resetAndStartTimer function
   useQuestionChangeEffects(
     currentQuestionIndex,
     initialLoadComplete,
@@ -102,7 +103,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     loadAnswerOptions,
     setTimeRemaining,
     setTimerActive,
-    updateTimeLimit
+    updateTimeLimit,
+    resetAndStartTimer
   );
 
   // Use time up handler hook
