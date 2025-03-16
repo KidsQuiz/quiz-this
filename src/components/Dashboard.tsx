@@ -35,14 +35,13 @@ const Dashboard = ({ activeTab }) => {
 
         const setupPromise = supabase.rpc('create_kid_wrong_answers_policy', {});
         
-        const { error } = await Promise.race([setupPromise, timeoutPromise]);
-        
-        if (error) {
-          console.warn('Could not set up RLS policy:', error.message);
-          setRlsError("RLS policy setup failed. Some features may be limited.");
-        } else {
+        try {
+          await Promise.race([setupPromise, timeoutPromise]);
           localStorage.setItem(storageKey, 'true');
           console.log('RLS policy setup complete');
+        } catch (err) {
+          console.warn('Could not set up RLS policy:', err instanceof Error ? err.message : String(err));
+          setRlsError("RLS policy setup failed. Some features may be limited.");
         }
       } catch (err) {
         console.warn('Error during RLS policy setup:', err);
