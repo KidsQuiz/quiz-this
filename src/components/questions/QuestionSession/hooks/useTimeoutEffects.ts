@@ -45,10 +45,11 @@ export const useTimeoutEffects = (
       const timeoutId = setTimeout(() => {
         console.log('Timeout completed, ready to advance question');
         
-        // Directly force the question index increment to ensure advancement
+        // CRITICAL FIX: Force advancement regardless of answer state
         if (currentQuestionIndex < questions.length - 1) {
-          console.log('Advancing to next question after timeout');
-          setCurrentQuestionIndex(prev => prev + 1);
+          console.log('Advancing to next question after timeout, from index', currentQuestionIndex, 'to', currentQuestionIndex + 1);
+          // Use the functional update to ensure we're working with the latest state
+          setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');

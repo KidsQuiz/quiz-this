@@ -15,6 +15,7 @@ export const useQuestionNavigation = () => {
         if (prev <= 1) {
           clearInterval(timer);
           setTimerActive(false);
+          console.log("Timer reached zero, stopping timer automatically");
           return 0;
         }
         return prev - 1;
@@ -44,6 +45,12 @@ export const useQuestionNavigation = () => {
     onClose();
   };
 
+  // Force advance to next question
+  const forceAdvanceQuestion = () => {
+    console.log("Forcing advancement to next question");
+    setCurrentQuestionIndex(prev => prev + 1);
+  };
+
   return {
     currentQuestionIndex,
     timeRemaining,
@@ -52,6 +59,7 @@ export const useQuestionNavigation = () => {
     setTimeRemaining,
     setTimerActive,
     handleTimeUp,
-    handleTerminateSession
+    handleTerminateSession,
+    forceAdvanceQuestion
   };
 };

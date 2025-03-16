@@ -59,6 +59,11 @@ const QuestionDisplay = ({
     }
   }, [timeRanOut]);
 
+  // Additional logging for index tracking (for debugging)
+  useEffect(() => {
+    console.log(`Current question index: ${currentQuestionIndex}, total questions: ${questionsTotal}`);
+  }, [currentQuestionIndex, questionsTotal]);
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <DialogHeader className="mb-2 flex-shrink-0">
