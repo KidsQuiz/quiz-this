@@ -75,6 +75,7 @@ export const useCorrectAnswerHandling = (
           // Important: Force DOM update with state reset before modal change
           document.body.style.pointerEvents = 'none';
           setTimeout(() => {
+            console.log("Closing current question dialog to advance to next question");
             setIsModalOpen(false); // Close this question to advance to next
             setTimeout(() => {
               document.body.style.removeProperty('pointer-events');
