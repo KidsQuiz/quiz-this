@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 /**
@@ -26,10 +26,30 @@ export const useSessionTransition = (
     }
   }, [currentQuestionIndex, questions, isConfiguring, sessionComplete, setSessionComplete]);
   
-  return {
-    advanceToNextQuestion: () => {
-      console.log("Advancing to next question");
+  // Advance to next question with more aggressive state reset
+  const advanceToNextQuestion = useCallback(() => {
+    console.log("Advancing to next question");
+    
+    // Forcibly reset any selected buttons in the DOM first
+    const allButtons = document.querySelectorAll('[data-answer-option]');
+    allButtons.forEach(button => {
+      button.setAttribute('data-selected', 'false');
+      button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md');
+    });
+    
+    // Briefly disable pointer events to prevent race conditions
+    document.body.style.pointerEvents = 'none';
+    
+    // Small delay before closing dialog to ensure DOM updates
+    setTimeout(() => {
       setIsModalOpen(false); // Close current dialog to trigger next question
-    }
-  };
+      
+      // Re-enable pointer events after a delay
+      setTimeout(() => {
+        document.body.style.removeProperty('pointer-events');
+      }, 200);
+    }, 50);
+  }, [setIsModalOpen]);
+  
+  return { advanceToNextQuestion };
 };

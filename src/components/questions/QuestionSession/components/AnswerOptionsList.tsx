@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,12 @@ const AnswerOptionsList = ({
 }: AnswerOptionsListProps) => {
   // Create a ref to track answer options change (new question)
   const optionsRef = useRef<string[]>([]);
+  const selectedIdRef = useRef<string | null>(null);
+  
+  // Update selectedIdRef whenever selectedAnswerId changes
+  useEffect(() => {
+    selectedIdRef.current = selectedAnswerId;
+  }, [selectedAnswerId]);
   
   // Force re-render and reset selected state when answer options change
   useEffect(() => {
@@ -29,8 +35,49 @@ const AnswerOptionsList = ({
       console.log("New question detected: Answer options changed");
       // Update our ref
       optionsRef.current = answerOptions.map(o => o.id);
+      
+      // Force re-render by using a slight delay
+      if (selectedIdRef.current !== null) {
+        console.log("Detected state mismatch - forcing unselected state");
+        // A small timeout ensures the DOM has time to update
+        setTimeout(() => {
+          const allButtons = document.querySelectorAll('[data-answer-option]');
+          allButtons.forEach(button => {
+            button.setAttribute('data-selected', 'false');
+            button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md');
+          });
+        }, 50);
+      }
     }
   }, [answerOptions]);
+  
+  // Create a safe select handler that double-checks state
+  const safeSelectAnswer = useCallback((answerId: string) => {
+    if (answerSubmitted) {
+      console.log("Answer already submitted, ignoring selection");
+      return;
+    }
+    
+    // Additional sanity check
+    if (selectedIdRef.current) {
+      console.log("Selection already exists, clearing before new selection");
+      selectedIdRef.current = null;
+      
+      // Force quick DOM update
+      const allButtons = document.querySelectorAll('[data-answer-option]');
+      allButtons.forEach(button => {
+        button.setAttribute('data-selected', 'false');
+      });
+      
+      // Small delay before allowing new selection
+      setTimeout(() => {
+        console.log("Applying new selection:", answerId);
+        handleSelectAnswer(answerId);
+      }, 50);
+    } else {
+      handleSelectAnswer(answerId);
+    }
+  }, [answerSubmitted, handleSelectAnswer]);
   
   return (
     <div className="h-full overflow-auto pr-1">
@@ -63,11 +110,13 @@ const AnswerOptionsList = ({
           return (
             <button
               key={option.id}
-              onClick={() => !answerSubmitted && handleSelectAnswer(option.id)}
+              onClick={() => !answerSubmitted && safeSelectAnswer(option.id)}
               disabled={answerSubmitted}
               className={answerClasses}
               data-selected={isSelected ? "true" : "false"}
               data-submitted={answerSubmitted ? "true" : "false"}
+              data-answer-option="true"
+              data-answer-id={option.id}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl">{option.content}</span>
