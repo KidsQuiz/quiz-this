@@ -10,6 +10,7 @@ export const useMilestonesFetch = (kidId?: string) => {
   const isFetchingRef = useRef(false);
   const hasAttemptedFetch = useRef(false);
   const fetchTimeoutId = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchMilestones = async () => {
     if (isFetchingRef.current) return [];
@@ -22,16 +23,32 @@ export const useMilestonesFetch = (kidId?: string) => {
       clearTimeout(fetchTimeoutId.current);
       fetchTimeoutId.current = null;
     }
+
+    // Abort any in-progress request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create a new abort controller for this request
+    abortControllerRef.current = new AbortController();
     
     try {
       isFetchingRef.current = true;
       setIsLoading(true);
       
+      // Set up a timeout to abort the request if it takes too long
+      const timeoutId = setTimeout(() => {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+      }, 15000); // 15-second timeout
+      
       // Type assertion for the from() method since milestones isn't in the types
       const query = supabase
         .from('milestones' as any)
         .select('*')
-        .order('points_required', { ascending: true });
+        .order('points_required', { ascending: true })
+        .abortSignal(abortControllerRef.current.signal);
       
       if (kidId) {
         query.eq('kid_id', kidId);
@@ -39,21 +56,34 @@ export const useMilestonesFetch = (kidId?: string) => {
         
       const { data, error } = await query;
         
+      clearTimeout(timeoutId);
+      
       if (error) throw error;
       
       // Cast the result to Milestone[] type
       setMilestones(data as unknown as Milestone[]);
       return data as unknown as Milestone[];
     } catch (error: any) {
-      console.error('Error fetching milestones:', error.message);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load milestones"
-      });
+      if (error.name === 'AbortError' || error.message === 'signal timed out') {
+        console.error('Milestone fetch request timed out or was aborted');
+        toast({
+          variant: "destructive",
+          title: "Connection Issue",
+          description: "Request timed out. Please try again later."
+        });
+      } else {
+        console.error('Error fetching milestones:', error.message);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load milestones"
+        });
+      }
       return [];
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
+      
       // Use a timeout to reset the fetch in progress flag after a delay
       // This prevents immediate subsequent fetch attempts
       fetchTimeoutId.current = setTimeout(() => {
@@ -72,6 +102,9 @@ export const useMilestonesFetch = (kidId?: string) => {
     return () => {
       if (fetchTimeoutId.current) {
         clearTimeout(fetchTimeoutId.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     };
   }, [kidId]);

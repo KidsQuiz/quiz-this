@@ -15,6 +15,7 @@ export const useQuestionFetching = (
   
   // Add ref to track loading state and prevent duplicate requests
   const loadingQuestionsRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   // Load questions when packages are selected
   const loadQuestions = useCallback(async (selectedPackageIds: string[]) => {
@@ -40,10 +41,25 @@ export const useQuestionFetching = (
       return;
     }
     
+    // Abort any in-progress request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create a new abort controller for this request
+    abortControllerRef.current = new AbortController();
+    
     try {
       setIsLoading(true);
       loadingQuestionsRef.current = true;
       console.log(`Loading questions for package IDs:`, selectedPackageIds);
+      
+      // Set up a timeout to abort the request if it takes too long
+      const timeoutId = setTimeout(() => {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+      }, 20000); // 20-second timeout for this complex operation
       
       // Execute two promises concurrently:
       // 1. Fetch package presentation orders
@@ -54,7 +70,8 @@ export const useQuestionFetching = (
           const { data, error } = await supabase
             .from('packages')
             .select('id, presentation_order')
-            .in('id', selectedPackageIds);
+            .in('id', selectedPackageIds)
+            .abortSignal(abortControllerRef.current?.signal || undefined);
             
           if (error) {
             console.error('Error fetching package presentation orders:', error.message);
@@ -73,12 +90,15 @@ export const useQuestionFetching = (
           const { data, error } = await supabase
             .from('questions')
             .select('*')
-            .in('package_id', selectedPackageIds);
+            .in('package_id', selectedPackageIds)
+            .abortSignal(abortControllerRef.current?.signal || undefined);
             
           if (error) throw error;
           return data || [];
         })()
       ]);
+      
+      clearTimeout(timeoutId);
       
       const packagePresentationOrders: Record<string, 'sequential' | 'shuffle'> = {};
       packageOrderResults.forEach(result => {
@@ -151,21 +171,40 @@ export const useQuestionFetching = (
       prefetchNextAnswerOptions(finalQuestions, 0);
       
     } catch (error: any) {
-      console.error('Error loading questions:', error.message);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load questions"
-      });
+      if (error.name === 'AbortError' || error.message === 'signal timed out') {
+        console.error('Question fetch request timed out or was aborted');
+        toast({
+          variant: "destructive",
+          title: "Connection Issue",
+          description: "Request timed out. Please try again."
+        });
+      } else {
+        console.error('Error loading questions:', error.message);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load questions"
+        });
+      }
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
       loadingQuestionsRef.current = false;
     }
   }, [toast, prefetchNextAnswerOptions, getCachedQuestions, setCachedQuestions]);
 
+  // Cleanup on unmount
+  const cleanup = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
+
   return {
     isLoading,
     questions,
-    loadQuestions
+    loadQuestions,
+    cleanup
   };
 };
