@@ -8,15 +8,16 @@ import { useAuth } from './AuthContext';
 // All supported languages
 export type SupportedLanguage = 'en' | 'bg';
 
-// Type for the language pack dictionaries
-export type LanguagePack = typeof en;
+// Type for the language pack dictionaries - using typeof en to get the keys, but not the values
+export type LanguagePackKeys = keyof typeof en;
+export type LanguagePack = Record<LanguagePackKeys, string>;
 
 // Type for the language context
 interface LanguageContextType {
   currentLanguage: SupportedLanguage;
   languagePack: LanguagePack;
   changeLanguage: (lang: SupportedLanguage) => void;
-  t: (key: keyof LanguagePack) => string;
+  t: (key: LanguagePackKeys) => string;
 }
 
 // Available language packs
@@ -120,7 +121,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   }, [currentLanguage]);
 
   // Translation function
-  const t = (key: keyof LanguagePack): string => {
+  const t = (key: LanguagePackKeys): string => {
     return languagePack[key] || key.toString();
   };
 
