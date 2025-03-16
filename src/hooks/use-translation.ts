@@ -1,10 +1,18 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 
+/**
+ * Enhanced translation hook that provides type-safe translations with interpolation
+ */
 export const useTranslation = () => {
   const { currentLanguage, languagePack, t } = useLanguage();
 
-  // Enhanced translation function with string interpolation support
+  /**
+   * Enhanced translation function with string interpolation support
+   * @param key Translation key to lookup
+   * @param replacements Optional object with replacement values
+   * @returns Translated string with replacements applied
+   */
   const translate = (key: string, replacements?: Record<string, string | number>) => {
     let text = t(key);
     
@@ -17,7 +25,9 @@ export const useTranslation = () => {
     return text;
   };
 
-  // Return the translation function and other useful properties
+  /**
+   * Returns all translation utilities needed throughout the application
+   */
   return { 
     t: translate,
     currentLanguage,

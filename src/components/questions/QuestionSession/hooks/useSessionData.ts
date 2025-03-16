@@ -28,6 +28,7 @@ export const useSessionData = () => {
     }
   };
   
+  // Memoize all returned values to prevent unnecessary re-renders
   return {
     // Toast and language
     toast, 

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
 import BoomEffect from './components/BoomEffect';
@@ -43,10 +43,10 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Handler for when the boom effect is complete or dismissed
-  const handleBoomEffectComplete = () => {
+  const handleBoomEffectComplete = useCallback(() => {
     console.log("Boom effect complete, hiding animation");
     setShowBoomEffect(false);
-  };
+  }, [setShowBoomEffect]);
 
   return (
     <>

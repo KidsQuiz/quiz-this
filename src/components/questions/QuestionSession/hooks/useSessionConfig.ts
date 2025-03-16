@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useToastAndLanguage } from './useToastAndLanguage';
 import { usePackageSelection } from './usePackageSelection';
 
@@ -13,10 +13,10 @@ export const useSessionConfig = (
 ) => {
   const { toast, t } = useToastAndLanguage();
   
-  // These functions will be provided later by useQuestionSession
-  const [loadQuestionsFn, setLoadQuestionsFn] = useState<LoadQuestionsFunction | null>(null);
-  const [setIsConfiguringFn, setIsConfiguringStateFn] = useState<SetStateFn<boolean> | null>(null);
-  const [setCurrentQuestionIndexFn, setCurrentQuestionIndexStateFn] = useState<SetStateFn<number> | null>(null);
+  // Use refs instead of state for function storage to prevent re-renders
+  const loadQuestionsFnRef = useRef<LoadQuestionsFunction | null>(null);
+  const setIsConfiguringRef = useRef<SetStateFn<boolean> | null>(null);
+  const setCurrentQuestionIndexRef = useRef<SetStateFn<number> | null>(null);
   
   // Load packages and handle selection
   const {
@@ -38,14 +38,14 @@ export const useSessionConfig = (
       return;
     }
     
-    if (loadQuestionsFn && setIsConfiguringFn && setCurrentQuestionIndexFn) {
-      await loadQuestionsFn(selectedPackageIds);
-      setIsConfiguringFn(false);
-      setCurrentQuestionIndexFn(0);
+    if (loadQuestionsFnRef.current && setIsConfiguringRef.current && setCurrentQuestionIndexRef.current) {
+      await loadQuestionsFnRef.current(selectedPackageIds);
+      setIsConfiguringRef.current(false);
+      setCurrentQuestionIndexRef.current(0);
     } else {
       console.error(t('sessionFunctionsNotInitialized'));
     }
-  }, [loadQuestionsFn, selectedPackageIds, setIsConfiguringFn, setCurrentQuestionIndexFn, toast, t]);
+  }, [selectedPackageIds, toast, t]);
 
   // This function will be called by useQuestionSession to initialize the required functions
   const initializeSessionFunctions = useCallback((
@@ -53,9 +53,9 @@ export const useSessionConfig = (
     setIsConfiguring: SetStateFn<boolean>,
     setCurrentQuestionIndex: SetStateFn<number>
   ) => {
-    setLoadQuestionsFn(() => loadQuestions);
-    setIsConfiguringStateFn(() => setIsConfiguring);
-    setCurrentQuestionIndexStateFn(() => setCurrentQuestionIndex);
+    loadQuestionsFnRef.current = loadQuestions;
+    setIsConfiguringRef.current = setIsConfiguring;
+    setCurrentQuestionIndexRef.current = setCurrentQuestionIndex;
   }, []);
 
   return {
