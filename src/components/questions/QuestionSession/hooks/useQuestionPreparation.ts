@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 /**
- * Hook that handles preparation of the current question and resets state
+ * Hook that handles loading and preparing the current question
  */
 export const useQuestionPreparation = (
   isConfiguring: boolean,
@@ -18,43 +18,36 @@ export const useQuestionPreparation = (
   setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
   loadAnswerOptions: (questionId: string) => Promise<void>
 ) => {
-  // Set up the current question when question index changes
+  // Set up current question whenever the index changes
   useEffect(() => {
+    // Skip if we're still configuring
     if (isConfiguring) return;
     
-    const setupQuestion = async () => {
-      // Reset all answer-related state when loading a new question
+    // Get the question at the current index
+    const question = questions[currentQuestionIndex];
+    
+    if (question) {
+      console.log(`Setting up question ${currentQuestionIndex + 1}: ${question.id}`);
+      
+      // Reset state for new question
+      setCurrentQuestion(question);
+      setTimeRemaining(question.time_limit);
       setAnswerSubmitted(false);
       setSelectedAnswerId(null);
       setIsCorrect(false);
       setShowWowEffect(false);
       
-      // Check if we have a valid question at this index
-      if (currentQuestionIndex < questions.length) {
-        const question = questions[currentQuestionIndex];
-        console.log(`Setting up question ${currentQuestionIndex + 1}/${questions.length}: ${question.id}`);
-        
-        // Set current question
-        setCurrentQuestion(question);
-        
-        // Reset timer to question's time limit
-        setTimeRemaining(question.time_limit || 30);
-        setTimerActive(true);
-        
-        // Load answer options for this question
-        await loadAnswerOptions(question.id);
-      } else {
-        // No valid question at this index
-        setCurrentQuestion(null);
-        setTimerActive(false);
-      }
-    };
-    
-    setupQuestion();
+      // Start the timer
+      console.log(`Starting timer for ${question.time_limit} seconds`);
+      setTimerActive(true);
+      
+      // Load answer options for this question
+      loadAnswerOptions(question.id);
+    }
   }, [
     isConfiguring,
-    currentQuestionIndex,
     questions,
+    currentQuestionIndex,
     setCurrentQuestion,
     setTimeRemaining,
     setAnswerSubmitted,
