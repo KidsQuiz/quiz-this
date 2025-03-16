@@ -105,7 +105,7 @@ const QuestionDisplay = ({
                       isCorrect={isCorrect}
                       points={currentQuestion.points}
                       answerSubmitted={answerSubmitted}
-                      timeRanOut={timeRanOut}
+                      timeRanOut={isTimeUp}
                     />
                   </div>
                 )}
