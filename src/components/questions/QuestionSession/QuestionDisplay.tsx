@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -25,6 +25,7 @@ interface QuestionDisplayProps {
   selectedAnswerId: string | null;
   isCorrect: boolean;
   showWowEffect: boolean;
+  showRelaxAnimation: boolean;
   handleSelectAnswer: (answerId: string) => void;
 }
 
@@ -38,38 +39,15 @@ const QuestionDisplay = ({
   selectedAnswerId,
   isCorrect,
   showWowEffect,
+  showRelaxAnimation,
   handleSelectAnswer
 }: QuestionDisplayProps) => {
-  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
-  
-  // Play sound effect when answer is submitted or time runs out
+  // Play sound effect when time runs out
   useEffect(() => {
-    if (answerSubmitted) {
-      // If time ran out (no selection made) play the incorrect sound
-      if (selectedAnswerId === null && timeRemaining === 0) {
-        playSound('incorrect');
-        setShowRelaxAnimation(true);
-      } else if (selectedAnswerId !== null) {
-        if (isCorrect) {
-          playSound('correct');
-        } else {
-          playSound('incorrect');
-          setShowRelaxAnimation(true);
-        }
-      }
+    if (answerSubmitted && selectedAnswerId === null && timeRemaining === 0) {
+      playSound('incorrect');
     }
-  }, [answerSubmitted, isCorrect, selectedAnswerId, timeRemaining]);
-
-  // Reset relax animation after a delay
-  useEffect(() => {
-    if (showRelaxAnimation) {
-      const timer = setTimeout(() => {
-        setShowRelaxAnimation(false);
-      }, 4000); // Show for 4 seconds
-      
-      return () => clearTimeout(timer);
-    }
-  }, [showRelaxAnimation]);
+  }, [answerSubmitted, selectedAnswerId, timeRemaining]);
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted && selectedAnswerId === null;
@@ -134,7 +112,7 @@ const QuestionDisplay = ({
       
       <AnimationStyles />
       
-      {/* Show relaxing animation when answer is incorrect */}
+      {/* Show relaxing animation directly in the dialog when answer is incorrect */}
       <RelaxAnimation show={showRelaxAnimation} />
     </div>
   );

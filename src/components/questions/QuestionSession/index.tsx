@@ -26,6 +26,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    showRelaxAnimation,
     showBoomEffect,
     setShowBoomEffect,
     isModalOpen,
@@ -105,6 +106,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
               selectedAnswerId={selectedAnswerId}
               isCorrect={isCorrect}
               showWowEffect={showWowEffect}
+              showRelaxAnimation={showRelaxAnimation}
               handleSelectAnswer={handleSelectAnswer}
             />
           )}

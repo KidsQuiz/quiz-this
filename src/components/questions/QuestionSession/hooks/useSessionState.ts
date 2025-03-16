@@ -18,6 +18,7 @@ export const useSessionState = () => {
   const [showBoomEffect, setShowBoomEffect] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [kidAnswers, setKidAnswers] = useState<KidAnswer[]>([]);
+  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
 
   return {
     isConfiguring,
@@ -35,6 +36,8 @@ export const useSessionState = () => {
     isModalOpen,
     setIsModalOpen,
     kidAnswers,
-    setKidAnswers
+    setKidAnswers,
+    showRelaxAnimation,
+    setShowRelaxAnimation
   };
 };

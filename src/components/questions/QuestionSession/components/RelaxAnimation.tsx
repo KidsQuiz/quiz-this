@@ -30,7 +30,7 @@ const RelaxAnimation: React.FC<RelaxAnimationProps> = ({ show }) => {
   
   return (
     <motion.div 
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm"
+      className="absolute inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

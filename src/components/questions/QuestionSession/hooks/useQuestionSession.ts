@@ -75,9 +75,11 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     selectedAnswerId,
     answerSubmitted,
     isCorrect,
+    showRelaxAnimation,
     setAnswerSubmitted,
     setSelectedAnswerId,
     setIsCorrect,
+    setShowRelaxAnimation,
     handleSelectAnswer: originalHandleSelectAnswer
   } = useAnswerHandling(
     answerOptions,
@@ -190,6 +192,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerSubmitted,
     isCorrect,
     showWowEffect,
+    showRelaxAnimation,
     showBoomEffect,
     setShowBoomEffect,
     isModalOpen,

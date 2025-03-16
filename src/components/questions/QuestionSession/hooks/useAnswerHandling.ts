@@ -18,6 +18,7 @@ export const useAnswerHandling = (
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
 
   // Handle answer selection
   const handleSelectAnswer = async (answerId: string) => {
@@ -79,12 +80,15 @@ export const useAnswerHandling = (
       // Play incorrect sound effect
       playSound('incorrect');
       
-      // For incorrect answers, wait 5 seconds before moving to next question
-      // to give the kid time to see the correct answer
+      // Show the relaxing animation directly in the question dialog
+      setShowRelaxAnimation(true);
+      
+      // Wait 5 seconds before moving to next question
       setTimeout(() => {
+        setShowRelaxAnimation(false);
         setCurrentQuestionIndex(prev => prev + 1);
         setIsModalOpen(true);
-      }, 5000); // Changed from 1000 to 5000 (5 seconds)
+      }, 5000);
     }
     
     return wasCorrect;
@@ -94,9 +98,11 @@ export const useAnswerHandling = (
     selectedAnswerId,
     answerSubmitted,
     isCorrect,
+    showRelaxAnimation,
     setSelectedAnswerId,
     setAnswerSubmitted,
     setIsCorrect,
+    setShowRelaxAnimation,
     handleSelectAnswer
   };
 };
