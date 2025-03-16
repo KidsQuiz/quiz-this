@@ -1,24 +1,45 @@
 
-import { useState } from 'react';
-
-interface KidAnswer {
-  questionId: string;
-  answerId: string;
-  isCorrect: boolean;
-  points: number;
-  timestamp: Date;
-}
+import { useAnswerStateManagement } from './useAnswerStateManagement';
+import { useSessionProgressState } from './useSessionProgressState';
+import { useSessionUIState } from './useSessionUIState';
+import { useKidAnswersState, KidAnswer } from './useKidAnswersState';
 
 export const useSessionState = () => {
-  const [isConfiguring, setIsConfiguring] = useState(false); // Set to false by default now
-  const [sessionComplete, setSessionComplete] = useState(false);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [showWowEffect, setShowWowEffect] = useState(false);
-  const [showBoomEffect, setShowBoomEffect] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true);
-  const [kidAnswers, setKidAnswers] = useState<KidAnswer[]>([]);
-  const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
+  const {
+    isConfiguring,
+    setIsConfiguring,
+    sessionComplete,
+    setSessionComplete,
+    correctAnswers,
+    setCorrectAnswers,
+    totalPoints,
+    setTotalPoints
+  } = useSessionProgressState();
+
+  const {
+    selectedAnswerId,
+    setSelectedAnswerId,
+    answerSubmitted,
+    setAnswerSubmitted,
+    isCorrect,
+    setIsCorrect,
+    showWowEffect,
+    setShowWowEffect,
+    showBoomEffect,
+    setShowBoomEffect
+  } = useAnswerStateManagement();
+
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    showRelaxAnimation,
+    setShowRelaxAnimation
+  } = useSessionUIState();
+
+  const {
+    kidAnswers,
+    setKidAnswers
+  } = useKidAnswersState();
 
   return {
     isConfiguring,
@@ -38,6 +59,15 @@ export const useSessionState = () => {
     kidAnswers,
     setKidAnswers,
     showRelaxAnimation,
-    setShowRelaxAnimation
+    setShowRelaxAnimation,
+    // Add these to maintain API compatibility with existing code
+    selectedAnswerId,
+    setSelectedAnswerId,
+    answerSubmitted,
+    setAnswerSubmitted,
+    isCorrect,
+    setIsCorrect
   };
 };
+
+export type { KidAnswer };
