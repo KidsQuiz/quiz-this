@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useQuestionSession } from './hooks/useQuestionSession';
 import QuestionDisplay from './QuestionDisplay';
 import CompletionScreen from './CompletionScreen';
 import BoomEffect from './components/BoomEffect';
 import RelaxAnimation from './components/RelaxAnimation';
 import { QuestionSessionProps } from './types';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClose }) => {
   const {
@@ -28,7 +29,7 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     isModalOpen,
     handleSelectAnswer,
     handleDialogClose,
-    setShowBoomEffect // Make sure to extract this from the hook
+    setShowBoomEffect
   } = useQuestionSession(kidId, kidName, onClose);
 
   // Render a loading state if currentQuestion is null but we're not at the completion screen
@@ -44,6 +45,12 @@ const QuestionSession: React.FC<QuestionSessionProps> = ({ kidId, kidName, onClo
     <>
       <Dialog open={isModalOpen} onOpenChange={handleDialogClose}>
         <DialogContent className="sm:max-w-[600px] p-0 gap-0 border-0 overflow-hidden">
+          {isLoadingOrMissingQuestion && (
+            <DialogTitle asChild>
+              <VisuallyHidden>Loading Questions</VisuallyHidden>
+            </DialogTitle>
+          )}
+          
           {sessionComplete ? (
             <CompletionScreen 
               kidName={kidName}
