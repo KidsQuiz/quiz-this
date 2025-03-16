@@ -124,6 +124,9 @@ export const en = {
   noPackagesSelected: 'No packages selected',
   pleaseSelectPackages: 'Please select at least one question package to start.',
   autoClosingIn: 'Auto-closing in a moment',
+  fantastic: 'FANTASTIC!',
+  allCorrectAnswers: 'You answered all questions correctly!',
+  clickToDismiss: 'Click anywhere to dismiss',
   
   // Language
   language: 'Language',

@@ -28,6 +28,8 @@ export const useSessionCompletion = (
         
         // Close the dialog with a short delay to allow points to update first
         setTimeout(() => {
+          // Make sure to restore pointer events before closing
+          document.body.style.removeProperty('pointer-events');
           setIsModalOpen(false);
         }, 800);
       }
@@ -92,4 +94,12 @@ export const useSessionCompletion = (
       setSessionComplete(true);
     }
   }, [currentQuestionIndex, questions.length, sessionComplete, kidId, kidName, totalPoints, correctAnswers, toast, setSessionComplete, setShowBoomEffect, setIsModalOpen]);
+
+  // Effect to clean up when the component unmounts
+  useEffect(() => {
+    return () => {
+      // Always ensure pointer events are restored on unmount
+      document.body.style.removeProperty('pointer-events');
+    };
+  }, []);
 };

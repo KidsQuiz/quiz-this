@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 
 export const useDialogManagement = (
@@ -6,25 +7,22 @@ export const useDialogManagement = (
   showBoomEffect: boolean,
   sessionComplete: boolean,
   correctAnswers: number,
-  questions: any[]
+  questions: { id: string }[]
 ) => {
   // Handle dialog closing
   const handleDialogClose = useCallback(() => {
-    // Clean up any styles applied to the body
+    // Always make sure pointer events are restored when closing the dialog
     document.body.style.removeProperty('pointer-events');
     
-    // If we have a perfect score and the session is complete, keep the boom effect visible
-    // when closing the dialog
-    const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
-    
-    if (isPerfectScore && sessionComplete && !showBoomEffect) {
-      console.log("Perfect score detected when closing dialog");
-    }
-    
-    // Close the dialog and call the onClose callback
+    // Close the modal
     setIsModalOpen(false);
-    onClose();
-  }, [setIsModalOpen, onClose, showBoomEffect, sessionComplete, correctAnswers, questions]);
+    
+    // Give a small delay before calling the parent's onClose to ensure clean state transitions
+    setTimeout(() => {
+      // Call the parent onClose to fully clean up
+      onClose();
+    }, 100);
+  }, [onClose, setIsModalOpen]);
 
   return {
     handleDialogClose

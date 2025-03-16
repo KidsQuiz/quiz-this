@@ -44,7 +44,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
   // Clean up effect for when component unmounts
   useEffect(() => {
     return () => {
-      // Remove any global styles or event listeners
+      // Always restore pointer events when unmounting
       document.body.style.removeProperty('pointer-events');
     };
   }, []);
@@ -56,6 +56,28 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [showBoomEffect, t]);
 
+  // Handle boom effect completion
+  const handleBoomEffectComplete = () => {
+    console.log(t('boomEffectComplete'));
+    // Explicitly restore pointer events
+    document.body.style.removeProperty('pointer-events');
+    setShowBoomEffect(false);
+    
+    // If dialog is already closed, call onClose to ensure complete cleanup
+    if (!isModalOpen) {
+      onClose();
+    }
+  };
+
+  // When the dialog is closed externally (by ESC key or clicking outside),
+  // make sure we clean up properly
+  useEffect(() => {
+    if (!isOpen && !showBoomEffect) {
+      // Ensure cleanup happens
+      handleDialogClose();
+    }
+  }, [isOpen, showBoomEffect, handleDialogClose]);
+
   // Determine effective open state as a combination of parent control and internal state
   const effectiveOpenState = isOpen && isModalOpen;
 
@@ -65,7 +87,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
         open={effectiveOpenState} 
         onOpenChange={(open) => {
           if (!open) {
-            // When dialog is closing, call our custom close handler
+            // When dialog is closing, call our custom close handler which ensures cleanup
             handleDialogClose();
           }
         }}
@@ -76,11 +98,13 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
             handleDialogClose();
           }}
           onInteractOutside={() => {
+            // Always ensure pointer events are restored
             document.body.style.removeProperty('pointer-events');
           }}
           onCloseAutoFocus={(e) => {
             // Prevent the default focus behavior which can cause issues
             e.preventDefault();
+            // Always ensure pointer events are restored
             document.body.style.removeProperty('pointer-events');
           }}
         >
@@ -128,10 +152,7 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       {/* Boom effect shown when the kid answers all questions correctly - outside Dialog */}
       <BoomEffect 
         isVisible={showBoomEffect} 
-        onComplete={() => {
-          console.log(t('boomEffectComplete'));
-          setShowBoomEffect(false);
-        }} 
+        onComplete={handleBoomEffectComplete} 
       />
     </>
   );
