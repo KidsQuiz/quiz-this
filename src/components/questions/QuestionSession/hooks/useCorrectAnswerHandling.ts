@@ -77,19 +77,17 @@ export const useCorrectAnswerHandling = (
           
           // Store transition time for debugging
           const transitionTime = Date.now();
-          console.log(`Starting correct answer transition at time: ${transitionTime}`);
+          console.log(`TRANSITION: Starting correct answer transition at time: ${transitionTime}`);
           
-          // Add a delay before closing the modal to ensure everything is reset
+          // CRITICAL: Use a longer delay before closing the modal
           setTimeout(() => {
-            console.log("Closing current question dialog to advance to next question");
-            setIsModalOpen(false); // Close this question to advance to next
+            console.log("TRANSITION: Closing current question dialog to advance to next question");
             
-            // Re-enable pointer events after a delay
-            setTimeout(() => {
-              document.body.style.removeProperty('pointer-events');
-              console.log(`Re-enabled pointer events at ${Date.now() - transitionTime}ms after transition start`);
-            }, 400);
-          }, 300); // Increased delay for more reliable transition
+            // This is the key step that triggers the transition flow in useModalTransition
+            setIsModalOpen(false);
+            
+            console.log("TRANSITION: Modal close request sent, transition should begin");
+          }, 500); // Significantly increased delay for more reliable transition
         }
         return prevIndex;
       });

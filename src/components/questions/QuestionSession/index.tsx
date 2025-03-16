@@ -78,13 +78,12 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
     }
   }, [isOpen, showBoomEffect, handleDialogClose]);
 
-  // Determine effective open state as a combination of parent control and internal state
-  const effectiveOpenState = isOpen && isModalOpen;
-
+  // IMPORTANT: We now directly use the isOpen prop to control the dialog
+  // This should prevent the immediate closing issue by maintaining parent control
   return (
     <>
       <Dialog 
-        open={effectiveOpenState} 
+        open={isOpen && isModalOpen} 
         onOpenChange={(open) => {
           if (!open) {
             // When dialog is closing, call our custom close handler which ensures cleanup

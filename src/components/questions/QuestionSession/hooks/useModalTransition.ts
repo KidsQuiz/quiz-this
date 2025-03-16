@@ -24,23 +24,29 @@ export const useModalTransition = (
         console.log('Reached end of questions, completing session');
         setSessionComplete(true);
       } else {
-        // Immediately advance to next question index
+        // CRITICAL: Immediately advance to next question index
         console.log(`Advancing to question ${nextQuestionIndex + 1}`);
         setCurrentQuestionIndex(nextQuestionIndex);
         
         // Store transition time for debugging
         const transitionTime = Date.now();
-        console.log(`Starting modal transition at time: ${transitionTime}`);
+        console.log(`TRANSITION: Modal closed at ${transitionTime}, scheduling reopen with delay`);
         
-        // Re-open the modal with a significant delay to ensure state updates properly
+        // CRITICAL: Use setTimeout with a LONGER delay to ensure complete DOM updates
+        // and proper React rendering cycle completion before reopening
         setTimeout(() => {
-          console.log(`Re-opening modal for next question at ${Date.now() - transitionTime}ms after transition start`);
+          console.log(`TRANSITION: Reopening modal after ${Date.now() - transitionTime}ms delay`);
           
           // Make sure pointer events are enabled before showing next question
           document.body.style.removeProperty('pointer-events');
           
-          setIsModalOpen(true);
-        }, 500); // Significantly increased delay for more reliable state update
+          // CRITICAL: Force clean state before reopening modal
+          setTimeout(() => {
+            console.log("TRANSITION: Final state reset before reopening modal");
+            // This will reopen the modal with the next question
+            setIsModalOpen(true);
+          }, 50);
+        }, 800); // Significantly increased delay for more reliable transition
       }
     }
   }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);

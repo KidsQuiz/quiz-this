@@ -32,21 +32,18 @@ export const useIncorrectAnswerHandling = (
       
       // Wait a moment after the animation before closing the modal to advance
       setTimeout(() => {
-        console.log("Closing question dialog after incorrect answer");
+        console.log("TRANSITION: Closing question dialog after incorrect answer");
         
         // Set a flag to prevent race conditions
         const transitionTime = Date.now();
-        console.log(`Starting transition at time: ${transitionTime}`);
+        console.log(`TRANSITION: Starting incorrect answer transition at time: ${transitionTime}`);
         
-        // This will trigger the modal transition to the next question
+        // CRITICAL: This will trigger the modal transition to the next question
+        // This is the key step that triggers useModalTransition
         setIsModalOpen(false);
         
-        // Re-enable pointer events after transition
-        setTimeout(() => {
-          document.body.style.removeProperty('pointer-events');
-          console.log(`Re-enabled pointer events at ${Date.now() - transitionTime}ms after transition start`);
-        }, 400);
-      }, 300);
+        console.log("TRANSITION: Modal close request sent, transition should begin");
+      }, 500);
     }, 2000);
   }, [setShowRelaxAnimation, setIsModalOpen, resetAnswerState]);
   
