@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -63,7 +62,8 @@ export const useCorrectAnswerHandling = (
               setShowBoomEffect(true);
             }, 2000);
             
-            // Dialog will close automatically in useSessionCompletion
+            // Keep the modal open for completion screen
+            return prevIndex + 1;
           } else {
             // Move to completion screen if not perfect score
             return prevIndex + 1;
@@ -72,24 +72,14 @@ export const useCorrectAnswerHandling = (
           // Not the last question, move to next
           console.log("Moving to next question, CONFIRMED selection state is null");
           
-          // Important: Force DOM update with state reset before modal change
+          // Important: Force DOM update with state reset before changing question
           document.body.style.pointerEvents = 'none';
           
-          // Store transition time for debugging
-          const transitionTime = Date.now();
-          console.log(`TRANSITION: Starting correct answer transition at time: ${transitionTime}`);
+          // We'll re-enable pointer events in useCurrentQuestion when the new question is loaded
           
-          // CRITICAL: Use a longer delay before closing the modal
-          setTimeout(() => {
-            console.log("TRANSITION: Closing current question dialog to advance to next question");
-            
-            // This is the key step that triggers the transition flow in useModalTransition
-            setIsModalOpen(false);
-            
-            console.log("TRANSITION: Modal close request sent, transition should begin");
-          }, 500); // Significantly increased delay for more reliable transition
+          // Return the next index (the modal stays open)
+          return prevIndex + 1;
         }
-        return prevIndex;
       });
     }, 1500);
   }, [
@@ -100,7 +90,6 @@ export const useCorrectAnswerHandling = (
     setCurrentQuestionIndex,
     setSessionComplete,
     setShowBoomEffect,
-    setIsModalOpen,
     resetAnswerState
   ]);
 

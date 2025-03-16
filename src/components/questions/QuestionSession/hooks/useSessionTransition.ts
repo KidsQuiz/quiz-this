@@ -28,7 +28,7 @@ export const useSessionTransition = (
   
   // Advance to next question with more aggressive state reset
   const advanceToNextQuestion = useCallback(() => {
-    console.log("Advancing to next question");
+    console.log("Advancing to next question directly");
     
     // Forcibly reset any selected buttons in the DOM first
     const allButtons = document.querySelectorAll('[data-answer-option]');
@@ -40,16 +40,12 @@ export const useSessionTransition = (
     // Briefly disable pointer events to prevent race conditions
     document.body.style.pointerEvents = 'none';
     
-    // Small delay before closing dialog to ensure DOM updates
-    setTimeout(() => {
-      setIsModalOpen(false); // Close current dialog to trigger next question
-      
-      // Re-enable pointer events after a delay
-      setTimeout(() => {
-        document.body.style.removeProperty('pointer-events');
-      }, 200);
-    }, 50);
-  }, [setIsModalOpen]);
+    // Instead of closing the modal, just increment the question index
+    // This will trigger the useCurrentQuestion hook to load the next question
+    setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+    
+    // Re-enable pointer events after a delay (will be controlled by useCurrentQuestion)
+  }, [setCurrentQuestionIndex]);
   
   return { advanceToNextQuestion };
 };

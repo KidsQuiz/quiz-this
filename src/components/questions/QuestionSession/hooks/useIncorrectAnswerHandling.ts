@@ -27,25 +27,20 @@ export const useIncorrectAnswerHandling = (
       // Reset answer state before transitioning
       resetAnswerState();
       
-      // Force multiple resets for redundancy
-      setTimeout(() => resetAnswerState(), 100);
-      
-      // Wait a moment after the animation before closing the modal to advance
+      // Wait a moment after the animation before advancing to next question
       setTimeout(() => {
-        console.log("TRANSITION: Closing question dialog after incorrect answer");
+        console.log("TRANSITION: Advancing to next question after incorrect answer");
         
-        // Set a flag to prevent race conditions
-        const transitionTime = Date.now();
-        console.log(`TRANSITION: Starting incorrect answer transition at time: ${transitionTime}`);
+        // Re-enable pointer events
+        document.body.style.removeProperty('pointer-events');
         
-        // CRITICAL: This will trigger the modal transition to the next question
-        // This is the key step that triggers useModalTransition
-        setIsModalOpen(false);
+        // Instead of closing the modal, just advance the question index
+        // The currentQuestionIndex will be updated in the parent component
+        setCurrentQuestionIndex(prevIndex => prevIndex + 1);
         
-        console.log("TRANSITION: Modal close request sent, transition should begin");
       }, 500);
     }, 2000);
-  }, [setShowRelaxAnimation, setIsModalOpen, resetAnswerState]);
+  }, [setShowRelaxAnimation, resetAnswerState, setCurrentQuestionIndex]);
   
   return { handleIncorrectAnswer };
 };
