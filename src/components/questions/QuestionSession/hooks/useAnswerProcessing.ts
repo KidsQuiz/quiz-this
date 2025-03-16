@@ -129,6 +129,11 @@ export const useAnswerProcessing = (
           } else {
             // Not the last question, move to next
             setIsModalOpen(false); // Close this question to advance to next
+            
+            // Make sure to reset selection state when advancing to next question
+            setSelectedAnswerId(null);
+            setAnswerSubmitted(false);
+            setIsCorrect(false);
           }
           return prevIndex;
         });
@@ -144,6 +149,11 @@ export const useAnswerProcessing = (
       setTimeout(() => {
         setShowRelaxAnimation(false);
         setIsModalOpen(false); // Close this question to advance to next
+        
+        // Make sure to reset selection state when advancing after incorrect answer
+        setSelectedAnswerId(null);
+        setAnswerSubmitted(false);
+        setIsCorrect(false);
       }, 5000);
     }
     

@@ -23,9 +23,10 @@ export const useCurrentQuestion = (
       // Check if we've reached the end of questions
       if (currentQuestionIndex >= questions.length) return;
       
-      // Reset all question state before loading the new question
+      // Complete reset of all question-related state before loading the new question
+      // This ensures no highlight persists between questions
       setAnswerSubmitted(false);
-      setSelectedAnswerId(null);
+      setSelectedAnswerId(null); // Explicitly set to null to clear any previous selection
       setIsCorrect(false);
       setShowWowEffect(false);
       
@@ -34,12 +35,14 @@ export const useCurrentQuestion = (
       setTimeRemaining(question.time_limit);
       
       // Load answer options for the new question
+      // Make sure to reset states before answer options are loaded
       await loadAnswerOptions(question.id);
       
       // Start the timer for this question
       setTimerActive(true);
     };
     
+    // Ensure we have a clean slate for the next question
     loadCurrentQuestion();
   }, [
     currentQuestionIndex, 
