@@ -5,7 +5,8 @@ import { playSound } from '@/utils/soundEffects';
 export const useIncorrectAnswerHandling = (
   setShowRelaxAnimation: React.Dispatch<React.SetStateAction<boolean>>,
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  resetAnswerState: () => void
+  resetAnswerState: () => void,
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const handleIncorrectAnswer = useCallback(() => {
     console.log("Incorrect answer. Showing relaxation animation.");

@@ -62,7 +62,8 @@ export const useAnswerProcessing = (
   const { handleIncorrectAnswer } = useIncorrectAnswerHandling(
     setShowRelaxAnimation,
     setIsModalOpen,
-    resetAnswerState
+    resetAnswerState,
+    setCurrentQuestionIndex
   );
 
   // Handle answer selection
