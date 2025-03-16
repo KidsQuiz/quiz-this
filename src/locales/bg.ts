@@ -1,4 +1,3 @@
-
 export const bg = {
   appName: 'Детска Викторина',
   loading: 'Зареждане...',
@@ -120,7 +119,8 @@ export const bg = {
   allCorrectAnswers: 'Отговори правилно на всички въпроси!',
   clickToDismiss: 'Кликнете където и да е, за да затворите',
   timeUp: "Времето изтече!",
-  correctAnswerShown: "Правилният отговор е маркиран. Следващият въпрос след 5 секунди...",
+  nextQuestionIn: "Следващият въпрос след",
+  seconds: "секунди",
   
   language: 'Език',
   english: 'Английски',

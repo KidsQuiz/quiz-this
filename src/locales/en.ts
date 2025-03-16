@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: 'Kid Quiz',
@@ -127,7 +126,9 @@ export const en = {
   fantastic: 'FANTASTIC!',
   allCorrectAnswers: 'You answered all questions correctly!',
   clickToDismiss: 'Click anywhere to dismiss',
-  timeUp: "Time's up!",
+  timeUp: "Time's Up!",
+  nextQuestionIn: "Next question in",
+  seconds: "seconds",
   correctAnswerShown: "The correct answer is highlighted. Next question in 5 seconds...",
   
   // Language

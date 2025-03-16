@@ -1,82 +1,96 @@
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
-export const useTimeUpHandler = (
-  timeRemaining: number,
-  answerSubmitted: boolean,
-  currentQuestion: Question | null,
-  timerActive: boolean,
-  questions: Question[],
-  currentQuestionIndex: number,
-  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
-  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>,
-  setShowRelaxAnimation: React.Dispatch<React.SetStateAction<boolean>>,
-  resetAnswerState: () => void,
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
-  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  // Handle time up - automatically move to next question
-  useEffect(() => {
-    if (timeRemaining === 0 && !answerSubmitted && currentQuestion && timerActive) {
-      console.log("Time's up for question:", currentQuestion.content);
+interface UseTimeUpHandlerProps {
+  timeUpTriggered: boolean;
+  setTimeUpTriggered: (value: boolean) => void;
+  answerSubmitted: boolean;
+  setAnswerSubmitted: (value: boolean) => void;
+  setIsCorrect: (value: boolean) => void;
+  setIsTimeUp: (value: boolean) => void;
+  setShowingTimeUpFeedback: (value: boolean) => void;
+  currentQuestion: Question | null;
+  goToNextQuestion: () => void;
+  setSelectedAnswerId: (value: string | null) => void;
+}
+
+export const useTimeUpHandler = ({
+  timeUpTriggered,
+  setTimeUpTriggered,
+  answerSubmitted,
+  setAnswerSubmitted,
+  setIsCorrect,
+  setIsTimeUp,
+  setShowingTimeUpFeedback,
+  currentQuestion,
+  goToNextQuestion,
+  setSelectedAnswerId
+}: UseTimeUpHandlerProps) => {
+  
+  // Find the correct answer ID when time is up
+  const findCorrectAnswerId = useCallback(() => {
+    if (!currentQuestion) return null;
+    
+    const correctAnswer = currentQuestion.answerOptions.find(option => option.isCorrect);
+    return correctAnswer?.id || null;
+  }, [currentQuestion]);
+  
+  // Handle the time up scenario
+  const handleTimeUp = useCallback(() => {
+    if (timeUpTriggered && !answerSubmitted) {
+      console.log("Handling time-up event");
       
-      // Show incorrect feedback
+      // Mark the answer as submitted
       setAnswerSubmitted(true);
+      
+      // Mark answer as incorrect 
       setIsCorrect(false);
-      setTimerActive(false);
       
-      // Play wrong sound
-      // We can't use playWrongSound() here as it would create a circular dependency
-      const audio = new Audio('/sounds/wrong.mp3');
-      audio.volume = 0.5;
-      audio.play().catch(e => console.error("Error playing sound:", e));
+      // Mark that time is up
+      setIsTimeUp(true);
       
-      // Show relax animation
-      setShowRelaxAnimation(true);
+      // Set the correct answer to highlight
+      const correctAnswerId = findCorrectAnswerId();
+      setSelectedAnswerId(correctAnswerId);
       
-      // Move to next question after delay
+      // Show the time-up feedback
+      setShowingTimeUpFeedback(true);
+      
+      // Reset the time up triggered flag
+      setTimeUpTriggered(false);
+      
+      // After 5 seconds, move to the next question
       setTimeout(() => {
-        // Reset state
-        resetAnswerState();
-        setShowRelaxAnimation(false);
-        
-        // Move to next question
-        setCurrentQuestionIndex(prev => {
-          const next = prev + 1;
-          if (next >= questions.length) {
-            setSessionComplete(true);
-            setShowBoomEffect(true);
-            return prev;
-          }
-          return next;
-        });
-        
-        // Restart timer for next question if not the last
-        setTimeout(() => {
-          const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
-          if (!isLastQuestion) {
-            setTimerActive(true);
-          }
-        }, 500);
-      }, 2500);
+        console.log("Time's up - moving to next question after delay");
+        setAnswerSubmitted(false);
+        setIsTimeUp(false);
+        setShowingTimeUpFeedback(false);
+        setSelectedAnswerId(null);
+        goToNextQuestion();
+      }, 5000);
     }
   }, [
-    answerSubmitted,
-    currentQuestion,
-    currentQuestionIndex,
-    questions.length,
-    resetAnswerState,
-    setAnswerSubmitted,
-    setCurrentQuestionIndex,
-    setIsCorrect,
-    setSessionComplete,
-    setShowBoomEffect,
-    setShowRelaxAnimation,
-    setTimerActive,
-    timeRemaining,
-    timerActive
+    timeUpTriggered, 
+    answerSubmitted, 
+    setAnswerSubmitted, 
+    setIsCorrect, 
+    setIsTimeUp, 
+    findCorrectAnswerId, 
+    setSelectedAnswerId, 
+    setShowingTimeUpFeedback, 
+    setTimeUpTriggered, 
+    goToNextQuestion
   ]);
+  
+  // Run the time up handler when needed
+  useEffect(() => {
+    if (timeUpTriggered) {
+      handleTimeUp();
+    }
+  }, [timeUpTriggered, handleTimeUp]);
+  
+  return {
+    handleTimeUp
+  };
 };

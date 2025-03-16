@@ -7,6 +7,8 @@ export const useAnswerStateManagement = () => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [showWowEffect, setShowWowEffect] = useState(false);
   const [showBoomEffect, setShowBoomEffect] = useState(false);
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [showingTimeUpFeedback, setShowingTimeUpFeedback] = useState(false);
 
   return {
     selectedAnswerId,
@@ -18,6 +20,10 @@ export const useAnswerStateManagement = () => {
     showWowEffect,
     setShowWowEffect,
     showBoomEffect,
-    setShowBoomEffect
+    setShowBoomEffect,
+    isTimeUp,
+    setIsTimeUp,
+    showingTimeUpFeedback,
+    setShowingTimeUpFeedback
   };
 };

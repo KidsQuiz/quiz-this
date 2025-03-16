@@ -7,11 +7,13 @@ export const useQuestionNavigation = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [questionTimeLimit, setQuestionTimeLimit] = useState(30); // Default time
   const timerResetRef = useRef(false);
+  const [timeUpTriggered, setTimeUpTriggered] = useState(false);
   
   // Handle when time runs out
   const handleTimeUp = useCallback(() => {
     console.log("Time's up callback triggered in useQuestionNavigation");
     setTimerActive(false); // Stop the timer when time is up
+    setTimeUpTriggered(true); // Mark that we've triggered the time up event
     // The parent hook will implement the rest of the logic
   }, []);
   
@@ -43,6 +45,8 @@ export const useQuestionNavigation = () => {
     setQuestionTimeLimit(seconds);
     // Then reset the timer with this value
     resetTimer(seconds);
+    // Reset the time up triggered state
+    setTimeUpTriggered(false);
     // Mark timer as not active during setup
     setTimerActive(false);
     // Then start it after a short delay
@@ -55,6 +59,8 @@ export const useQuestionNavigation = () => {
     currentQuestionIndex,
     timeRemaining,
     timerActive,
+    timeUpTriggered,
+    setTimeUpTriggered,
     setTimerActive,
     setCurrentQuestionIndex,
     setTimeRemaining: resetTimer,
