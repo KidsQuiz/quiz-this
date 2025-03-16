@@ -23,9 +23,10 @@ export const useTimeoutEffects = (
 ) => {
   // Handle when time runs out for a question
   useEffect(() => {
-    if (!currentQuestion || isConfiguring || sessionComplete || answerSubmitted) return;
+    if (!currentQuestion || isConfiguring || sessionComplete) return;
     
-    if (timeRemaining === 0) {
+    // Only process if timer reaches zero and answer is not already submitted
+    if (timeRemaining === 0 && !answerSubmitted) {
       console.log('Time ran out for current question');
       
       // Mark as submitted with no selection
@@ -42,11 +43,12 @@ export const useTimeoutEffects = (
       // Wait 5 seconds to show the timeout state and the correct answer, then move to next question
       const timeoutId = setTimeout(() => {
         if (currentQuestionIndex >= questions.length - 1) {
-          // Last question, will complete the session
+          // Last question, complete the session
+          console.log('Last question timed out, completing session');
           setSessionComplete(true);
         } else {
-          // Instead of just closing the modal, directly increment the question index
-          // This ensures we don't lose state between questions
+          // Move to the next question
+          console.log('Time expired - advancing to next question');
           setCurrentQuestionIndex(prevIndex => prevIndex + 1);
         }
       }, 5000); // 5 seconds delay

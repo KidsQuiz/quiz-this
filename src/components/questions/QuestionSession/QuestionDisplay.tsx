@@ -43,10 +43,10 @@ const QuestionDisplay = ({
 }: QuestionDisplayProps) => {
   // Play sound effect when time runs out
   useEffect(() => {
-    if (answerSubmitted && timeRemaining === 0) {
+    if (timeRemaining === 0 && !isCorrect) {
       playSound('incorrect');
     }
-  }, [answerSubmitted, timeRemaining]);
+  }, [timeRemaining, isCorrect]);
 
   // Check if time ran out
   const timeRanOut = timeRemaining === 0 && answerSubmitted;

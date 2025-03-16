@@ -24,19 +24,14 @@ export const useQuestionNavigation = () => {
     return () => clearInterval(timer);
   }, [timerActive, timeRemaining]);
 
-  // Handle when time is up
-  const handleTimeUp = (answerSubmitted: boolean, timeBetweenQuestions: number, onClose: () => void) => {
-    if (answerSubmitted) return;
-    
-    setTimerActive(false);
-    
-    // Wait for the time between questions before moving to next or closing
-    setTimeout(() => {
-      // Check if this was the last question
-      setCurrentQuestionIndex(prev => prev + 1);
-    }, timeBetweenQuestions * 1000);
-    
-    return true; // Time up event processed
+  // Handle when time is up - this function is now simplified since the 
+  // timeout effect is handled in useTimeoutEffects
+  const handleTimeUp = () => {
+    if (timerActive) {
+      setTimerActive(false);
+      return true; // Time up event processed
+    }
+    return false;
   };
 
   // Handle user-initiated termination of the quiz session
