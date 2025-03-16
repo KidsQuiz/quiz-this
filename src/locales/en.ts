@@ -127,6 +127,8 @@ export const en = {
   fantastic: 'FANTASTIC!',
   allCorrectAnswers: 'You answered all questions correctly!',
   clickToDismiss: 'Click anywhere to dismiss',
+  timeUp: "Time's up!",
+  correctAnswerShown: "The correct answer is highlighted. Next question in 5 seconds...",
   
   // Language
   language: 'Language',

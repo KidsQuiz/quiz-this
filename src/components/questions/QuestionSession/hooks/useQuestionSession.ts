@@ -117,6 +117,7 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     timeRemaining,
     currentQuestion,
     showBoomEffect,
+    answerOptions,
     setCurrentQuestion,
     setTimeRemaining,
     setAnswerSubmitted,

@@ -119,6 +119,8 @@ export const bg = {
   fantastic: 'ФАНТАСТИЧНО!',
   allCorrectAnswers: 'Отговори правилно на всички въпроси!',
   clickToDismiss: 'Кликнете където и да е, за да затворите',
+  timeUp: "Времето изтече!",
+  correctAnswerShown: "Правилният отговор е маркиран. Следващият въпрос след 5 секунди...",
   
   language: 'Език',
   english: 'Английски',
