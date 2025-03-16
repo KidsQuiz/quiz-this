@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { Question } from '@/hooks/questionsTypes';
 import { useAnswerState } from './useAnswerState';
-import { playCorrectSound, playWrongSound } from '@/utils/soundEffects';
+import { playSound } from '@/utils/soundEffects';
 
 export const useAnswerHandling = (
   answerOptions: AnswerOption[],
@@ -63,7 +63,7 @@ export const useAnswerHandling = (
     
     // Play the appropriate sound
     if (isAnswerCorrect) {
-      playCorrectSound();
+      playSound('correct');
       
       // Update correct answers count and points
       setCorrectAnswers(prev => prev + 1);
@@ -76,7 +76,7 @@ export const useAnswerHandling = (
       // Show the wow effect
       setShowWowEffect(true);
     } else {
-      playWrongSound();
+      playSound('incorrect');
       // Show relax animation for incorrect answers
       setShowRelaxAnimation(true);
     }
@@ -88,15 +88,15 @@ export const useAnswerHandling = (
       setShowRelaxAnimation(false);
       
       // Move to the next question
-      const nextQuestionIndex = currentQuestionIndex => {
-        const next = currentQuestionIndex + 1;
+      const nextQuestionIndex = (prevIndex: number) => {
+        const next = prevIndex + 1;
         
         // Check if we've reached the end
         if (next >= questions.length) {
           console.log("Session complete!");
           setSessionComplete(true);
           setShowBoomEffect(true);
-          return currentQuestionIndex; // Keep the same index
+          return prevIndex; // Keep the same index
         }
         
         // Move to next question
@@ -110,8 +110,8 @@ export const useAnswerHandling = (
       setCurrentQuestionIndex(nextQuestionIndex);
       
       // Only restart the timer if we're not at the end
-      const isLastQuestion = currentQuestionIndex => (currentQuestionIndex + 1) >= questions.length;
-      if (!isLastQuestion(currentQuestionIndex)) {
+      const isLastQuestion = (index: number) => (index + 1) >= questions.length;
+      if (!isLastQuestion(nextQuestionIndex(currentQuestionIndex => currentQuestionIndex))) {
         setTimerActive(true);
       }
     }, 2500); // Wait 2.5 seconds before advancing

@@ -35,3 +35,7 @@ export const playSound = (soundType: 'correct' | 'incorrect') => {
     console.error(`Error playing ${soundType} sound:`, error);
   });
 };
+
+// For backward compatibility
+export const playCorrectSound = () => playSound('correct');
+export const playWrongSound = () => playSound('incorrect');

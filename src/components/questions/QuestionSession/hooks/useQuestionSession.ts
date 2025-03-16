@@ -90,8 +90,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
         console.error("Error loading questions:", error);
         toast({
           variant: "destructive",
-          title: t('errorLoadingQuestions'),
-          description: t('tryAgainLater')
+          title: t('error'),
+          description: t('somethingWentWrong')
         });
         
         // Close the session on error
