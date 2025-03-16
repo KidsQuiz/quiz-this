@@ -9,6 +9,7 @@ export const useAnswerStateManagement = () => {
   const [showBoomEffect, setShowBoomEffect] = useState(false);
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [showingTimeUpFeedback, setShowingTimeUpFeedback] = useState(false);
+  const [timeUpTriggered, setTimeUpTriggered] = useState(false);
 
   return {
     selectedAnswerId,
@@ -24,6 +25,8 @@ export const useAnswerStateManagement = () => {
     isTimeUp,
     setIsTimeUp,
     showingTimeUpFeedback,
-    setShowingTimeUpFeedback
+    setShowingTimeUpFeedback,
+    timeUpTriggered,
+    setTimeUpTriggered
   };
 };

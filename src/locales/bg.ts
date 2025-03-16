@@ -84,7 +84,7 @@ export const bg = {
   importQuestions: 'Импортирай въпроси',
   importQuestionsInstructions: 'Импортирайте въпроси от CSV файл със следната структура:',
   csvMustContain: 'CSV трябва да съдържа колони: question, answer1, answer2, answer3, answer4, correctAnswer, points, timelimit (по избор)',
-  csvExample: 'Пример: correctAnswer трябва да е 1, 2, 3 или 4, за да покаже ��ой отговор е пра��илен',
+  csvExample: 'Пример: correctAnswer трябва да е 1, 2, 3 или 4, за да покаже ���ой отговор е пра��илен',
   csvCorrectAnswerNote: 'correctAnswer трябва да е число (1-4), съответстващо на правилния отговор',
   clickToSelectCSV: 'Кликнете, за да изберете CSV файл',
   onlyCSVSupported: 'Поддържат се само CSV файлове',
@@ -121,6 +121,7 @@ export const bg = {
   timeUp: "Времето изтече!",
   nextQuestionIn: "Следващият въпрос след",
   seconds: "секунди",
+  correctAnswerShown: "Правилният отговор е маркиран. Следващ въпрос след 5 секунди...",
   
   language: 'Език',
   english: 'Английски',

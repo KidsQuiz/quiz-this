@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 
@@ -9,6 +9,25 @@ interface TimeUpFeedbackProps {
 
 const TimeUpFeedback: React.FC<TimeUpFeedbackProps> = ({ show }) => {
   const { t } = useLanguage();
+  const [countdown, setCountdown] = useState(5);
+  
+  useEffect(() => {
+    if (!show) return;
+    
+    setCountdown(5);
+    
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [show]);
   
   if (!show) return null;
   
@@ -23,7 +42,7 @@ const TimeUpFeedback: React.FC<TimeUpFeedbackProps> = ({ show }) => {
       </div>
       
       <div className="mt-2 text-sm text-gray-600">
-        {t('nextQuestionIn')} <span className="font-bold">5</span> {t('seconds')}
+        {t('nextQuestionIn')} <span className="font-bold">{countdown}</span> {t('seconds')}
       </div>
     </motion.div>
   );

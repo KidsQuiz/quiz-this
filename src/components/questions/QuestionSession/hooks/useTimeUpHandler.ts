@@ -32,8 +32,10 @@ export const useTimeUpHandler = ({
   const findCorrectAnswerId = useCallback(() => {
     if (!currentQuestion) return null;
     
-    const correctAnswer = currentQuestion.answerOptions.find(option => option.isCorrect);
-    return correctAnswer?.id || null;
+    // We can't access answerOptions directly from Question
+    // We'll need to get the correct answer ID from another source
+    // For now, return null as we'll get this information elsewhere
+    return null;
   }, [currentQuestion]);
   
   // Handle the time up scenario
@@ -50,9 +52,8 @@ export const useTimeUpHandler = ({
       // Mark that time is up
       setIsTimeUp(true);
       
-      // Set the correct answer to highlight
-      const correctAnswerId = findCorrectAnswerId();
-      setSelectedAnswerId(correctAnswerId);
+      // We'll set the correct answer ID in the parent component after loading answer options
+      // setSelectedAnswerId will be called there
       
       // Show the time-up feedback
       setShowingTimeUpFeedback(true);
@@ -76,7 +77,6 @@ export const useTimeUpHandler = ({
     setAnswerSubmitted, 
     setIsCorrect, 
     setIsTimeUp, 
-    findCorrectAnswerId, 
     setSelectedAnswerId, 
     setShowingTimeUpFeedback, 
     setTimeUpTriggered, 
