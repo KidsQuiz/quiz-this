@@ -1,14 +1,23 @@
 
 import { useCallback } from 'react';
 
-export const useDialogManagement = (
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  onClose: () => void,
-  showBoomEffect: boolean,
-  sessionComplete: boolean,
-  correctAnswers: number,
-  questions: { id: string }[]
-) => {
+interface DialogManagementProps {
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
+  showBoomEffect: boolean;
+  sessionComplete: boolean;
+  correctAnswers: number;
+  questions: { id: string }[];
+}
+
+export const useDialogManagement = ({
+  setIsModalOpen,
+  onClose,
+  showBoomEffect,
+  sessionComplete,
+  correctAnswers,
+  questions
+}: DialogManagementProps) => {
   // Handle dialog closing
   const handleDialogClose = useCallback(() => {
     // Always make sure pointer events are restored when closing the dialog

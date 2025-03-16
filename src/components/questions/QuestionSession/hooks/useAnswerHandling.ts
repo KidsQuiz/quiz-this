@@ -2,54 +2,50 @@
 import { useCallback } from 'react';
 import { AnswerOption } from '@/hooks/questionsTypes';
 import { Question } from '@/hooks/questionsTypes';
-import { useAnswerState } from './useAnswerState';
-import { useVisualEffectsState } from './useVisualEffectsState';
 import { playSound } from '@/utils/soundEffects';
 
-export const useAnswerHandling = (
-  answerOptions: AnswerOption[],
-  currentQuestion: Question | null,
-  setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>,
-  setTotalPoints: React.Dispatch<React.SetStateAction<number>>,
-  setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  questions: Question[],
-  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>,
-  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  // Get answer state from our hook
-  const {
-    selectedAnswerId,
-    answerSubmitted,
-    isCorrect,
-    setSelectedAnswerId,
-    setAnswerSubmitted,
-    setIsCorrect,
-    resetAnswerSelectionState
-  } = useAnswerState();
+interface AnswerHandlingProps {
+  answerOptions: AnswerOption[];
+  currentQuestion: Question | null;
+  setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>;
+  setTotalPoints: React.Dispatch<React.SetStateAction<number>>;
+  setShowWowEffect: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  questions: Question[];
+  setShowBoomEffect: React.Dispatch<React.SetStateAction<boolean>>;
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>;
+  setTimerActive: React.Dispatch<React.SetStateAction<boolean>>;
+  resetAnswerState: () => void;
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  // Get visual effects state from our hook
-  const {
-    showRelaxAnimation,
-    setShowRelaxAnimation,
-    resetVisualEffects
-  } = useVisualEffectsState();
-
-  // Combined reset function
-  const resetAnswerState = () => {
-    resetAnswerSelectionState();
-    resetVisualEffects();
-  };
-
+export const useAnswerHandling = ({
+  answerOptions,
+  currentQuestion,
+  setCorrectAnswers,
+  setTotalPoints,
+  setShowWowEffect,
+  setCurrentQuestionIndex,
+  setIsModalOpen,
+  questions,
+  setShowBoomEffect,
+  setSessionComplete,
+  setTimerActive,
+  resetAnswerState,
+  setAnswerSubmitted,
+  setSelectedAnswerId,
+  setIsCorrect
+}: AnswerHandlingProps) => {
   // Handle selecting an answer
   const handleSelectAnswer = useCallback((answerId: string) => {
     console.log("Answer selected:", answerId);
     
     // If answer already submitted, do nothing
-    if (answerSubmitted) {
-      console.log("Answer already submitted, ignoring selection");
+    if (!currentQuestion) {
+      console.log("No current question, ignoring selection");
       return;
     }
     
@@ -81,23 +77,19 @@ export const useAnswerHandling = (
       setCorrectAnswers(prev => prev + 1);
       
       // Add points for this question
-      if (currentQuestion) {
-        setTotalPoints(prev => prev + currentQuestion.points);
-      }
+      setTotalPoints(prev => prev + currentQuestion.points);
       
       // Show the wow effect
       setShowWowEffect(true);
     } else {
       playSound('incorrect');
-      // Show relax animation for incorrect answers
-      setShowRelaxAnimation(true);
+      // We'll handle incorrect answer effects separately
     }
     
     // Automatically proceed to the next question after a delay
     setTimeout(() => {
       // Hide effects
       setShowWowEffect(false);
-      setShowRelaxAnimation(false);
       
       // Move to the next question
       setCurrentQuestionIndex(prevIndex => {
@@ -132,7 +124,6 @@ export const useAnswerHandling = (
     
   }, [
     answerOptions, 
-    answerSubmitted, 
     currentQuestion, 
     questions.length, 
     resetAnswerState, 
@@ -143,21 +134,12 @@ export const useAnswerHandling = (
     setSelectedAnswerId, 
     setSessionComplete, 
     setShowBoomEffect, 
-    setShowRelaxAnimation,
     setShowWowEffect, 
     setTimerActive, 
     setTotalPoints
   ]);
 
   return {
-    selectedAnswerId,
-    answerSubmitted,
-    isCorrect,
-    showRelaxAnimation,
-    setAnswerSubmitted,
-    setSelectedAnswerId,
-    setIsCorrect,
-    resetAnswerState,
     handleSelectAnswer
   };
 };

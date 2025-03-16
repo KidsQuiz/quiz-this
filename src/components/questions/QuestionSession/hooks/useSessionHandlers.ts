@@ -1,20 +1,18 @@
 
-import { useCallback } from 'react';
-import { Question } from '@/hooks/questionsTypes';
 import { useDialogManagement } from './useDialogManagement';
-import { useAnswerHandling } from './useAnswerHandling';
 import { useQuestionNavigationHandler } from './useQuestionNavigationHandler';
 import { useTimeUpHandler } from './useTimeUpHandler';
+import { useAnswerHandling } from './useAnswerHandling';
 
 /**
  * Centralizes all event handlers for the question session
  */
 export const useSessionHandlers = (props: {
-  // Session state
-  currentQuestion: Question | null;
+  // From session data
+  currentQuestion: any;
   answerOptions: any[];
   isCorrect: boolean;
-  questions: Question[];
+  questions: any[];
   currentQuestionIndex: number;
   setCorrectAnswers: React.Dispatch<React.SetStateAction<number>>;
   setTotalPoints: React.Dispatch<React.SetStateAction<number>>;
@@ -36,34 +34,35 @@ export const useSessionHandlers = (props: {
   correctAnswers: number;
   timeUpTriggered: boolean;
   answerSubmitted: boolean;
+  // From props
   onClose: () => void;
   kidId: string;
 }) => {
   // Use dialog management
-  const { handleDialogClose } = useDialogManagement(
-    props.setIsModalOpen,
-    props.onClose,
-    props.showBoomEffect,
-    props.sessionComplete,
-    props.correctAnswers,
-    props.questions
-  );
+  const { handleDialogClose } = useDialogManagement({
+    setIsModalOpen: props.setIsModalOpen,
+    onClose: props.onClose,
+    showBoomEffect: props.showBoomEffect,
+    sessionComplete: props.sessionComplete,
+    correctAnswers: props.correctAnswers,
+    questions: props.questions
+  });
 
   // Use navigation handler
-  const { goToNextQuestion } = useQuestionNavigationHandler(
-    props.currentQuestionIndex,
-    props.questions,
-    props.setCurrentQuestionIndex,
-    props.resetAnswerState,
-    props.setAnswerSubmitted,
-    props.setSelectedAnswerId,
-    props.setIsCorrect,
-    props.setIsTimeUp,
-    props.setShowingTimeUpFeedback,
-    props.setTimeUpTriggered,
-    props.setIsModalOpen,
-    props.setSessionComplete
-  );
+  const { goToNextQuestion } = useQuestionNavigationHandler({
+    currentQuestionIndex: props.currentQuestionIndex,
+    questions: props.questions,
+    setCurrentQuestionIndex: props.setCurrentQuestionIndex,
+    resetAnswerState: props.resetAnswerState,
+    setAnswerSubmitted: props.setAnswerSubmitted,
+    setSelectedAnswerId: props.setSelectedAnswerId,
+    setIsCorrect: props.setIsCorrect,
+    setIsTimeUp: props.setIsTimeUp,
+    setShowingTimeUpFeedback: props.setShowingTimeUpFeedback,
+    setTimeUpTriggered: props.setTimeUpTriggered,
+    setIsModalOpen: props.setIsModalOpen,
+    setSessionComplete: props.setSessionComplete
+  });
 
   // Use time up handler
   const { handleTimeUp } = useTimeUpHandler({
@@ -81,19 +80,23 @@ export const useSessionHandlers = (props: {
   });
 
   // Use answer handling
-  const { handleSelectAnswer } = useAnswerHandling(
-    props.answerOptions,
-    props.currentQuestion,
-    props.setCorrectAnswers,
-    props.setTotalPoints,
-    props.setShowWowEffect,
-    props.setCurrentQuestionIndex,
-    props.setIsModalOpen,
-    props.questions,
-    props.setShowBoomEffect,
-    props.setSessionComplete,
-    props.setTimerActive
-  );
+  const { handleSelectAnswer } = useAnswerHandling({
+    answerOptions: props.answerOptions,
+    currentQuestion: props.currentQuestion,
+    setCorrectAnswers: props.setCorrectAnswers,
+    setTotalPoints: props.setTotalPoints,
+    setShowWowEffect: props.setShowWowEffect,
+    setCurrentQuestionIndex: props.setCurrentQuestionIndex,
+    setIsModalOpen: props.setIsModalOpen,
+    questions: props.questions,
+    setShowBoomEffect: props.setShowBoomEffect,
+    setSessionComplete: props.setSessionComplete,
+    setTimerActive: props.setTimerActive,
+    resetAnswerState: props.resetAnswerState,
+    setAnswerSubmitted: props.setAnswerSubmitted,
+    setSelectedAnswerId: props.setSelectedAnswerId,
+    setIsCorrect: props.setIsCorrect
+  });
 
   return {
     handleDialogClose,

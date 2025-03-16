@@ -1,20 +1,35 @@
 
 import { useCallback } from 'react';
 
-export const useQuestionNavigationHandler = (
-  currentQuestionIndex: number,
-  questions: any[],
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
-  resetAnswerState: () => void,
-  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
-  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>,
-  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsTimeUp: React.Dispatch<React.SetStateAction<boolean>>,
-  setShowingTimeUpFeedback: React.Dispatch<React.SetStateAction<boolean>>,
-  setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
-) => {
+interface NavigationHandlerProps {
+  currentQuestionIndex: number;
+  questions: any[];
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
+  resetAnswerState: () => void;
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsTimeUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowingTimeUpFeedback: React.Dispatch<React.SetStateAction<boolean>>;
+  setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const useQuestionNavigationHandler = ({
+  currentQuestionIndex,
+  questions,
+  setCurrentQuestionIndex,
+  resetAnswerState,
+  setAnswerSubmitted,
+  setSelectedAnswerId,
+  setIsCorrect,
+  setIsTimeUp,
+  setShowingTimeUpFeedback,
+  setTimeUpTriggered,
+  setIsModalOpen,
+  setSessionComplete
+}: NavigationHandlerProps) => {
   // Create a function to go to the next question
   const goToNextQuestion = useCallback(() => {
     console.log("Going to next question, current index:", currentQuestionIndex);
