@@ -20,7 +20,10 @@ export const updateKidPoints = async (
       .eq('id', kidId)
       .single();
       
-    if (kidError) throw kidError;
+    if (kidError) {
+      console.error('Error fetching kid points:', kidError);
+      throw kidError;
+    }
     
     const currentPoints = kidData?.points || 0;
     const newTotalPoints = currentPoints + earnedPoints;
@@ -33,7 +36,10 @@ export const updateKidPoints = async (
       .update({ points: newTotalPoints })
       .eq('id', kidId);
       
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Error updating kid points:', updateError);
+      throw updateError;
+    }
     
     console.log(`Points updated successfully. ${kidName} now has ${newTotalPoints} points`);
     

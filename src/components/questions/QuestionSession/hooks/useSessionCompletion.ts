@@ -27,6 +27,7 @@ export const useSessionCompletion = (
     if (!sessionComplete) return;
     
     const completeSession = async () => {
+      console.log(`===== SESSION COMPLETION =====`);
       console.log(`Session completed for ${kidName}. Score: ${correctAnswers}/${questions.length}`);
       console.log(`Total points earned: ${totalPoints}`);
       
@@ -36,6 +37,19 @@ export const useSessionCompletion = (
           console.log(`CRITICAL: Updating points for kid ${kidName}: Adding ${totalPoints} points`);
           const newTotalPoints = await updateKidPoints(kidId, kidName, totalPoints, toast);
           console.log(`Points update complete. New total: ${newTotalPoints}`);
+          
+          // Double-check that points were actually updated
+          const { data: verifyData, error: verifyError } = await supabase
+            .from('kids')
+            .select('points')
+            .eq('id', kidId)
+            .single();
+            
+          if (verifyError) {
+            console.error('Error verifying points update:', verifyError);
+          } else {
+            console.log(`Verification - Kid points after update: ${verifyData.points}`);
+          }
         } else {
           console.log(`No points to add for kid ${kidName}`);
         }
@@ -62,7 +76,7 @@ export const useSessionCompletion = (
           console.log('Perfect score achieved! Recording milestone.');
           
           // Record this milestone using the milestones table
-          await supabase.from('milestones').insert({
+          const { error: milestoneError } = await supabase.from('milestones').insert({
             kid_id: kidId,
             name: 'Perfect Score', // Using name field for milestone type
             points_required: 0, // Not relevant for this usage
@@ -70,9 +84,22 @@ export const useSessionCompletion = (
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
+          
+          if (milestoneError) {
+            console.error('Error recording perfect score milestone:', milestoneError);
+          } else {
+            console.log('Perfect score milestone recorded');
+          }
         }
+        
+        console.log(`===== SESSION COMPLETION FINISHED =====`);
       } catch (error) {
         console.error('Error recording session results:', error);
+        toast({
+          variant: "destructive",
+          title: "Error saving results",
+          description: "There was a problem saving your results. Your points may not have been updated."
+        });
       }
     };
     
@@ -90,6 +117,7 @@ export const useSessionCompletion = (
   return {
     checkForCompletion: () => {
       if (currentQuestionIndex >= questions.length && questions.length > 0) {
+        console.log(`Completion check: currentQuestionIndex (${currentQuestionIndex}) >= questions.length (${questions.length})`);
         setSessionComplete(true);
       }
     }
