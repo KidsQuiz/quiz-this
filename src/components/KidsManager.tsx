@@ -98,24 +98,32 @@ const KidsManager = () => {
   const closeWrongAnswersDialog = () => {
     setIsWrongAnswersDialogOpen(false);
     setSelectedKidForWrongAnswers(null);
+    // Refresh kids data to reflect any changes
+    fetchKids();
   };
   
   // Reset wrong answers function
   const resetWrongAnswers = async (id: string, name: string) => {
-    if (!confirm(t('resetWrongAnswersConfirmation').replace('{name}', name))) return;
-    
     try {
+      console.log(`Resetting wrong answers for kid: ${id} (${name})`);
+      
       const { error } = await supabase
         .from('kid_wrong_answers')
         .delete()
         .eq('kid_id', id);
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error resetting wrong answers:', error);
+        throw error;
+      }
       
       toast({
         title: t('success'),
         description: t('wrongAnswersResetSuccess')
       });
+      
+      // Refresh kids data
+      fetchKids();
     } catch (error) {
       console.error('Error resetting wrong answers:', error);
       toast({

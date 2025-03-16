@@ -93,6 +93,11 @@ export const useWrongAnswers = (kidId: string, isOpen: boolean) => {
       setGroupedWrongAnswers([]);
     } catch (error) {
       console.error('Error resetting wrong answers:', error);
+      toast({
+        variant: "destructive",
+        title: t('error'),
+        description: t('errorResettingWrongAnswers')
+      });
     } finally {
       setIsLoading(false);
     }
