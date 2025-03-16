@@ -59,15 +59,16 @@ export const useAnswerProcessing = (
       
       // Record in database if not correct (for analytics of wrong answers)
       if (!wasCorrect) {
-        const selectedAnswerText = selectedAnswer?.text || "";
-        const correctAnswer = answerOptions.find(a => a.is_correct)?.text || "";
+        const selectedAnswerContent = selectedAnswer?.content || "";
+        const correctAnswer = answerOptions.find(a => a.is_correct)?.content || "";
         
-        await supabase.from('wrong_answers').insert({
+        await supabase.from('kid_wrong_answers').insert({
           kid_id: kidId,
           question_id: currentQuestion.id,
-          question_text: currentQuestion.text,
-          selected_answer: selectedAnswerText,
-          correct_answer: correctAnswer,
+          answer_id: answerId,
+          question_content: currentQuestion.content,
+          answer_content: selectedAnswerContent,
+          correct_answer_content: correctAnswer,
           created_at: new Date().toISOString()
         });
       } else {
