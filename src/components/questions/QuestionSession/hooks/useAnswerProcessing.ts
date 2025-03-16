@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AnswerOption, Question } from '@/hooks/questionsTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { playSound } from '@/utils/soundEffects';
@@ -31,10 +31,19 @@ export const useAnswerProcessing = (
   const [isCorrect, setIsCorrect] = useState(false);
   const [showRelaxAnimation, setShowRelaxAnimation] = useState(false);
 
+  // Define a reusable function to reset all answer-related state
+  const resetAnswerState = useCallback(() => {
+    console.log("Explicitly resetting answer state");
+    setSelectedAnswerId(null);
+    setAnswerSubmitted(false);
+    setIsCorrect(false);
+  }, [setSelectedAnswerId, setAnswerSubmitted, setIsCorrect]);
+
   // Handle answer selection
   const handleSelectAnswer = async (answerId: string) => {
     if (answerSubmitted || !currentQuestion) return;
     
+    console.log(`Answer selected: ${answerId}`);
     setSelectedAnswerId(answerId);
     setAnswerSubmitted(true);
     
@@ -107,6 +116,9 @@ export const useAnswerProcessing = (
       setTimeout(() => {
         setShowWowEffect(false);
         
+        // First reset answer state before any other operations
+        resetAnswerState();
+        
         // Get current question index value to check if it's the last question
         setCurrentQuestionIndex(prevIndex => {
           if (isLastQuestion(prevIndex)) {
@@ -129,11 +141,6 @@ export const useAnswerProcessing = (
           } else {
             // Not the last question, move to next
             setIsModalOpen(false); // Close this question to advance to next
-            
-            // Make sure to reset selection state when advancing to next question
-            setSelectedAnswerId(null);
-            setAnswerSubmitted(false);
-            setIsCorrect(false);
           }
           return prevIndex;
         });
@@ -147,13 +154,11 @@ export const useAnswerProcessing = (
       
       // Wait 5 seconds before moving to next question
       setTimeout(() => {
+        // First reset answer state
+        resetAnswerState();
+        
         setShowRelaxAnimation(false);
         setIsModalOpen(false); // Close this question to advance to next
-        
-        // Make sure to reset selection state when advancing after incorrect answer
-        setSelectedAnswerId(null);
-        setAnswerSubmitted(false);
-        setIsCorrect(false);
       }, 5000);
     }
     
@@ -168,6 +173,7 @@ export const useAnswerProcessing = (
     setSelectedAnswerId,
     setAnswerSubmitted,
     setIsCorrect,
-    handleSelectAnswer
+    handleSelectAnswer,
+    resetAnswerState // Export the reset function for use elsewhere
   };
 };
