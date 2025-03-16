@@ -7,9 +7,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface BoomEffectProps {
   isVisible: boolean;
   onComplete?: () => void;
+  totalPoints?: number; // Add total points as an optional prop
 }
 
-const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
+const BoomEffect = ({ isVisible, onComplete, totalPoints = 0 }: BoomEffectProps) => {
   const [particles, setParticles] = useState<React.ReactNode[]>([]);
   const { t } = useLanguage();
   
@@ -127,6 +128,11 @@ const BoomEffect = ({ isVisible, onComplete }: BoomEffectProps) => {
       <div className="relative flex flex-col items-center animate-[boom-scale_0.5s_forwards]">
         <div className="text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 text-transparent bg-clip-text drop-shadow-lg">
           {t('fantastic')}
+        </div>
+        
+        {/* Add total points display */}
+        <div className="mb-6 text-4xl md:text-5xl font-bold text-white">
+          +{totalPoints} {t('points')}
         </div>
         
         <div className="flex gap-6 justify-center animate-[boom-rotate_2s_linear_infinite]">

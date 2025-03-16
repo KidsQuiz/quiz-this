@@ -152,7 +152,8 @@ const QuestionSession = ({ isOpen, onClose, kidId, kidName }: QuestionSessionPro
       {/* Boom effect shown when the kid answers all questions correctly - outside Dialog */}
       <BoomEffect 
         isVisible={showBoomEffect} 
-        onComplete={handleBoomEffectComplete} 
+        onComplete={handleBoomEffectComplete}
+        totalPoints={totalPoints} // Pass the total points to display in the effect
       />
     </>
   );
