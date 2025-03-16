@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -56,17 +57,17 @@ export const useQuestionTimer = (
         
         // Time's up
         if (newTime <= 0) {
+          // Immediately stop the timer
           if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
           }
           
-          // Only call onTimeUp once
+          // Only call onTimeUp once, and ensure it's not called again
           if (!timeUpCalledRef.current) {
             console.log("Time's up! Calling onTimeUp callback");
             timeUpCalledRef.current = true;
-            activeRef.current = false; // Force deactivate the timer
-            onTimeUp();
+            onTimeUp(); // Execute the time up callback
           }
           
           return 0;

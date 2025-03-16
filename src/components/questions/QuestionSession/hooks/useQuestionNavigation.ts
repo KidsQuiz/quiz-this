@@ -12,9 +12,8 @@ export const useQuestionNavigation = () => {
   // Handle when time runs out
   const handleTimeUp = useCallback(() => {
     console.log("Time's up callback triggered in useQuestionNavigation");
-    setTimerActive(false); // Stop the timer when time is up
+    setTimerActive(false); // Stop the timer immediately when time is up
     setTimeUpTriggered(true); // Mark that we've triggered the time up event
-    // The parent hook will implement the rest of the logic
   }, []);
   
   // Set up the timer with the useQuestionTimer hook
@@ -28,7 +27,6 @@ export const useQuestionNavigation = () => {
   const updateTimeLimit = useCallback((newTimeLimit: number) => {
     console.log("Updating time limit to:", newTimeLimit);
     setQuestionTimeLimit(newTimeLimit);
-    // Don't automatically reset the timer here - we'll do it explicitly
   }, []);
   
   // Function to handle session termination
@@ -41,19 +39,19 @@ export const useQuestionNavigation = () => {
   // Function to reset and start the timer
   const resetAndStartTimer = useCallback((seconds: number) => {
     console.log(`Reset and start timer: ${seconds} seconds`);
-    // First update the time limit
+    // Mark timer as not active during setup
+    setTimerActive(false);
+    // Update the time limit
     setQuestionTimeLimit(seconds);
-    // Then reset the timer with this value
+    // Reset the timer with this value
     resetTimer(seconds);
     // Reset the time up triggered state
     setTimeUpTriggered(false);
-    // Mark timer as not active during setup
-    setTimerActive(false);
-    // Then start it after a short delay
+    // Start the timer with a small delay to ensure all states are updated
     setTimeout(() => {
       setTimerActive(true);
     }, 50);
-  }, [resetTimer]);
+  }, [resetTimer, setQuestionTimeLimit]);
   
   return {
     currentQuestionIndex,

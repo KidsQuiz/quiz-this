@@ -67,7 +67,9 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     updateTimeLimit,
     resetAndStartTimer,
     handleTimeUp: triggerTimeUp,
-    handleTerminateSession
+    handleTerminateSession,
+    timeUpTriggered: navigationTimeUpTriggered,
+    setTimeUpTriggered: setNavigationTimeUpTriggered
   } = useQuestionNavigation();
 
   // Use initialization hook
@@ -137,8 +139,17 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     currentQuestion,
     goToNextQuestion,
     setSelectedAnswerId,
-    answerOptions // Pass answerOptions to the hook
+    answerOptions
   });
+
+  // Sync timeUpTriggered from navigation to the main state
+  useEffect(() => {
+    if (navigationTimeUpTriggered && !timeUpTriggered && !answerSubmitted) {
+      console.log("Syncing time up trigger from navigation");
+      setTimeUpTriggered(true);
+      setNavigationTimeUpTriggered(false);
+    }
+  }, [navigationTimeUpTriggered, timeUpTriggered, answerSubmitted, setTimeUpTriggered, setNavigationTimeUpTriggered]);
 
   // React to timer reaching zero by setting timeUpTriggered
   useEffect(() => {

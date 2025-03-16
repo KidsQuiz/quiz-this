@@ -14,7 +14,7 @@ interface UseTimeUpHandlerProps {
   currentQuestion: Question | null;
   goToNextQuestion: () => void;
   setSelectedAnswerId: (value: string | null) => void;
-  answerOptions: AnswerOption[]; // Add answerOptions to props
+  answerOptions: AnswerOption[];
 }
 
 export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
@@ -34,17 +34,28 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
   
   // Find the correct answer ID when time is up
   const findCorrectAnswerId = useCallback(() => {
-    if (!answerOptions || answerOptions.length === 0) return null;
+    if (!answerOptions || answerOptions.length === 0) {
+      console.warn("No answer options available to find correct answer");
+      return null;
+    }
     
     // Find the correct answer from answer options
     const correctAnswer = answerOptions.find(option => option.is_correct);
-    return correctAnswer ? correctAnswer.id : null;
+    if (!correctAnswer) {
+      console.warn("Could not find correct answer in options:", answerOptions);
+      return null;
+    }
+    return correctAnswer.id;
   }, [answerOptions]);
   
   // Handle the time up scenario
   const handleTimeUp = useCallback(() => {
     if (timeUpTriggered && !answerSubmitted) {
-      console.log("Handling time-up event - treating as incorrect answer");
+      console.log("Handling time-up event - treating as incorrect answer", {
+        timeUpTriggered,
+        answerSubmitted,
+        currentQuestion: currentQuestion?.id
+      });
       
       // Play 'incorrect' sound
       playSound('incorrect');
@@ -86,6 +97,7 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
   }, [
     timeUpTriggered, 
     answerSubmitted, 
+    currentQuestion,
     setAnswerSubmitted, 
     setIsCorrect, 
     setIsTimeUp, 
@@ -99,6 +111,7 @@ export const useTimeUpHandler = (props: UseTimeUpHandlerProps) => {
   // Run the time up handler when needed
   useEffect(() => {
     if (timeUpTriggered) {
+      console.log("timeUpTriggered is true, calling handleTimeUp");
       handleTimeUp();
     }
   }, [timeUpTriggered, handleTimeUp]);

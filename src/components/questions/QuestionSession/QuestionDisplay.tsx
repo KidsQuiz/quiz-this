@@ -54,23 +54,17 @@ const QuestionDisplay = ({
     }
   }, [timeRemaining, isCorrect, showWowEffect]);
 
-  // Check if time ran out - the key check for triggering feedback
-  const timeRanOut = timeRemaining === 0 && answerSubmitted;
-  
-  // Log for debugging
+  // Debugging logs
   useEffect(() => {
-    if (timeRanOut) {
-      console.log('Time ran out state detected in QuestionDisplay');
-      console.log(`Current question index: ${currentQuestionIndex}, question: ${currentQuestion.id}`);
-      console.log('Timer status:', { timeRemaining, answerSubmitted, isCorrect });
-    }
-  }, [timeRanOut, currentQuestionIndex, currentQuestion.id, timeRemaining, answerSubmitted, isCorrect]);
-
-  // Additional logging for index tracking (for debugging)
-  useEffect(() => {
-    console.log(`QuestionDisplay rendering - question index: ${currentQuestionIndex}, total questions: ${questionsTotal}`);
-    console.log(`Question ID: ${currentQuestion.id}, Time limit: ${currentQuestion.time_limit}`);
-  }, [currentQuestionIndex, questionsTotal, currentQuestion]);
+    console.log('QuestionDisplay state:', {
+      index: currentQuestionIndex,
+      total: questionsTotal,
+      timeRemaining,
+      answerSubmitted,
+      isTimeUp,
+      showingTimeUpFeedback
+    });
+  }, [currentQuestionIndex, questionsTotal, timeRemaining, answerSubmitted, isTimeUp, showingTimeUpFeedback]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -124,7 +118,7 @@ const QuestionDisplay = ({
         </CardContent>
       </Card>
       
-      {/* Show time-up feedback when needed */}
+      {/* Show time-up feedback overlay when timer expires */}
       {showingTimeUpFeedback && (
         <TimeUpFeedback show={showingTimeUpFeedback} />
       )}

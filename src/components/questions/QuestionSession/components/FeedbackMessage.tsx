@@ -29,11 +29,14 @@ const FeedbackMessage = ({
     if (!isCorrect || timeRanOut) {
       // Reset progress
       setProgressValue(0);
-      console.log("Starting 5-second countdown animation before auto-advancing");
+      console.log("Starting 5-second countdown animation before auto-advancing", {
+        isCorrect,
+        timeRanOut
+      });
       
       // Animate progress over 5 seconds (same as the timeout duration)
       const startTime = Date.now();
-      const duration = 5000; // 5 seconds, matching the timeout in useTimeoutEffects
+      const duration = 5000; // 5 seconds, matching the timeout
       
       const progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
