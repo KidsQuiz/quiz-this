@@ -15,6 +15,7 @@ export const en = {
   user: 'User',
   error: 'Error',
   clone: 'Clone',
+  success: 'Success',
   
   // Auth
   signIn: 'Sign In',
@@ -166,6 +167,10 @@ export const en = {
   wrongCount: "Wrong Count",
   notEnoughData: "Not enough data to display statistics",
   occurrences: "Occurrences",
+  resetWrongAnswers: "Reset Wrong Answers",
+  resetWrongAnswersConfirmation: "Are you sure you want to reset all wrong answers for {name}?",
+  wrongAnswersResetSuccess: "Wrong answers have been reset successfully",
+  errorResettingWrongAnswers: "There was an error resetting wrong answers",
   
   // Admin translations
   adminDashboard: 'Admin Dashboard',

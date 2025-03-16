@@ -2,7 +2,7 @@
 import React from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2, RotateCcw, ChartPieIcon } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, RotateCcw, ChartPieIcon, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KidActionsProps {
@@ -12,6 +12,7 @@ interface KidActionsProps {
   onDelete: (id: string) => void;
   onResetPoints?: (id: string, name: string) => void;
   onViewWrongAnswers?: (id: string, name: string) => void;
+  onResetWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidActions = ({ 
@@ -20,7 +21,8 @@ const KidActions = ({
   onEdit, 
   onDelete, 
   onResetPoints,
-  onViewWrongAnswers
+  onViewWrongAnswers,
+  onResetWrongAnswers
 }: KidActionsProps) => {
   const { t } = useLanguage();
   
@@ -50,6 +52,13 @@ const KidActions = ({
           <DropdownMenuItem onClick={() => onViewWrongAnswers(id, name)}>
             <ChartPieIcon className="mr-2 h-4 w-4" />
             {t('viewWrongAnswers')}
+          </DropdownMenuItem>
+        )}
+        
+        {onResetWrongAnswers && (
+          <DropdownMenuItem onClick={() => onResetWrongAnswers(id, name)}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            {t('resetWrongAnswers')}
           </DropdownMenuItem>
         )}
         

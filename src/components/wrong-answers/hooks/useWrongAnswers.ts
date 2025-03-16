@@ -64,9 +64,44 @@ export const useWrongAnswers = (kidId: string, isOpen: boolean) => {
     }
   };
 
+  const resetWrongAnswers = async () => {
+    setIsLoading(true);
+    try {
+      console.log('Resetting wrong answers for kid:', kidId);
+      const { error } = await supabase
+        .from('kid_wrong_answers')
+        .delete()
+        .eq('kid_id', kidId);
+
+      if (error) {
+        console.error('Error resetting wrong answers:', error);
+        toast({
+          variant: "destructive",
+          title: t('error'),
+          description: t('errorResettingWrongAnswers')
+        });
+        throw error;
+      }
+      
+      toast({
+        title: t('success'),
+        description: t('wrongAnswersResetSuccess')
+      });
+      
+      // Clear the local state
+      setWrongAnswers([]);
+      setGroupedWrongAnswers([]);
+    } catch (error) {
+      console.error('Error resetting wrong answers:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     wrongAnswers,
     groupedWrongAnswers,
-    isLoading
+    isLoading,
+    resetWrongAnswers
   };
 };

@@ -9,10 +9,15 @@ import KidsHeader from './kids/KidsHeader';
 import KidsDialogs from './kids/KidsDialogs';
 import MilestonesDialog from './milestones/MilestonesDialog';
 import WrongAnswersDashboard from './wrong-answers';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const KidsManager = () => {
   const { kids, isLoading, fetchKids, deleteKid, reorderKids } = useKidsData();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { toast } = useToast();
+  const { t } = useLanguage();
   
   // Milestone dialog state
   const [isMilestoneDialogOpen, setIsMilestoneDialogOpen] = useState(false);
@@ -95,6 +100,32 @@ const KidsManager = () => {
     setSelectedKidForWrongAnswers(null);
   };
   
+  // Reset wrong answers function
+  const resetWrongAnswers = async (id: string, name: string) => {
+    if (!confirm(t('resetWrongAnswersConfirmation').replace('{name}', name))) return;
+    
+    try {
+      const { error } = await supabase
+        .from('kid_wrong_answers')
+        .delete()
+        .eq('kid_id', id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: t('success'),
+        description: t('wrongAnswersResetSuccess')
+      });
+    } catch (error) {
+      console.error('Error resetting wrong answers:', error);
+      toast({
+        variant: "destructive",
+        title: t('error'),
+        description: t('errorResettingWrongAnswers')
+      });
+    }
+  };
+  
   return (
     <div className="w-full max-w-4xl mx-auto">
       <KidsHeader onAddKid={openAddKidForm} />
@@ -111,6 +142,7 @@ const KidsManager = () => {
         onResetPoints={openResetPointsDialog}
         onManageMilestones={openMilestoneDialog}
         onViewWrongAnswers={openWrongAnswersDialog}
+        onResetWrongAnswers={resetWrongAnswers}
       />
       
       <KidsDialogs

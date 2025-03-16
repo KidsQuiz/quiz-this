@@ -29,6 +29,7 @@ interface KidsListProps {
   onResetPoints?: (id: string, name: string) => void;
   onManageMilestones?: (id: string, name: string, points: number) => void;
   onViewWrongAnswers?: (id: string, name: string) => void;
+  onResetWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidsList = ({ 
@@ -42,7 +43,8 @@ const KidsList = ({
   onStartQuestions,
   onResetPoints,
   onManageMilestones,
-  onViewWrongAnswers
+  onViewWrongAnswers,
+  onResetWrongAnswers
 }: KidsListProps) => {
   const { t } = useLanguage();
   const sortedKids = [...kids].sort((a, b) => a.position - b.position);
@@ -106,6 +108,7 @@ const KidsList = ({
                       onResetPoints={onResetPoints}
                       onManageMilestones={onManageMilestones}
                       onViewWrongAnswers={onViewWrongAnswers}
+                      onResetWrongAnswers={onResetWrongAnswers}
                     />
                   </div>
                 )}

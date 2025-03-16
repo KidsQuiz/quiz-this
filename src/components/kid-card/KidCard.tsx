@@ -22,6 +22,7 @@ interface KidCardProps {
   onResetPoints?: (id: string, name: string) => void;
   onManageMilestones?: (id: string, name: string, points: number) => void;
   onViewWrongAnswers?: (id: string, name: string) => void;
+  onResetWrongAnswers?: (id: string, name: string) => void;
 }
 
 const KidCard = ({ 
@@ -36,7 +37,8 @@ const KidCard = ({
   onStartQuestions,
   onResetPoints,
   onManageMilestones,
-  onViewWrongAnswers
+  onViewWrongAnswers,
+  onResetWrongAnswers
 }: KidCardProps) => {
   const [packageCount, setPackageCount] = useState<number>(0);
   const { 
@@ -118,6 +120,7 @@ const KidCard = ({
               onDelete={onDelete}
               onResetPoints={onResetPoints}
               onViewWrongAnswers={onViewWrongAnswers}
+              onResetWrongAnswers={onResetWrongAnswers}
             />
           </div>
           
