@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { useToast } from '@/hooks/use-toast';
@@ -10,20 +10,43 @@ export const useQuestionLoading = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answerOptions, setAnswerOptions] = useState<AnswerOption[]>([]);
+  
+  // Add refs to track loading states and prevent duplicate requests
+  const loadingQuestionsRef = useRef(false);
+  const loadingAnswersRef = useRef(false);
+  const loadingAnswersForQuestionId = useRef<string | null>(null);
+  const questionsCacheRef = useRef<Record<string, Question[]>>({});
+  const answersCacheRef = useRef<Record<string, AnswerOption[]>>({});
 
   // Load questions when packages are selected
   const loadQuestions = useCallback(async (selectedPackageIds: string[]) => {
     if (!selectedPackageIds.length) return;
     
+    // Prevent multiple concurrent loading operations
+    if (loadingQuestionsRef.current) {
+      console.log('Already loading questions, skipping duplicate request');
+      return;
+    }
+    
+    // Check if we have this combination of packages cached
+    const cacheKey = selectedPackageIds.sort().join('_');
+    if (questionsCacheRef.current[cacheKey]) {
+      console.log('Using cached questions for packages:', selectedPackageIds);
+      setQuestions(questionsCacheRef.current[cacheKey]);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       setIsLoading(true);
+      loadingQuestionsRef.current = true;
       console.log(`Loading questions for package IDs:`, selectedPackageIds);
       
       let allQuestions: Question[] = [];
       let packagePresentationOrders: Record<string, 'sequential' | 'shuffle'> = {};
       
-      // First, get the presentation_order for all selected packages
-      for (const packageId of selectedPackageIds) {
+      // Use Promise.all to fetch package presentation orders in parallel
+      const packageOrderPromises = selectedPackageIds.map(async (packageId) => {
         const { data: packageData, error: packageError } = await supabase
           .from('packages')
           .select('id, presentation_order')
@@ -33,32 +56,54 @@ export const useQuestionLoading = () => {
         if (packageError) {
           console.error('Error fetching package presentation order:', packageError.message);
           // Default to shuffle if there's an error
-          packagePresentationOrders[packageId] = 'shuffle';
+          return { packageId, order: 'shuffle' as const };
         } else if (packageData) {
           // Make sure we cast the presentation_order to the correct type
-          packagePresentationOrders[packageId] = (packageData.presentation_order as 'sequential' | 'shuffle') || 'shuffle';
+          return { 
+            packageId, 
+            order: (packageData.presentation_order as 'sequential' | 'shuffle') || 'shuffle'
+          };
         }
-      }
+        return { packageId, order: 'shuffle' as const };
+      });
       
-      // Get questions for all selected packages
-      for (const packageId of selectedPackageIds) {
-        const { data, error } = await supabase
-          .from('questions')
-          .select('*')
-          .eq('package_id', packageId)
-          .order('created_at');
-          
-        if (error) throw error;
+      const packageOrderResults = await Promise.all(packageOrderPromises);
+      packageOrderResults.forEach(result => {
+        packagePresentationOrders[result.packageId] = result.order;
+      });
+      
+      // Batch questions fetching by using a single query with IN operator
+      const { data: questionsData, error: questionsError } = await supabase
+        .from('questions')
+        .select('*')
+        .in('package_id', selectedPackageIds);
         
-        if (data && data.length > 0) {
-          console.log(`Loaded ${data.length} questions for package ${packageId}`);
-          
-          // Apply the correct ordering based on package configuration
-          let packageQuestions = [...data];
+      if (questionsError) throw questionsError;
+      
+      if (questionsData && questionsData.length > 0) {
+        console.log(`Loaded ${questionsData.length} total questions from all packages`);
+        
+        // Group questions by package_id
+        const questionsByPackage: Record<string, Question[]> = {};
+        questionsData.forEach(question => {
+          if (!questionsByPackage[question.package_id]) {
+            questionsByPackage[question.package_id] = [];
+          }
+          questionsByPackage[question.package_id].push(question);
+        });
+        
+        // Process each package's questions according to its presentation_order
+        for (const packageId of selectedPackageIds) {
+          const packageQuestions = questionsByPackage[packageId] || [];
           
           // If this package is set to shuffle, randomize its questions
           if (packagePresentationOrders[packageId] === 'shuffle') {
-            packageQuestions = packageQuestions.sort(() => Math.random() - 0.5);
+            packageQuestions.sort(() => Math.random() - 0.5);
+          } else {
+            // For sequential packages, sort by created_at
+            packageQuestions.sort((a, b) => 
+              new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
           }
           
           allQuestions = [...allQuestions, ...packageQuestions];
@@ -92,6 +137,9 @@ export const useQuestionLoading = () => {
       // but the order within each package respects its configuration
       const finalQuestions = [...uniqueQuestions].sort(() => Math.random() - 0.5);
       
+      // Cache the results for future use
+      questionsCacheRef.current[cacheKey] = finalQuestions;
+      
       setQuestions(finalQuestions);
       
     } catch (error: any) {
@@ -103,19 +151,35 @@ export const useQuestionLoading = () => {
       });
     } finally {
       setIsLoading(false);
+      loadingQuestionsRef.current = false;
     }
   }, [toast]);
 
   // Load answer options for the current question
   const loadAnswerOptions = useCallback(async (questionId: string) => {
+    // Prevent duplicate/concurrent requests for the same question
+    if (loadingAnswersRef.current && loadingAnswersForQuestionId.current === questionId) {
+      console.log(`Already loading answer options for question ${questionId}, skipping duplicate request`);
+      return;
+    }
+    
+    // Check if we have answers for this question cached
+    if (answersCacheRef.current[questionId]) {
+      console.log(`Using cached answer options for question ${questionId}`);
+      setAnswerOptions(answersCacheRef.current[questionId]);
+      return;
+    }
+    
     try {
+      loadingAnswersRef.current = true;
+      loadingAnswersForQuestionId.current = questionId;
+      
       console.log(`Loading answer options for question ID: ${questionId}`);
       
       const { data, error } = await supabase
         .from('answer_options')
         .select('*')
-        .eq('question_id', questionId)
-        .order('id');
+        .eq('question_id', questionId);
         
       if (error) throw error;
       
@@ -127,6 +191,10 @@ export const useQuestionLoading = () => {
       
       // Randomize the order of answers
       const shuffledAnswers = [...(data || [])].sort(() => Math.random() - 0.5);
+      
+      // Cache the results
+      answersCacheRef.current[questionId] = shuffledAnswers;
+      
       setAnswerOptions(shuffledAnswers);
       
     } catch (error: any) {
@@ -136,6 +204,11 @@ export const useQuestionLoading = () => {
         title: "Error",
         description: "Failed to load answer options"
       });
+    } finally {
+      loadingAnswersRef.current = false;
+      if (loadingAnswersForQuestionId.current === questionId) {
+        loadingAnswersForQuestionId.current = null;
+      }
     }
   }, [toast]);
 
