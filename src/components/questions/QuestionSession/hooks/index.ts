@@ -41,3 +41,6 @@ export { useSessionProgressState } from './useSessionProgressState';
 export { useSessionUIState } from './useSessionUIState';
 export { useKidAnswersState } from './useKidAnswersState';
 export type { KidAnswer } from './useKidAnswersState';
+export { useSessionTimeManagement } from './useSessionTimeManagement';
+export { useQuestionNavigationHandler } from './useQuestionNavigationHandler';
+export { usePackageAutoLoader } from './usePackageAutoLoader';

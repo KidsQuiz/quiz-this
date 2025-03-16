@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+
+import { useSessionState } from './useSessionState';
 import { useQuestionLoading } from './useQuestionLoading';
 import { useQuestionNavigation } from './useQuestionNavigation';
-import { useSessionState } from './useSessionState';
 import { useDialogManagement } from './useDialogManagement';
 import { useToastAndLanguage } from './useToastAndLanguage';
 import { useAnswerHandling } from './useAnswerHandling';
 import { useSessionInitialization } from './useSessionInitialization';
 import { useQuestionChangeEffects } from './useQuestionChangeEffects';
 import { useTimeUpHandler } from './useTimeUpHandler';
+import { useSessionTimeManagement } from './useSessionTimeManagement';
+import { useQuestionNavigationHandler } from './useQuestionNavigationHandler';
+import { usePackageAutoLoader } from './usePackageAutoLoader';
 
 export const useQuestionSession = (kidId: string, kidName: string, onClose: () => void) => {
   const { toast, t } = useToastAndLanguage();
@@ -31,7 +34,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setKidAnswers,
     showRelaxAnimation,
     setShowRelaxAnimation,
-    // Include these from useSessionState
     selectedAnswerId,
     setSelectedAnswerId,
     answerSubmitted,
@@ -97,30 +99,21 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     setTimerActive
   );
 
-  // Create a function to go to the next question
-  const goToNextQuestion = () => {
-    console.log("Going to next question, current index:", currentQuestionIndex);
-    // Ensure we're in a clean state for the next question
-    resetAnswerState();
-    
-    if (currentQuestionIndex < questions.length - 1) {
-      // Get the next index value directly
-      const nextIndex = currentQuestionIndex + 1;
-      console.log(`Setting question index to ${nextIndex}`);
-      
-      // CRITICAL: Set the index directly
-      setCurrentQuestionIndex(nextIndex);
-      
-      // Ensure the modal stays open
-      setIsModalOpen(true);
-    } else {
-      console.log("This was the last question, completing session");
-      setSessionComplete(true);
-      
-      // Keep modal open for completion screen
-      setIsModalOpen(true);
-    }
-  };
+  // Use the new navigation handler hook
+  const { goToNextQuestion, prepareForNavigation } = useQuestionNavigationHandler(
+    currentQuestionIndex,
+    questions,
+    setCurrentQuestionIndex,
+    resetAnswerState,
+    setAnswerSubmitted,
+    setSelectedAnswerId,
+    setIsCorrect,
+    setIsTimeUp,
+    setShowingTimeUpFeedback,
+    setTimeUpTriggered,
+    setIsModalOpen,
+    setSessionComplete
+  );
 
   // Use time up handler hook with proper props
   const { handleTimeUp } = useTimeUpHandler({
@@ -137,7 +130,19 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     answerOptions
   });
 
-  // Use question change effects hook with our new resetAndStartTimer function
+  // Use session time management hook
+  useSessionTimeManagement({
+    timeUpTriggered,
+    navigationTimeUpTriggered,
+    timeRemaining,
+    answerSubmitted,
+    timerActive,
+    setTimeUpTriggered,
+    setNavigationTimeUpTriggered,
+    setTimerActive
+  });
+
+  // Use question change effects hook
   useQuestionChangeEffects(
     currentQuestionIndex,
     initialLoadComplete,
@@ -155,23 +160,8 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     resetAndStartTimer
   );
 
-  // Sync timeUpTriggered from navigation to the main state
-  useEffect(() => {
-    if (navigationTimeUpTriggered && !timeUpTriggered && !answerSubmitted) {
-      console.log("Syncing time up trigger from navigation");
-      setTimeUpTriggered(true);
-      setNavigationTimeUpTriggered(false);
-    }
-  }, [navigationTimeUpTriggered, timeUpTriggered, answerSubmitted, setTimeUpTriggered, setNavigationTimeUpTriggered]);
-
-  // React to timer reaching zero by setting timeUpTriggered
-  useEffect(() => {
-    if (timeRemaining === 0 && !answerSubmitted && timerActive) {
-      console.log("Time ran out, triggering time up handler now");
-      setTimerActive(false); // Stop the timer immediately
-      setTimeUpTriggered(true); // Mark that time is up
-    }
-  }, [timeRemaining, answerSubmitted, timerActive, setTimeUpTriggered, setTimerActive]);
+  // Use package auto loader hook
+  usePackageAutoLoader(kidId, loadQuestions);
 
   const { handleDialogClose } = useDialogManagement(
     setIsModalOpen,
@@ -204,7 +194,6 @@ export const useQuestionSession = (kidId: string, kidName: string, onClose: () =
     handleSelectAnswer,
     handleDialogClose,
     loadQuestions,
-    // Add isTimeUp and showingTimeUpFeedback to the return values
     isTimeUp,
     showingTimeUpFeedback
   };

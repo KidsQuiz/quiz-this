@@ -1,0 +1,70 @@
+import { useCallback } from 'react';
+
+export const useQuestionNavigationHandler = (
+  currentQuestionIndex: number,
+  questions: any[],
+  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>,
+  resetAnswerState: () => void,
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>,
+  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>,
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsTimeUp: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowingTimeUpFeedback: React.Dispatch<React.SetStateAction<boolean>>,
+  setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  // Create a function to go to the next question
+  const goToNextQuestion = useCallback(() => {
+    console.log("Going to next question, current index:", currentQuestionIndex);
+    // Ensure we're in a clean state for the next question
+    resetAnswerState();
+    
+    if (currentQuestionIndex < questions.length - 1) {
+      // Get the next index value directly
+      const nextIndex = currentQuestionIndex + 1;
+      console.log(`Setting question index to ${nextIndex}`);
+      
+      // CRITICAL: Set the index directly
+      setCurrentQuestionIndex(nextIndex);
+      
+      // Ensure the modal stays open
+      setIsModalOpen(true);
+    } else {
+      console.log("This was the last question, completing session");
+      setSessionComplete(true);
+      
+      // Keep modal open for completion screen
+      setIsModalOpen(true);
+    }
+  }, [
+    currentQuestionIndex, 
+    questions.length, 
+    resetAnswerState, 
+    setCurrentQuestionIndex, 
+    setIsModalOpen,
+    setSessionComplete
+  ]);
+
+  // Reset answer state function for navigation
+  const prepareForNavigation = useCallback(() => {
+    setAnswerSubmitted(false);
+    setSelectedAnswerId(null);
+    setIsCorrect(false);
+    setIsTimeUp(false);
+    setShowingTimeUpFeedback(false);
+    setTimeUpTriggered(false);
+  }, [
+    setAnswerSubmitted, 
+    setSelectedAnswerId, 
+    setIsCorrect, 
+    setIsTimeUp,
+    setShowingTimeUpFeedback,
+    setTimeUpTriggered
+  ]);
+
+  return {
+    goToNextQuestion,
+    prepareForNavigation
+  };
+};
