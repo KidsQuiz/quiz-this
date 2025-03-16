@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -60,9 +61,12 @@ export const useCorrectAnswerHandling = (
             setTimeout(() => {
               console.log("Showing boom effect after 2-second delay");
               setShowBoomEffect(true);
+              
+              // Hide the dialog/modal when showing boom effect
+              // This will skip the summary screen
+              setIsModalOpen(false);
             }, 2000);
             
-            // Keep the modal open for completion screen
             return prevIndex + 1;
           } else {
             // Move to completion screen if not perfect score
@@ -90,6 +94,7 @@ export const useCorrectAnswerHandling = (
     setCurrentQuestionIndex,
     setSessionComplete,
     setShowBoomEffect,
+    setIsModalOpen,
     resetAnswerState
   ]);
 

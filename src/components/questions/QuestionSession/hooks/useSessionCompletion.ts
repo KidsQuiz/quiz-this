@@ -90,6 +90,15 @@ export const useSessionCompletion = (
           } else {
             console.log('Perfect score milestone recorded');
           }
+          
+          // For perfect scores, immediately trigger boom effect if not already shown
+          if (correctAnswers === questions.length && questions.length > 0) {
+            console.log("Ensuring boom effect is shown for perfect score");
+            setShowBoomEffect(true);
+            
+            // Hide modal to skip summary screen for perfect scores
+            setIsModalOpen(false);
+          }
         }
         
         console.log(`===== SESSION COMPLETION FINISHED =====`);
@@ -111,7 +120,9 @@ export const useSessionCompletion = (
     questions.length, 
     correctAnswers, 
     totalPoints,
-    toast
+    toast,
+    setShowBoomEffect,
+    setIsModalOpen
   ]);
   
   return {
