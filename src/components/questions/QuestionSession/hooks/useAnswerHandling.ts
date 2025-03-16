@@ -125,6 +125,7 @@ export const useAnswerHandling = (
     const nextIndex = currentQuestionIndex + 1;
     
     if (nextIndex < questions.length) {
+      // Critical fix: Reset the answer state before changing the question index
       resetAnswer();
       setCurrentQuestionIndex(nextIndex);
     } else {
