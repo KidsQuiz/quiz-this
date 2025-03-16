@@ -63,9 +63,15 @@ export const useAnswerHandling = (
           if (isLastQuestion(prevIndex)) {
             // If perfect score (all questions answered correctly)
             if (newCorrectAnswers === questions.length) {
-              console.log("🎉🎉🎉 PERFECT SCORE after last question! Showing boom effect");
+              console.log("🎉🎉🎉 PERFECT SCORE after last question! Adding delay before showing boom effect");
               setSessionComplete(true);
-              setShowBoomEffect(true);
+              
+              // Add a 2-second delay before showing the boom effect
+              setTimeout(() => {
+                console.log("Showing boom effect after 2-second delay");
+                setShowBoomEffect(true);
+              }, 2000);
+              
               // Dialog will close automatically in useSessionCompletion
             } else {
               // Move to completion screen if not perfect score
