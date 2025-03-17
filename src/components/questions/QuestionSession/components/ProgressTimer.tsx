@@ -11,7 +11,7 @@ interface ProgressTimerProps {
 
 const ProgressTimer = ({ timeRemaining, timeLimit }: ProgressTimerProps) => {
   // Calculate progress percentage with boundaries
-  const progressPercent = Math.max(0, Math.min(100, (timeRemaining / timeLimit) * 100));
+  const progressPercent = Math.max(0, Math.min(100, (timeRemaining / (timeLimit || 30)) * 100));
   
   // Determine progress color based on remaining time
   const progressColor = progressPercent > 50 
