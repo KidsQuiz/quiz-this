@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 /**
- * Simplified hook to handle current question loading and setup
+ * Improved hook to handle current question loading and setup with better race condition protection
  */
 export const useCurrentQuestion = (
   isConfiguring: boolean,
@@ -21,6 +21,16 @@ export const useCurrentQuestion = (
   // Track loading state to prevent duplicate loads
   const loadingRef = useRef(false);
   const lastProcessedIndexRef = useRef(-1);
+  const setupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (setupTimeoutRef.current) {
+        clearTimeout(setupTimeoutRef.current);
+      }
+    };
+  }, []);
   
   useEffect(() => {
     // Skip during configuration or with no questions
@@ -58,38 +68,46 @@ export const useCurrentQuestion = (
     setIsCorrect(false);
     setShowWowEffect(false);
     
-    // Get deep clone of current question
-    const question = JSON.parse(JSON.stringify(questions[currentQuestionIndex]));
-    console.log(`Loading question: ${question.id}`);
-    
-    // Set time limit with validation
-    const timeLimit = typeof question.time_limit === 'number' && question.time_limit > 0 
-      ? question.time_limit 
-      : 30;
-    
-    // Update state with new question
-    setCurrentQuestion(question);
-    setTimeRemaining(timeLimit);
-    
-    // Load answer options
-    loadAnswerOptions(question.id)
-      .then(() => {
-        console.log(`Answer options loaded for question ${question.id}`);
-        
-        // Enable interaction and start timer
-        document.body.style.removeProperty('pointer-events');
-        setTimerActive(true);
-        
-        // Complete loading process
-        loadingRef.current = false;
-      })
-      .catch(error => {
-        console.error("Error loading answer options:", error);
-        document.body.style.removeProperty('pointer-events');
-        loadingRef.current = false;
-      });
+    // Add a slight delay to ensure state has settled before loading the new question
+    setupTimeoutRef.current = setTimeout(() => {
+      // Get deep clone of current question to avoid reference issues
+      const question = structuredClone(questions[currentQuestionIndex]);
+      console.log(`Loading question: ${question.id}`);
+      
+      // Set time limit with validation
+      const timeLimit = typeof question.time_limit === 'number' && question.time_limit > 0 
+        ? question.time_limit 
+        : 30;
+      
+      // Update state with new question
+      setCurrentQuestion(question);
+      setTimeRemaining(timeLimit);
+      
+      // Load answer options
+      loadAnswerOptions(question.id)
+        .then(() => {
+          console.log(`Answer options loaded for question ${question.id}`);
+          
+          // Enable interaction and start timer
+          document.body.style.removeProperty('pointer-events');
+          
+          // Add a slight delay before starting the timer
+          setTimeout(() => {
+            setTimerActive(true);
+            loadingRef.current = false;
+          }, 200);
+        })
+        .catch(error => {
+          console.error("Error loading answer options:", error);
+          document.body.style.removeProperty('pointer-events');
+          loadingRef.current = false;
+        });
+    }, 100);
     
     return () => {
+      if (setupTimeoutRef.current) {
+        clearTimeout(setupTimeoutRef.current);
+      }
       document.body.style.removeProperty('pointer-events');
     };
   }, [

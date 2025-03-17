@@ -31,23 +31,30 @@ export const useTimeUpHandler = ({
   goToNextQuestion: () => void;
   setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
   answerOptions: AnswerOption[];
-  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>; // Make this optional
+  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>; // Optional timer active state setter
 }) => {
-  // Single processing lock
+  // Track when processing is happening to prevent duplicate handling
   const processingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastProcessedTimeUpRef = useRef<boolean>(false);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, []);
 
-  // Handle time up sequence with simplified logic
+  // Handle time up sequence with improved race condition protection
   useEffect(() => {
+    // Skip if already processed this exact time-up event
+    if (lastProcessedTimeUpRef.current === timeUpTriggered) {
+      return;
+    }
+    
     // Skip if not triggered, already submitted, or already processing
     if (!timeUpTriggered || answerSubmitted || processingRef.current || !currentQuestion) {
       return;
@@ -55,6 +62,7 @@ export const useTimeUpHandler = ({
 
     console.log("Processing time up event");
     processingRef.current = true;
+    lastProcessedTimeUpRef.current = timeUpTriggered;
     
     // Stop timer
     if (setTimerActive) {
@@ -76,7 +84,7 @@ export const useTimeUpHandler = ({
       setSelectedAnswerId(correctAnswer.id);
     }
     
-    // Wait before advancing to next question
+    // Use a longer timeout (3 seconds) to ensure feedback is visible
     timeoutRef.current = setTimeout(() => {
       console.log("Time's up sequence complete, advancing");
       
@@ -91,16 +99,14 @@ export const useTimeUpHandler = ({
       // Reset processing flag
       setTimeout(() => {
         processingRef.current = false;
-        timeoutRef.current = null;
-      }, 100);
-    }, 1500);
+      }, 500);
+    }, 3000); // Increased from 1500ms to 3000ms
     
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      processingRef.current = false;
     };
   }, [
     timeUpTriggered,
@@ -119,7 +125,9 @@ export const useTimeUpHandler = ({
 
   const handleTimeUp = () => {
     console.log("Time up handler called explicitly");
-    setTimeUpTriggered(true);
+    if (!processingRef.current) {
+      setTimeUpTriggered(true);
+    }
   };
 
   return { handleTimeUp };
