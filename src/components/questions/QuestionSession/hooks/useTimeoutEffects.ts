@@ -25,6 +25,8 @@ export const useTimeoutEffects = (
   // Create a ref to track if advancement is already scheduled
   const advancementScheduledRef = useRef(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+  // Track the last time we initiated an advancement
+  const lastAdvancementTimeRef = useRef(0);
   
   // Clear timeout on unmount
   useEffect(() => {
@@ -48,7 +50,17 @@ export const useTimeoutEffects = (
     
     // Only process if timer reaches zero and answer is not already submitted
     if (timeRemaining === 0 && !answerSubmitted && !advancementScheduledRef.current) {
+      // Check for debounce
+      const now = Date.now();
+      if (now - lastAdvancementTimeRef.current < 2000) {
+        console.log(`Timeout advancement requested too soon (${now - lastAdvancementTimeRef.current}ms), ignoring`);
+        return;
+      }
+      
       console.log('Time ran out for current question - preparing to advance');
+      
+      // Update last advancement time
+      lastAdvancementTimeRef.current = now;
       
       // Play timeout sound
       playSound('incorrect');
@@ -94,12 +106,9 @@ export const useTimeoutEffects = (
           const nextIndex = currentQuestionIndex + 1;
           console.log(`DIRECT ADVANCEMENT: Setting question index from ${currentQuestionIndex} to ${nextIndex}`);
           
-          // Use setTimeout to ensure clean state transition
-          setTimeout(() => {
-            // CRITICAL FIX: Using direct value instead of function form
-            setCurrentQuestionIndex(nextIndex);
-            console.log(`Question index updated to ${nextIndex}`);
-          }, 50);
+          // Use direct index setting instead of function form
+          setCurrentQuestionIndex(nextIndex);
+          console.log(`Question index updated to ${nextIndex}`);
         } else {
           // Last question, complete the session
           console.log('Last question timed out, completing session');
@@ -111,8 +120,8 @@ export const useTimeoutEffects = (
           document.body.style.removeProperty('pointer-events');
           advancementScheduledRef.current = false;
           console.log('Question advancement process complete, advancement flag reset');
-        }, 200);
-      }, 1000); // Slightly longer delay to show the correct answer
+        }, 300); // Increased delay for better stability
+      }, 1500); // Slightly longer delay to show the correct answer
       
       return () => {
         if (timeoutIdRef.current) {

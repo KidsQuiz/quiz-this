@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+
+import { useEffect, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
 export const useModalTransition = (
@@ -11,11 +12,33 @@ export const useModalTransition = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  // Track whether a transition is already in progress
+  const transitionInProgressRef = useRef(false);
+  // Track the last time a transition was initiated to prevent rapid repeated transitions
+  const lastTransitionTimeRef = useRef(0);
+  
   // Advance to the next question when modal is closed
   useEffect(() => {
     // Only process if modal is closed, session is not complete, and we have valid questions
     if (!isModalOpen && !sessionComplete && questions.length > 0 && currentQuestionIndex < questions.length) {
       console.log(`Modal closed, current question index: ${currentQuestionIndex}, total questions: ${questions.length}`);
+      
+      // Prevent rapid transitions
+      const now = Date.now();
+      if (now - lastTransitionTimeRef.current < 1000) {
+        console.log(`Transition requested too soon (${now - lastTransitionTimeRef.current}ms), ignoring`);
+        return;
+      }
+      
+      // Prevent duplicate transitions
+      if (transitionInProgressRef.current) {
+        console.log("Modal transition already in progress, ignoring duplicate event");
+        return;
+      }
+      
+      // Set the transition flag and update the transition time
+      transitionInProgressRef.current = true;
+      lastTransitionTimeRef.current = now;
       
       // Move to the next question
       const nextQuestionIndex = currentQuestionIndex + 1;
@@ -30,6 +53,7 @@ export const useModalTransition = (
         if (isPerfectScore) {
           // For perfect scores, keep the modal closed
           console.log("Perfect score detected - keeping modal closed");
+          transitionInProgressRef.current = false;
         } else {
           // For non-perfect scores, reopen the modal for the summary screen
           console.log("Non-perfect score - reopening modal for summary");
@@ -47,6 +71,7 @@ export const useModalTransition = (
             
             // This will reopen the modal with the summary screen
             setIsModalOpen(true);
+            transitionInProgressRef.current = false;
           }, 800);
         }
       } else {
@@ -68,8 +93,12 @@ export const useModalTransition = (
           
           // Reopen the modal with the next question
           setIsModalOpen(true);
+          transitionInProgressRef.current = false;
         }, 800);
       }
+    } else if (isModalOpen) {
+      // Reset transition flag when modal is open
+      transitionInProgressRef.current = false;
     }
   }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, correctAnswers, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
 };

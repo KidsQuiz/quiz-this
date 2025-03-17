@@ -14,8 +14,9 @@ export const useSessionTransition = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  // Ref to track ongoing transitions
+  // Ref to track ongoing transitions and debounce rapid state changes
   const transitionInProgressRef = useRef(false);
+  const lastTransitionTimeRef = useRef(0);
   
   // Handle transition between questions
   useEffect(() => {
@@ -31,14 +32,22 @@ export const useSessionTransition = (
   
   // Advance to next question with more aggressive state reset
   const advanceToNextQuestion = useCallback(() => {
+    // Debounce transition to prevent rapid multiple calls
+    const now = Date.now();
+    if (now - lastTransitionTimeRef.current < 500) {
+      console.log("Transition requested too soon after previous transition, ignoring");
+      return;
+    }
+    
     // Prevent duplicate transitions
     if (transitionInProgressRef.current) {
       console.log("Transition already in progress, ignoring duplicate request");
       return;
     }
     
-    // Set transition flag
+    // Set transition flag and update last transition time
     transitionInProgressRef.current = true;
+    lastTransitionTimeRef.current = now;
     
     console.log("TRANSITION: Advancing to next question directly");
     
@@ -66,7 +75,7 @@ export const useSessionTransition = (
     setTimeout(() => {
       document.body.style.removeProperty('pointer-events');
       transitionInProgressRef.current = false;
-    }, 100);
+    }, 300); // Increased delay to prevent race conditions
   }, [currentQuestionIndex, setCurrentQuestionIndex]);
   
   return { advanceToNextQuestion };

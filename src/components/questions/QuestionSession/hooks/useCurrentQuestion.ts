@@ -19,6 +19,8 @@ export const useCurrentQuestion = (
   const currentQuestionIdRef = useRef<string | null>(null);
   // Track the last processed index to detect genuine changes
   const lastProcessedIndexRef = useRef<number>(-1);
+  // Track active operation to prevent overlapping loads
+  const loadingOperationRef = useRef<string | null>(null);
   
   // Display the current question
   useEffect(() => {
@@ -41,8 +43,12 @@ export const useCurrentQuestion = (
     // Update last processed index immediately to prevent duplicate processing
     lastProcessedIndexRef.current = currentQuestionIndex;
     
+    // Generate a unique operation ID for this load sequence
+    const operationId = `load_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    loadingOperationRef.current = operationId;
+    
     const loadCurrentQuestion = async () => {
-      console.log("-------- STARTING NEW QUESTION LOAD SEQUENCE --------");
+      console.log(`-------- STARTING NEW QUESTION LOAD SEQUENCE (${operationId}) --------`);
       console.log(`Loading question ${currentQuestionIndex + 1}/${questions.length}`);
       
       // CRITICAL: Immediately disable UI and stop timer
@@ -69,12 +75,24 @@ export const useCurrentQuestion = (
       // Apply visual state reset immediately
       clearDomState();
       
+      // Check if this is still the active operation
+      if (loadingOperationRef.current !== operationId) {
+        console.log(`Operation ${operationId} has been superseded, aborting`);
+        return;
+      }
+      
       // Create a new question ID unique to this load sequence to prevent race conditions
       const newQuestionLoadId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
       currentQuestionIdRef.current = newQuestionLoadId;
       
       // Get the question at the current index
-      const question = questions[currentQuestionIndex];
+      if (!questions[currentQuestionIndex]) {
+        console.error(`No question found at index ${currentQuestionIndex}`);
+        document.body.style.removeProperty('pointer-events');
+        return;
+      }
+      
+      const question = {...questions[currentQuestionIndex]}; // Clone to avoid reference issues
       console.log(`Loading question data for index ${currentQuestionIndex}:`, question.id);
       
       // Ensure time_limit is a valid number
@@ -84,18 +102,30 @@ export const useCurrentQuestion = (
       
       console.log(`Question time limit: ${questionTimeLimit} seconds`);
       
+      // Check if this is still the active operation
+      if (loadingOperationRef.current !== operationId) {
+        console.log(`Operation ${operationId} has been superseded during question setup, aborting`);
+        return;
+      }
+      
       // Set current question and time limit
       setCurrentQuestion(question);
       setTimeRemaining(questionTimeLimit);
       
       // Load answer options for the new question
       try {
+        // Check if this is still the active operation
+        if (loadingOperationRef.current !== operationId) {
+          console.log(`Operation ${operationId} has been superseded before loading options, aborting`);
+          return;
+        }
+        
         await loadAnswerOptions(question.id);
         console.log(`Answer options loaded for question ${question.id}`);
         
         // Check if this is still the active load sequence
-        if (currentQuestionIdRef.current !== newQuestionLoadId) {
-          console.log("Aborting question setup - superseded by newer request");
+        if (currentQuestionIdRef.current !== newQuestionLoadId || loadingOperationRef.current !== operationId) {
+          console.log(`Operation ${operationId} has been superseded after loading options, aborting`);
           return;
         }
         
@@ -108,10 +138,10 @@ export const useCurrentQuestion = (
         document.body.style.removeProperty('pointer-events');
         
         // Start the timer using the question's time limit
-        console.log(`Starting timer with ${questionTimeLimit} seconds`);
+        console.log(`Starting timer with ${questionTimeLimit} seconds for question ${question.id}`);
         setTimerActive(true);
         console.log(`Question ${currentQuestionIndex + 1} fully loaded and timer started`);
-        console.log("-------- QUESTION LOAD SEQUENCE COMPLETE --------");
+        console.log(`-------- QUESTION LOAD SEQUENCE (${operationId}) COMPLETE --------`);
       } catch (error) {
         console.error("Error loading answer options:", error);
         document.body.style.removeProperty('pointer-events');
