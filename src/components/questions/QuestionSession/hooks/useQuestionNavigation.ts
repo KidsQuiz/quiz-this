@@ -16,7 +16,7 @@ export const useQuestionNavigation = () => {
     setTimeUpTriggered(true); // Mark that we've triggered the time up event
   }, []);
   
-  // Set up the timer with the useQuestionTimer hook
+  // Set up the timer with the useQuestionTimer hook - passing the actual question time limit
   const { timeRemaining, resetTimer } = useQuestionTimer(
     questionTimeLimit,
     timerActive,
@@ -70,7 +70,7 @@ export const useQuestionNavigation = () => {
     setTimeout(() => {
       setTimerActive(true);
     }, 50);
-  }, [resetTimer, setQuestionTimeLimit]);
+  }, [resetTimer]);
   
   return {
     currentQuestionIndex,
