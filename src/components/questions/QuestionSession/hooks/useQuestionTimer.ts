@@ -32,17 +32,22 @@ export const useQuestionTimer = (
   
   // Update initialTimeRef when initialTime changes
   useEffect(() => {
-    console.log(`Initial time updated to: ${initialTime}`);
-    initialTimeRef.current = initialTime;
-    
-    // If timer is not active, store the new time as a pending reset
-    // If timer is active, immediately update the time remaining
-    if (!isActive) {
-      console.log(`Timer inactive, storing ${initialTime} as pending reset`);
-      pendingResetRef.current = initialTime;
+    // Only update if initialTime is valid
+    if (typeof initialTime === 'number' && initialTime > 0) {
+      console.log(`Initial time updated to: ${initialTime}`);
+      initialTimeRef.current = initialTime;
+      
+      // If timer is not active, store the new time as a pending reset
+      // If timer is active, immediately update the time remaining
+      if (!isActive) {
+        console.log(`Timer inactive, storing ${initialTime} as pending reset`);
+        pendingResetRef.current = initialTime;
+      } else {
+        console.log(`Timer active, immediately updating time remaining to ${initialTime}`);
+        setTimeRemaining(initialTime);
+      }
     } else {
-      console.log(`Timer active, immediately updating time remaining to ${initialTime}`);
-      setTimeRemaining(initialTime);
+      console.warn(`Received invalid initialTime: ${initialTime}, ignoring`);
     }
   }, [initialTime, isActive]);
   
@@ -114,7 +119,13 @@ export const useQuestionTimer = (
       timerRef.current = null;
     }
     
-    const timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
+    // Use the provided time, or fall back to initialTimeRef.current, but ensure it's valid
+    let timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
+    if (typeof timeToSet !== 'number' || timeToSet < 0) {
+      console.warn(`Invalid reset time: ${timeToSet}, using default of 30`);
+      timeToSet = 30;
+    }
+    
     console.log(`Will set time to: ${timeToSet} (from initialTime: ${initialTimeRef.current})`);
     
     if (isActive) {

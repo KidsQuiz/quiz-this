@@ -34,7 +34,12 @@ export const useQuestionNavigation = () => {
   // Function to handle updating the time limit for a new question
   const updateTimeLimit = useCallback((newTimeLimit: number) => {
     console.log("Updating time limit to:", newTimeLimit);
-    setQuestionTimeLimit(newTimeLimit);
+    if (typeof newTimeLimit !== 'number' || newTimeLimit <= 0) {
+      console.warn(`Invalid time limit provided: ${newTimeLimit}, defaulting to 30`);
+      setQuestionTimeLimit(30);
+    } else {
+      setQuestionTimeLimit(newTimeLimit);
+    }
   }, []);
   
   // Function to handle session termination
@@ -47,6 +52,12 @@ export const useQuestionNavigation = () => {
   // Function to reset and start the timer
   const resetAndStartTimer = useCallback((seconds: number) => {
     console.log(`Reset and start timer: ${seconds} seconds (from navigation hook)`);
+    // Validate the seconds parameter
+    if (typeof seconds !== 'number' || seconds <= 0) {
+      console.warn(`Invalid seconds value: ${seconds}, using default of 30`);
+      seconds = 30;
+    }
+    
     // Mark timer as not active during setup
     setTimerActive(false);
     // Update the time limit
