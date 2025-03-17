@@ -65,24 +65,73 @@ export const useSubmitQuestion = () => {
           
         if (questionError) throw questionError;
         
-        // Handle answer options - first delete existing ones
-        const { error: deleteError } = await supabase
+        // Update existing answers or insert new ones instead of delete and recreate
+        for (const answer of filledAnswers) {
+          if (answer.id.startsWith('temp-')) {
+            // This is a new answer, insert it
+            const { error: insertError } = await supabase
+              .from('answer_options')
+              .insert({
+                question_id: questionId,
+                content: answer.content,
+                is_correct: answer.isCorrect
+              });
+              
+            if (insertError) throw insertError;
+          } else {
+            // This is an existing answer, update it
+            const { error: updateError } = await supabase
+              .from('answer_options')
+              .update({
+                content: answer.content,
+                is_correct: answer.isCorrect
+              })
+              .eq('id', answer.id);
+              
+            if (updateError) throw updateError;
+          }
+        }
+        
+        // Find answers that were removed (not in filledAnswers)
+        // Get existing answer IDs for this question
+        const { data: existingAnswers, error: fetchError } = await supabase
           .from('answer_options')
-          .delete()
+          .select('id')
           .eq('question_id', questionId);
           
-        if (deleteError) throw deleteError;
+        if (fetchError) throw fetchError;
         
-        // Then insert new ones
-        const { error: answersError } = await supabase
-          .from('answer_options')
-          .insert(filledAnswers.map(answer => ({
-            question_id: questionId,
-            content: answer.content,
-            is_correct: answer.isCorrect
-          })));
+        // Find IDs that are in existingAnswers but not in filledAnswers
+        const existingIds = existingAnswers.map(a => a.id);
+        const currentIds = filledAnswers
+          .filter(a => !a.id.startsWith('temp-'))
+          .map(a => a.id);
+        
+        const idsToDelete = existingIds.filter(id => !currentIds.includes(id));
+        
+        // Check if any answer options are referenced in kid_wrong_answers
+        if (idsToDelete.length > 0) {
+          const { data: referencedAnswers, error: checkError } = await supabase
+            .from('kid_wrong_answers')
+            .select('answer_id')
+            .in('answer_id', idsToDelete);
+            
+          if (checkError) throw checkError;
           
-        if (answersError) throw answersError;
+          // Only delete answers that are not referenced
+          const safeToDeleteIds = idsToDelete.filter(
+            id => !referencedAnswers?.some(ref => ref.answer_id === id)
+          );
+          
+          if (safeToDeleteIds.length > 0) {
+            const { error: deleteError } = await supabase
+              .from('answer_options')
+              .delete()
+              .in('id', safeToDeleteIds);
+              
+            if (deleteError) throw deleteError;
+          }
+        }
         
         toast({
           title: "Success",
