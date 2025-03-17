@@ -41,8 +41,10 @@ export const useQuestionFetching = (
       return;
     }
     
-    // Check if we have this combination of packages cached
-    const cacheKey = selectedPackageIds.sort().join('_');
+    // Create a consistent cache key regardless of package ID order
+    const cacheKey = selectedPackageIds.slice().sort().join('_');
+    console.log('Using cache key:', cacheKey);
+    
     const cachedQuestions = getCachedQuestions(cacheKey);
     
     if (cachedQuestions) {
@@ -80,6 +82,8 @@ export const useQuestionFetching = (
         loadingRef.current = false;
         return;
       }
+      
+      console.log('Package orders before processing:', packageOrderResults);
       
       // Process the question data
       const finalQuestions = processQuestions(
