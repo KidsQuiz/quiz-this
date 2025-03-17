@@ -22,6 +22,7 @@ export const useCurrentQuestion = (
   const loadingRef = useRef(false);
   const lastProcessedIndexRef = useRef(-1);
   const setupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastQuestionIdRef = useRef<string | null>(null);
   
   // Clean up on unmount
   useEffect(() => {
@@ -36,21 +37,23 @@ export const useCurrentQuestion = (
     // Skip during configuration or with no questions
     if (isConfiguring || questions.length === 0) return;
     
-    // Skip if already processed this index
-    if (lastProcessedIndexRef.current === currentQuestionIndex) {
-      console.log(`Question index ${currentQuestionIndex} already processed, skipping`);
-      return;
-    }
-    
     // Skip if beyond question range
     if (currentQuestionIndex >= questions.length) {
       console.log(`Question index ${currentQuestionIndex} is beyond available questions`);
       return;
     }
     
-    // Skip if already loading
+    // Skip if already loading or this index was already processed recently
     if (loadingRef.current) {
       console.log(`Question loading in progress, skipping`);
+      return;
+    }
+    
+    // If we've already processed this index very recently, skip
+    const now = Date.now();
+    const tooRecentThreshold = 500; // ms
+    if (lastProcessedIndexRef.current === currentQuestionIndex) {
+      console.log(`Question index ${currentQuestionIndex} was just processed, avoiding duplicate load`);
       return;
     }
     
@@ -72,7 +75,17 @@ export const useCurrentQuestion = (
     setupTimeoutRef.current = setTimeout(() => {
       // Get deep clone of current question to avoid reference issues
       const question = structuredClone(questions[currentQuestionIndex]);
+      
+      // Skip if this is the same question we just processed
+      if (lastQuestionIdRef.current === question.id) {
+        console.log(`Already loaded question ID ${question.id}, skipping duplicate load`);
+        loadingRef.current = false;
+        document.body.style.removeProperty('pointer-events');
+        return;
+      }
+      
       console.log(`Loading question: ${question.id}`);
+      lastQuestionIdRef.current = question.id;
       
       // Set time limit with validation
       const timeLimit = typeof question.time_limit === 'number' && question.time_limit > 0 
@@ -88,21 +101,20 @@ export const useCurrentQuestion = (
         .then(() => {
           console.log(`Answer options loaded for question ${question.id}`);
           
-          // Enable interaction and start timer
-          document.body.style.removeProperty('pointer-events');
-          
-          // Add a slight delay before starting the timer
+          // Enable interaction and start timer with a small delay to ensure all states are synchronized
           setTimeout(() => {
+            document.body.style.removeProperty('pointer-events');
             setTimerActive(true);
             loadingRef.current = false;
-          }, 200);
+            console.log(`Question ${currentQuestionIndex + 1} setup complete, timer activated`);
+          }, 300);
         })
         .catch(error => {
           console.error("Error loading answer options:", error);
           document.body.style.removeProperty('pointer-events');
           loadingRef.current = false;
         });
-    }, 100);
+    }, 200);
     
     return () => {
       if (setupTimeoutRef.current) {

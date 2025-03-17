@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
 
@@ -14,7 +14,21 @@ export const useCorrectAnswerHandling = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   resetAnswerState: () => void
 ) => {
+  // Add a processing flag to prevent duplicate transitions
+  const isProcessingRef = useRef(false);
+  const lastProcessedQuestionIdRef = useRef<string | null>(null);
+
   const handleCorrectAnswer = useCallback((currentQuestion: Question) => {
+    // Skip if already processing or this question was already processed
+    if (isProcessingRef.current || lastProcessedQuestionIdRef.current === currentQuestion.id) {
+      console.log("Already processing this correct answer, skipping duplicate handling");
+      return;
+    }
+    
+    // Mark as processing and store the question ID
+    isProcessingRef.current = true;
+    lastProcessedQuestionIdRef.current = currentQuestion.id;
+    
     const points = currentQuestion.points;
     console.log(`Correct answer! Adding ${points} points to session total`);
     
@@ -49,8 +63,13 @@ export const useCorrectAnswerHandling = (
       
       console.log("Multiple forced resets applied, current selection state:", null);
       
+      // Ensure we completely disable interaction during transition
+      document.body.style.pointerEvents = 'none';
+      
       // Get current question index value to check if it's the last question
       setCurrentQuestionIndex(prevIndex => {
+        const nextIndex = prevIndex + 1;
+        
         if (isLastQuestion(prevIndex)) {
           // If perfect score (all questions answered correctly)
           if (newCorrectAnswers === questions.length && questions.length > 0) {
@@ -66,24 +85,24 @@ export const useCorrectAnswerHandling = (
             // Show boom effect immediately without delay
             console.log("Showing boom effect immediately");
             setShowBoomEffect(true);
-            
-            return prevIndex + 1;
           } else {
             // Move to completion screen if not perfect score
-            return prevIndex + 1;
+            console.log("Moving to completion screen (not a perfect score)");
+            setSessionComplete(true);
           }
         } else {
           // Not the last question, move to next
-          console.log("Moving to next question, CONFIRMED selection state is null");
-          
-          // Important: Force DOM update with state reset before changing question
-          document.body.style.pointerEvents = 'none';
-          
-          // We'll re-enable pointer events in useCurrentQuestion when the new question is loaded
-          
-          // Return the next index (the modal stays open)
-          return prevIndex + 1;
+          console.log(`Moving to next question (${nextIndex + 1}), CONFIRMED selection state is null`);
         }
+        
+        // Re-enable pointer events after a significant delay
+        setTimeout(() => {
+          document.body.style.removeProperty('pointer-events');
+          isProcessingRef.current = false;
+          console.log("Re-enabled pointer events, processing flag reset");
+        }, 800);
+        
+        return nextIndex;
       });
     }, 1500);
   }, [
