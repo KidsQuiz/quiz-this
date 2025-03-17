@@ -31,7 +31,7 @@ export const useQuestionsProcessing = () => {
       if (!questionsByPackage[question.package_id]) {
         questionsByPackage[question.package_id] = [];
       }
-      questionsByPackage[question.package_id].push(question);
+      questionsByPackage[question.package_id].push({...question}); // Clone the question to avoid reference issues
     });
     
     // Process and order questions by package
@@ -41,35 +41,38 @@ export const useQuestionsProcessing = () => {
       const packageQuestions = questionsByPackage[packageId] || [];
       console.log(`Package ${packageId} has ${packageQuestions.length} questions with order ${orderMap[packageId]}`);
       
+      // Process a copy of the questions to avoid reference issues
+      const processedQuestions = [...packageQuestions];
+      
       // If this package is set to shuffle, randomize its questions
       if (orderMap[packageId] === 'shuffle') {
         console.log(`Shuffling questions for package ${packageId}`);
         // Use Fisher-Yates shuffle for better randomization
-        for (let i = packageQuestions.length - 1; i > 0; i--) {
+        for (let i = processedQuestions.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [packageQuestions[i], packageQuestions[j]] = [packageQuestions[j], packageQuestions[i]];
+          [processedQuestions[i], processedQuestions[j]] = [processedQuestions[j], processedQuestions[i]];
         }
       } else {
         // For sequential packages, sort by created_at
         console.log(`Ordering questions sequentially for package ${packageId}`);
-        packageQuestions.sort((a, b) => 
+        processedQuestions.sort((a, b) => 
           new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
         );
       }
       
-      allQuestions = [...allQuestions, ...packageQuestions];
+      allQuestions = [...allQuestions, ...processedQuestions];
     }
     
-    // Deduplicate questions by ID
-    const uniqueQuestionsMap = new Map<string, Question>();
+    // Deduplicate questions by ID but preserve order
+    const seenIds = new Set<string>();
+    const uniqueQuestions: Question[] = [];
+    
     allQuestions.forEach(question => {
-      if (!uniqueQuestionsMap.has(question.id)) {
-        uniqueQuestionsMap.set(question.id, question);
+      if (!seenIds.has(question.id)) {
+        seenIds.add(question.id);
+        uniqueQuestions.push(question);
       }
     });
-    
-    // Convert back to array
-    const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
     
     console.log(`Final question order: ${uniqueQuestions.map(q => q.id).join(', ')}`);
     console.log(`Processed ${uniqueQuestions.length} unique questions across all packages`);

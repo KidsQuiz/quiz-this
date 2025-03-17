@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 
@@ -79,7 +80,8 @@ export const useQuestionCache = () => {
     const cached = questionsCacheRef.current[cacheKey];
     if (cached) {
       console.log(`Cache hit for questions with key: ${cacheKey}`);
-      return cached;
+      // Return a deep copy of the cached questions to prevent reference issues
+      return JSON.parse(JSON.stringify(cached));
     }
     console.log(`Cache miss for questions with key: ${cacheKey}`);
     return null;
@@ -87,16 +89,23 @@ export const useQuestionCache = () => {
 
   const setCachedQuestions = (cacheKey: string, questions: Question[]) => {
     console.log(`Caching ${questions.length} questions with key: ${cacheKey}`);
-    questionsCacheRef.current[cacheKey] = questions;
+    // Store a deep copy to prevent reference issues
+    questionsCacheRef.current[cacheKey] = JSON.parse(JSON.stringify(questions));
     cleanCache(); // Clean cache after adding new entries
   };
 
   const getCachedAnswerOptions = (questionId: string): AnswerOption[] | null => {
-    return answersCacheRef.current[questionId] || null;
+    const cached = answersCacheRef.current[questionId];
+    if (cached) {
+      // Return a deep copy to prevent reference issues
+      return JSON.parse(JSON.stringify(cached));
+    }
+    return null;
   };
 
   const setCachedAnswerOptions = (questionId: string, options: AnswerOption[]) => {
-    answersCacheRef.current[questionId] = options;
+    // Store a deep copy to prevent reference issues
+    answersCacheRef.current[questionId] = JSON.parse(JSON.stringify(options));
   };
 
   return {
