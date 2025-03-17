@@ -76,10 +76,11 @@ export const useCurrentQuestion = (
       // Get the question at the current index
       const question = questions[currentQuestionIndex];
       console.log(`Loading question data for index ${currentQuestionIndex}:`, question.id);
+      console.log(`Question time limit: ${question.time_limit} seconds`);
       
       // Set current question and time limit
       setCurrentQuestion(question);
-      setTimeRemaining(question.time_limit);
+      setTimeRemaining(question.time_limit || 30);
       
       // Load answer options for the new question
       try {
@@ -100,7 +101,8 @@ export const useCurrentQuestion = (
         // Re-enable UI interactions
         document.body.style.removeProperty('pointer-events');
         
-        // Start the timer
+        // Start the timer using the question's time limit
+        console.log(`Starting timer with ${question.time_limit || 30} seconds`);
         setTimerActive(true);
         console.log(`Question ${currentQuestionIndex + 1} fully loaded and timer started`);
         console.log("-------- QUESTION LOAD SEQUENCE COMPLETE --------");

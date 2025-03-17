@@ -62,10 +62,15 @@ export const useQuestionChangeEffects = (
         
         // Set the timer based on the question's time limit
         if (!sessionComplete) {
+          // Get time limit from the question, with fallback to 30 seconds
           const timeLimit = question.time_limit || 30;
           
-          // Ensure we reset and start the timer with the correct time limit
-          console.log(`Setting up timer for question ${currentQuestionIndex + 1} with ${timeLimit} seconds`);
+          // Ensure we use the correct time limit from this question
+          console.log(`Setting time limit for question ${currentQuestionIndex + 1} to ${timeLimit} seconds`);
+          updateTimeLimit(timeLimit);
+          
+          // Reset and start timer with the correct time limit
+          console.log(`Resetting and starting timer with ${timeLimit} seconds`);
           resetAndStartTimer(timeLimit);
         }
         

@@ -46,7 +46,7 @@ export const useQuestionNavigation = () => {
   
   // Function to reset and start the timer
   const resetAndStartTimer = useCallback((seconds: number) => {
-    console.log(`Reset and start timer: ${seconds} seconds`);
+    console.log(`Reset and start timer: ${seconds} seconds (from navigation hook)`);
     // Mark timer as not active during setup
     setTimerActive(false);
     // Update the time limit

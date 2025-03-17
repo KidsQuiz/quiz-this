@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useQuestionTimer = (
@@ -29,11 +30,19 @@ export const useQuestionTimer = (
     }
   }, [isActive]);
   
+  // Update initialTimeRef when initialTime changes
   useEffect(() => {
+    console.log(`Initial time updated to: ${initialTime}`);
     initialTimeRef.current = initialTime;
-    // Only apply initial time when timer is not active
+    
+    // If timer is not active, store the new time as a pending reset
+    // If timer is active, immediately update the time remaining
     if (!isActive) {
+      console.log(`Timer inactive, storing ${initialTime} as pending reset`);
       pendingResetRef.current = initialTime;
+    } else {
+      console.log(`Timer active, immediately updating time remaining to ${initialTime}`);
+      setTimeRemaining(initialTime);
     }
   }, [initialTime, isActive]);
   
@@ -98,12 +107,15 @@ export const useQuestionTimer = (
   
   // Reset the timer
   const resetTimer = useCallback((newTime?: number) => {
+    console.log(`resetTimer called with newTime: ${newTime !== undefined ? newTime : 'undefined'}`);
+    
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
     
     const timeToSet = newTime !== undefined ? newTime : initialTimeRef.current;
+    console.log(`Will set time to: ${timeToSet} (from initialTime: ${initialTimeRef.current})`);
     
     if (isActive) {
       console.log("Timer active, immediately setting time to:", timeToSet);
