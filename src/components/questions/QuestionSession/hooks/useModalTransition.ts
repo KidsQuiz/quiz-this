@@ -16,6 +16,8 @@ export const useModalTransition = (
   const transitionInProgressRef = useRef(false);
   // Track the last time a transition was initiated to prevent rapid repeated transitions
   const lastTransitionTimeRef = useRef(0);
+  // Track the last question index that was processed
+  const lastProcessedIndexRef = useRef(-1);
   
   // Advance to the next question when modal is closed
   useEffect(() => {
@@ -23,9 +25,15 @@ export const useModalTransition = (
     if (!isModalOpen && !sessionComplete && questions.length > 0 && currentQuestionIndex < questions.length) {
       console.log(`Modal closed, current question index: ${currentQuestionIndex}, total questions: ${questions.length}`);
       
+      // Skip if we just processed this index (prevents duplicate processing)
+      if (lastProcessedIndexRef.current === currentQuestionIndex) {
+        console.log(`Already processed transition for index ${currentQuestionIndex}, skipping`);
+        return;
+      }
+      
       // Prevent rapid transitions
       const now = Date.now();
-      if (now - lastTransitionTimeRef.current < 1000) {
+      if (now - lastTransitionTimeRef.current < 1200) { // Increased from 1000ms to 1200ms
         console.log(`Transition requested too soon (${now - lastTransitionTimeRef.current}ms), ignoring`);
         return;
       }
@@ -39,6 +47,7 @@ export const useModalTransition = (
       // Set the transition flag and update the transition time
       transitionInProgressRef.current = true;
       lastTransitionTimeRef.current = now;
+      lastProcessedIndexRef.current = currentQuestionIndex;
       
       // Move to the next question
       const nextQuestionIndex = currentQuestionIndex + 1;
@@ -72,7 +81,7 @@ export const useModalTransition = (
             // This will reopen the modal with the summary screen
             setIsModalOpen(true);
             transitionInProgressRef.current = false;
-          }, 800);
+          }, 1000); // Increased from 800ms to 1000ms
         }
       } else {
         // CRITICAL: Immediately advance to next question index
@@ -94,7 +103,7 @@ export const useModalTransition = (
           // Reopen the modal with the next question
           setIsModalOpen(true);
           transitionInProgressRef.current = false;
-        }, 800);
+        }, 1000); // Increased from 800ms to 1000ms
       }
     } else if (isModalOpen) {
       // Reset transition flag when modal is open

@@ -34,7 +34,7 @@ export const useSessionTransition = (
   const advanceToNextQuestion = useCallback(() => {
     // Debounce transition to prevent rapid multiple calls
     const now = Date.now();
-    if (now - lastTransitionTimeRef.current < 500) {
+    if (now - lastTransitionTimeRef.current < 800) { // Increased from 500ms to 800ms
       console.log("Transition requested too soon after previous transition, ignoring");
       return;
     }
@@ -75,7 +75,7 @@ export const useSessionTransition = (
     setTimeout(() => {
       document.body.style.removeProperty('pointer-events');
       transitionInProgressRef.current = false;
-    }, 300); // Increased delay to prevent race conditions
+    }, 500); // Increased from 300ms to 500ms
   }, [currentQuestionIndex, setCurrentQuestionIndex]);
   
   return { advanceToNextQuestion };

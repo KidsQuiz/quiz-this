@@ -27,6 +27,8 @@ export const useTimeoutEffects = (
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   // Track the last time we initiated an advancement
   const lastAdvancementTimeRef = useRef(0);
+  // Track the last index we processed a timeout for
+  const lastTimeoutIndexRef = useRef(-1);
   
   // Clear timeout on unmount
   useEffect(() => {
@@ -48,6 +50,12 @@ export const useTimeoutEffects = (
     // Skip if any of these conditions are met
     if (!currentQuestion || isConfiguring || sessionComplete) return;
     
+    // Skip if we just processed a timeout for this question index
+    if (lastTimeoutIndexRef.current === currentQuestionIndex) {
+      console.log(`Already processed timeout for question index ${currentQuestionIndex}, skipping`);
+      return;
+    }
+    
     // Only process if timer reaches zero and answer is not already submitted
     if (timeRemaining === 0 && !answerSubmitted && !advancementScheduledRef.current) {
       // Check for debounce
@@ -59,8 +67,9 @@ export const useTimeoutEffects = (
       
       console.log('Time ran out for current question - preparing to advance');
       
-      // Update last advancement time
+      // Update last advancement time and index
       lastAdvancementTimeRef.current = now;
+      lastTimeoutIndexRef.current = currentQuestionIndex;
       
       // Play timeout sound
       playSound('incorrect');
@@ -120,8 +129,8 @@ export const useTimeoutEffects = (
           document.body.style.removeProperty('pointer-events');
           advancementScheduledRef.current = false;
           console.log('Question advancement process complete, advancement flag reset');
-        }, 300); // Increased delay for better stability
-      }, 1500); // Slightly longer delay to show the correct answer
+        }, 500); // Increased from 300ms to 500ms for better stability
+      }, 2000); // Increased from 1500ms to 2000ms to show the correct answer longer
       
       return () => {
         if (timeoutIdRef.current) {

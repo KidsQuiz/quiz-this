@@ -21,14 +21,18 @@ export const useCurrentQuestion = (
   const lastProcessedIndexRef = useRef<number>(-1);
   // Track active operation to prevent overlapping loads
   const loadingOperationRef = useRef<string | null>(null);
+  // Track the last time we processed this index
+  const lastProcessedTimeRef = useRef<number>(0);
   
   // Display the current question
   useEffect(() => {
     if (isConfiguring || questions.length === 0) return;
     
-    // Skip if we've already processed this index (prevents duplicate processing)
-    if (lastProcessedIndexRef.current === currentQuestionIndex) {
-      console.log(`Already processed question index ${currentQuestionIndex}, skipping duplicate load`);
+    // Prevent processing the same index in quick succession
+    const now = Date.now();
+    if (lastProcessedIndexRef.current === currentQuestionIndex && 
+        now - lastProcessedTimeRef.current < 1000) {
+      console.log(`Already processed question index ${currentQuestionIndex} recently, skipping duplicate load`);
       return;
     }
     
@@ -39,6 +43,9 @@ export const useCurrentQuestion = (
     }
     
     console.log(`====== DETECTED INDEX CHANGE TO ${currentQuestionIndex} (from ${lastProcessedIndexRef.current}) ======`);
+    
+    // Update last processed time
+    lastProcessedTimeRef.current = now;
     
     // Update last processed index immediately to prevent duplicate processing
     lastProcessedIndexRef.current = currentQuestionIndex;
@@ -78,6 +85,7 @@ export const useCurrentQuestion = (
       // Check if this is still the active operation
       if (loadingOperationRef.current !== operationId) {
         console.log(`Operation ${operationId} has been superseded, aborting`);
+        document.body.style.removeProperty('pointer-events');
         return;
       }
       
@@ -92,7 +100,8 @@ export const useCurrentQuestion = (
         return;
       }
       
-      const question = {...questions[currentQuestionIndex]}; // Clone to avoid reference issues
+      // CRITICAL: Deep clone the question to avoid reference issues that could cause the same question to reappear
+      const question = JSON.parse(JSON.stringify(questions[currentQuestionIndex]));
       console.log(`Loading question data for index ${currentQuestionIndex}:`, question.id);
       
       // Ensure time_limit is a valid number
@@ -105,6 +114,7 @@ export const useCurrentQuestion = (
       // Check if this is still the active operation
       if (loadingOperationRef.current !== operationId) {
         console.log(`Operation ${operationId} has been superseded during question setup, aborting`);
+        document.body.style.removeProperty('pointer-events');
         return;
       }
       
@@ -117,6 +127,7 @@ export const useCurrentQuestion = (
         // Check if this is still the active operation
         if (loadingOperationRef.current !== operationId) {
           console.log(`Operation ${operationId} has been superseded before loading options, aborting`);
+          document.body.style.removeProperty('pointer-events');
           return;
         }
         
@@ -126,6 +137,7 @@ export const useCurrentQuestion = (
         // Check if this is still the active load sequence
         if (currentQuestionIdRef.current !== newQuestionLoadId || loadingOperationRef.current !== operationId) {
           console.log(`Operation ${operationId} has been superseded after loading options, aborting`);
+          document.body.style.removeProperty('pointer-events');
           return;
         }
         
