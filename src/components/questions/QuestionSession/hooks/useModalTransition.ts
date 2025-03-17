@@ -2,6 +2,9 @@
 import { useEffect, useRef } from 'react';
 import { Question } from '@/hooks/questionsTypes';
 
+/**
+ * Simplified hook to handle modal transitions between questions
+ */
 export const useModalTransition = (
   isModalOpen: boolean,
   sessionComplete: boolean,
@@ -12,102 +15,76 @@ export const useModalTransition = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  // Track whether a transition is already in progress
-  const transitionInProgressRef = useRef(false);
-  // Track the last time a transition was initiated to prevent rapid repeated transitions
-  const lastTransitionTimeRef = useRef(0);
-  // Track the last question index that was processed
+  // Single transition lock ref
+  const transitionLockRef = useRef(false);
   const lastProcessedIndexRef = useRef(-1);
   
-  // Advance to the next question when modal is closed
+  // Handle modal closing to advance to next question
   useEffect(() => {
-    // Only process if modal is closed, session is not complete, and we have valid questions
-    if (!isModalOpen && !sessionComplete && questions.length > 0 && currentQuestionIndex < questions.length) {
-      console.log(`Modal closed, current question index: ${currentQuestionIndex}, total questions: ${questions.length}`);
-      
-      // Skip if we just processed this index (prevents duplicate processing)
-      if (lastProcessedIndexRef.current === currentQuestionIndex) {
-        console.log(`Already processed transition for index ${currentQuestionIndex}, skipping`);
-        return;
-      }
-      
-      // Prevent rapid transitions
-      const now = Date.now();
-      if (now - lastTransitionTimeRef.current < 1200) { // Increased from 1000ms to 1200ms
-        console.log(`Transition requested too soon (${now - lastTransitionTimeRef.current}ms), ignoring`);
-        return;
-      }
-      
-      // Prevent duplicate transitions
-      if (transitionInProgressRef.current) {
-        console.log("Modal transition already in progress, ignoring duplicate event");
-        return;
-      }
-      
-      // Set the transition flag and update the transition time
-      transitionInProgressRef.current = true;
-      lastTransitionTimeRef.current = now;
-      lastProcessedIndexRef.current = currentQuestionIndex;
-      
-      // Move to the next question
-      const nextQuestionIndex = currentQuestionIndex + 1;
-      
-      if (nextQuestionIndex >= questions.length) {
-        // If we've reached the end, mark session as complete
-        console.log('Reached end of questions, completing session');
-        setSessionComplete(true);
-        
-        // Check for perfect score
-        const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
-        if (isPerfectScore) {
-          // For perfect scores, keep the modal closed
-          console.log("Perfect score detected - keeping modal closed");
-          transitionInProgressRef.current = false;
-        } else {
-          // For non-perfect scores, reopen the modal for the summary screen
-          console.log("Non-perfect score - reopening modal for summary");
-          
-          // Store transition time for debugging
-          const transitionTime = Date.now();
-          console.log(`TRANSITION: Modal closed at ${transitionTime}, scheduling reopen with delay`);
-          
-          // CRITICAL: Use setTimeout with a LONGER delay to ensure complete DOM updates
-          setTimeout(() => {
-            console.log(`TRANSITION: Reopening modal after ${Date.now() - transitionTime}ms delay`);
-            
-            // Make sure pointer events are enabled before showing summary
-            document.body.style.removeProperty('pointer-events');
-            
-            // This will reopen the modal with the summary screen
-            setIsModalOpen(true);
-            transitionInProgressRef.current = false;
-          }, 1000); // Increased from 800ms to 1000ms
-        }
-      } else {
-        // CRITICAL: Immediately advance to next question index
-        console.log(`Advancing to question ${nextQuestionIndex + 1}`);
-        setCurrentQuestionIndex(nextQuestionIndex);
-        
-        // Store transition time for debugging
-        const transitionTime = Date.now();
-        console.log(`TRANSITION: Modal closed at ${transitionTime}, scheduling reopen with delay`);
-        
-        // CRITICAL: Ensure the modal reopens with the next question
-        // Use setTimeout with a longer delay to ensure complete DOM updates
-        setTimeout(() => {
-          console.log(`TRANSITION: Reopening modal after ${Date.now() - transitionTime}ms delay`);
-          
-          // Make sure pointer events are enabled before showing next question
-          document.body.style.removeProperty('pointer-events');
-          
-          // Reopen the modal with the next question
-          setIsModalOpen(true);
-          transitionInProgressRef.current = false;
-        }, 1000); // Increased from 800ms to 1000ms
-      }
-    } else if (isModalOpen) {
-      // Reset transition flag when modal is open
-      transitionInProgressRef.current = false;
+    // Only process when modal closes during active session
+    if (isModalOpen || sessionComplete || questions.length === 0 || 
+        currentQuestionIndex >= questions.length) {
+      return;
     }
-  }, [isModalOpen, sessionComplete, currentQuestionIndex, questions.length, correctAnswers, setCurrentQuestionIndex, setIsModalOpen, setSessionComplete]);
+    
+    // Skip if already processed this index
+    if (lastProcessedIndexRef.current === currentQuestionIndex) {
+      console.log(`Already processed transition for index ${currentQuestionIndex}`);
+      return;
+    }
+    
+    // Skip if transition is in progress
+    if (transitionLockRef.current) {
+      console.log("Modal transition locked, skipping");
+      return;
+    }
+    
+    // Lock transition and mark index as processed
+    transitionLockRef.current = true;
+    lastProcessedIndexRef.current = currentQuestionIndex;
+    
+    console.log(`Modal closed for question ${currentQuestionIndex + 1}, handling transition`);
+    
+    // Determine next action based on question index
+    const nextQuestionIndex = currentQuestionIndex + 1;
+    
+    if (nextQuestionIndex >= questions.length) {
+      // End of questions reached
+      console.log('Last question completed, ending session');
+      setSessionComplete(true);
+      
+      // Check for perfect score (skip modal for celebration)
+      const isPerfectScore = correctAnswers === questions.length && questions.length > 0;
+      if (!isPerfectScore) {
+        // Show summary for non-perfect scores after delay
+        setTimeout(() => {
+          console.log('Reopening modal with summary');
+          setIsModalOpen(true);
+          transitionLockRef.current = false;
+        }, 1000);
+      } else {
+        transitionLockRef.current = false;
+      }
+    } else {
+      // Advance to next question
+      console.log(`Advancing to question ${nextQuestionIndex + 1}`);
+      setCurrentQuestionIndex(nextQuestionIndex);
+      
+      // Reopen modal with next question after delay
+      setTimeout(() => {
+        console.log('Reopening modal with next question');
+        setIsModalOpen(true);
+        transitionLockRef.current = false;
+      }, 1000);
+    }
+  }, [
+    isModalOpen, 
+    sessionComplete, 
+    currentQuestionIndex, 
+    questions, 
+    correctAnswers, 
+    setCurrentQuestionIndex, 
+    setIsModalOpen, 
+    setSessionComplete
+  ]);
 };

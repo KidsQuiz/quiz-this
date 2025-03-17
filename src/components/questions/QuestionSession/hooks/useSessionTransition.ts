@@ -4,6 +4,7 @@ import { Question } from '@/hooks/questionsTypes';
 
 /**
  * Hook that handles transitions between questions and session states
+ * Simplified to focus on core transition logic with better safeguards
  */
 export const useSessionTransition = (
   isConfiguring: boolean,
@@ -14,13 +15,13 @@ export const useSessionTransition = (
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setSessionComplete: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  // Ref to track ongoing transitions and debounce rapid state changes
-  const transitionInProgressRef = useRef(false);
+  // Single ref to prevent duplicate transitions
+  const transitionLockRef = useRef(false);
   const lastTransitionTimeRef = useRef(0);
   
-  // Handle transition between questions
+  // Handle end of questions check
   useEffect(() => {
-    // Don't handle transitions during configuration or when session is complete
+    // Skip during configuration or when session is already complete
     if (isConfiguring || sessionComplete) return;
     
     // Check if we've reached the end of questions
@@ -30,52 +31,38 @@ export const useSessionTransition = (
     }
   }, [currentQuestionIndex, questions, isConfiguring, sessionComplete, setSessionComplete]);
   
-  // Advance to next question with more aggressive state reset
+  // Simplified advance to next question function
   const advanceToNextQuestion = useCallback(() => {
-    // Debounce transition to prevent rapid multiple calls
+    // Skip if in transition lockout period
     const now = Date.now();
-    if (now - lastTransitionTimeRef.current < 800) { // Increased from 500ms to 800ms
-      console.log("Transition requested too soon after previous transition, ignoring");
+    if (now - lastTransitionTimeRef.current < 800) {
+      console.log("Transition debounced - too soon after previous transition");
       return;
     }
     
-    // Prevent duplicate transitions
-    if (transitionInProgressRef.current) {
-      console.log("Transition already in progress, ignoring duplicate request");
+    // Skip if already processing a transition
+    if (transitionLockRef.current) {
+      console.log("Transition already in progress, ignoring request");
       return;
     }
     
-    // Set transition flag and update last transition time
-    transitionInProgressRef.current = true;
+    // Lock transitions and update timestamp
+    transitionLockRef.current = true;
     lastTransitionTimeRef.current = now;
     
-    console.log("TRANSITION: Advancing to next question directly");
+    console.log(`Advancing from question ${currentQuestionIndex + 1} to ${currentQuestionIndex + 2}`);
     
-    // Log transition details
-    const nextIndex = currentQuestionIndex + 1;
-    console.log(`TRANSITION DETAIL: from question ${currentQuestionIndex + 1} to ${nextIndex + 1}`);
-    
-    // Forcibly reset any selected buttons in the DOM first
-    const allButtons = document.querySelectorAll('[data-answer-option]');
-    allButtons.forEach(button => {
-      button.setAttribute('data-selected', 'false');
-      button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
-                             'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
-                             'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
-    });
-    
-    // Briefly disable pointer events to prevent race conditions
+    // Reset any DOM state before transition
     document.body.style.pointerEvents = 'none';
     
-    // Force the exact next index - using direct value, not function updater
-    setCurrentQuestionIndex(nextIndex);
-    console.log(`TRANSITION COMPLETE: Question index updated to: ${nextIndex}`);
+    // Update question index
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
     
-    // Re-enable pointer events after a delay
+    // Release lock after delay to ensure state updates complete
     setTimeout(() => {
       document.body.style.removeProperty('pointer-events');
-      transitionInProgressRef.current = false;
-    }, 500); // Increased from 300ms to 500ms
+      transitionLockRef.current = false;
+    }, 500);
   }, [currentQuestionIndex, setCurrentQuestionIndex]);
   
   return { advanceToNextQuestion };

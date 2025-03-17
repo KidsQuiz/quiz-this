@@ -1,22 +1,11 @@
+
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
 
-interface TimeUpHandlerProps {
-  timeUpTriggered: boolean;
-  setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>;
-  answerSubmitted: boolean;
-  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsTimeUp: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowingTimeUpFeedback: React.Dispatch<React.SetStateAction<boolean>>;
-  currentQuestion: Question | null;
-  goToNextQuestion: () => void;
-  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
-  answerOptions: AnswerOption[];
-  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
+/**
+ * Simplified hook to handle time-up scenario
+ */
 export const useTimeUpHandler = ({
   timeUpTriggered,
   setTimeUpTriggered,
@@ -30,38 +19,31 @@ export const useTimeUpHandler = ({
   setSelectedAnswerId,
   answerOptions,
   setTimerActive
-}: TimeUpHandlerProps) => {
-  // Keep a ref to track ongoing time-up processing
-  const isProcessingTimeUpRef = useRef(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+}) => {
+  // Single processing lock
+  const processingRef = useRef(false);
+  const timeoutRef = useRef(null);
 
-  // Clear timeout on unmount
+  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
       }
     };
   }, []);
 
-  // Handle time up sequence
+  // Handle time up sequence with simplified logic
   useEffect(() => {
-    // Skip if already processing, if answer already submitted, or if no trigger
-    if (isProcessingTimeUpRef.current || answerSubmitted || !timeUpTriggered || !currentQuestion) {
+    // Skip if not triggered, already submitted, or already processing
+    if (!timeUpTriggered || answerSubmitted || processingRef.current || !currentQuestion) {
       return;
     }
 
-    console.log("TIME UP HANDLER: Processing time up event", {
-      timeUpTriggered,
-      answerSubmitted,
-      isProcessing: isProcessingTimeUpRef.current
-    });
-
-    // Set processing flag
-    isProcessingTimeUpRef.current = true;
+    console.log("Processing time up event");
+    processingRef.current = true;
     
-    // Stop the timer first
+    // Stop timer
     if (setTimerActive) {
       setTimerActive(false);
     }
@@ -69,52 +51,43 @@ export const useTimeUpHandler = ({
     // Play incorrect sound
     playSound('incorrect');
     
-    // Update UI states - CRITICAL: Force these to execute synchronously
+    // Update UI states
     setIsTimeUp(true);
     setAnswerSubmitted(true);
     setIsCorrect(false);
     setShowingTimeUpFeedback(true);
     
-    // Find and highlight the correct answer
+    // Highlight correct answer
     const correctAnswer = answerOptions.find(option => option.is_correct);
     if (correctAnswer) {
-      console.log("Highlighting correct answer:", correctAnswer.id);
       setSelectedAnswerId(correctAnswer.id);
     }
     
-    // Briefly pause to show the correct answer (just long enough for the UI to update)
-    console.log("Briefly highlighting correct answer before advancing");
+    // Wait before advancing to next question
     timeoutRef.current = setTimeout(() => {
-      console.log("Timeout completed - now advancing to next question");
+      console.log("Time's up sequence complete, advancing");
       
-      // Clean up states
+      // Reset states
       setIsTimeUp(false);
       setShowingTimeUpFeedback(false);
       setTimeUpTriggered(false);
       
-      // Force re-enable pointer events before navigation
-      document.body.style.pointerEvents = '';
-      
-      // Force-advance to next question with a slightly longer delay
-      // to ensure all state updates are completed
+      // Advance to next question
       goToNextQuestion();
       
-      // Reset processing flag after question advancement
+      // Reset processing flag
       setTimeout(() => {
-        isProcessingTimeUpRef.current = false;
+        processingRef.current = false;
         timeoutRef.current = null;
-        console.log("Time up processing cycle complete");
       }, 100);
-      
-    }, 1500); // Longer delay to ensure the correct answer is visible
+    }, 1500);
     
     return () => {
-      // Clean up if component unmounts during timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      isProcessingTimeUpRef.current = false;
+      processingRef.current = false;
     };
   }, [
     timeUpTriggered,
@@ -132,7 +105,7 @@ export const useTimeUpHandler = ({
   ]);
 
   const handleTimeUp = () => {
-    console.log("handleTimeUp called explicitly");
+    console.log("Time up handler called explicitly");
     setTimeUpTriggered(true);
   };
 

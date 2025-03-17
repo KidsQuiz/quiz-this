@@ -4,7 +4,7 @@ import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
 
 /**
- * Manages timeout effects when time runs out for a question
+ * Simplified hook for handling timeout effects when time runs out
  */
 export const useTimeoutEffects = (
   timeRemaining: number,
@@ -22,138 +22,103 @@ export const useTimeoutEffects = (
   setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>,
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  // Create a ref to track if advancement is already scheduled
-  const advancementScheduledRef = useRef(false);
-  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-  // Track the last time we initiated an advancement
-  const lastAdvancementTimeRef = useRef(0);
-  // Track the last index we processed a timeout for
-  const lastTimeoutIndexRef = useRef(-1);
+  // Single timeout ref
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const processingTimeoutRef = useRef(false);
+  const lastProcessedIndexRef = useRef(-1);
   
-  // Clear timeout on unmount
+  // Clean up on unmount
   useEffect(() => {
     return () => {
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
   }, []);
   
-  // Handle when time runs out for a question
+  // Handle time running out
   useEffect(() => {
     // Clear any existing timeout
-    if (timeoutIdRef.current) {
-      clearTimeout(timeoutIdRef.current);
-      timeoutIdRef.current = null;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     
-    // Skip if any of these conditions are met
-    if (!currentQuestion || isConfiguring || sessionComplete) return;
-    
-    // Skip if we just processed a timeout for this question index
-    if (lastTimeoutIndexRef.current === currentQuestionIndex) {
-      console.log(`Already processed timeout for question index ${currentQuestionIndex}, skipping`);
+    // Skip if inactive or already processing
+    if (!currentQuestion || isConfiguring || sessionComplete || 
+        answerSubmitted || processingTimeoutRef.current) {
       return;
     }
     
-    // Only process if timer reaches zero and answer is not already submitted
-    if (timeRemaining === 0 && !answerSubmitted && !advancementScheduledRef.current) {
-      // Check for debounce
-      const now = Date.now();
-      if (now - lastAdvancementTimeRef.current < 2000) {
-        console.log(`Timeout advancement requested too soon (${now - lastAdvancementTimeRef.current}ms), ignoring`);
-        return;
-      }
+    // Skip if already processed this index
+    if (lastProcessedIndexRef.current === currentQuestionIndex) {
+      return;
+    }
+    
+    // Only process when timer reaches zero
+    if (timeRemaining === 0) {
+      console.log('Time ran out, processing timeout');
       
-      console.log('Time ran out for current question - preparing to advance');
-      
-      // Update last advancement time and index
-      lastAdvancementTimeRef.current = now;
-      lastTimeoutIndexRef.current = currentQuestionIndex;
+      // Mark as processing
+      processingTimeoutRef.current = true;
+      lastProcessedIndexRef.current = currentQuestionIndex;
       
       // Play timeout sound
       playSound('incorrect');
       
-      // Set flag to prevent duplicate advancement scheduling
-      advancementScheduledRef.current = true;
-      
-      // Mark as submitted with no selection
+      // Update state to show feedback
       setAnswerSubmitted(true);
       setIsCorrect(false);
       
-      // Find and highlight the correct answer
+      // Find and highlight correct answer
       const correctAnswer = answerOptions.find(option => option.is_correct);
       if (correctAnswer) {
-        console.log('Highlighting correct answer:', correctAnswer.id);
         setSelectedAnswerId(correctAnswer.id);
       }
       
-      // Wait a moment to show the correct answer, then advance
-      timeoutIdRef.current = setTimeout(() => {
-        console.log('TIMEOUT COMPLETE: Now advancing to next question');
-        timeoutIdRef.current = null;
+      // Advance after delay
+      timeoutRef.current = setTimeout(() => {
+        console.log('Advancing after timeout');
         
-        // Reset any lingering DOM state
-        const clearDomState = () => {
-          const allButtons = document.querySelectorAll('[data-answer-option]');
-          allButtons.forEach(button => {
-            button.setAttribute('data-selected', 'false');
-            button.classList.remove('border-primary', 'bg-primary/10', 'shadow-md', 
-                                  'border-green-500', 'bg-green-50', 'dark:bg-green-950/30',
-                                  'border-red-500', 'bg-red-50', 'dark:bg-red-950/30');
-          });
-        };
-        
-        // Clear DOM state
-        clearDomState();
-        
-        // Briefly disable all pointer events to prevent race conditions
+        // Disable interaction
         document.body.style.pointerEvents = 'none';
         
         if (currentQuestionIndex < questions.length - 1) {
-          // Critical: Force update the index directly with the new value
-          const nextIndex = currentQuestionIndex + 1;
-          console.log(`DIRECT ADVANCEMENT: Setting question index from ${currentQuestionIndex} to ${nextIndex}`);
-          
-          // Use direct index setting instead of function form
-          setCurrentQuestionIndex(nextIndex);
-          console.log(`Question index updated to ${nextIndex}`);
+          // Move to next question
+          setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-          // Last question, complete the session
-          console.log('Last question timed out, completing session');
+          // End session
           setSessionComplete(true);
         }
         
-        // Re-enable pointer events after a short delay
+        // Re-enable interaction after delay
         setTimeout(() => {
           document.body.style.removeProperty('pointer-events');
-          advancementScheduledRef.current = false;
-          console.log('Question advancement process complete, advancement flag reset');
-        }, 500); // Increased from 300ms to 500ms for better stability
-      }, 2000); // Increased from 1500ms to 2000ms to show the correct answer longer
+          processingTimeoutRef.current = false;
+          timeoutRef.current = null;
+        }, 500);
+      }, 2000);
       
       return () => {
-        if (timeoutIdRef.current) {
-          console.log('Clearing timeout for question advancement');
-          clearTimeout(timeoutIdRef.current);
-          timeoutIdRef.current = null;
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
         }
-        advancementScheduledRef.current = false;
+        processingTimeoutRef.current = false;
         document.body.style.removeProperty('pointer-events');
       };
     }
   }, [
-    timeRemaining, 
-    currentQuestion, 
-    isConfiguring, 
-    sessionComplete, 
-    answerSubmitted, 
-    setAnswerSubmitted, 
-    currentQuestionIndex, 
-    questions.length, 
-    setSessionComplete,
-    setIsModalOpen,
+    timeRemaining,
+    currentQuestion,
+    isConfiguring,
+    sessionComplete,
+    answerSubmitted,
+    currentQuestionIndex,
+    questions.length,
     answerOptions,
+    setAnswerSubmitted,
+    setSessionComplete,
     setIsCorrect,
     setSelectedAnswerId,
     setCurrentQuestionIndex
