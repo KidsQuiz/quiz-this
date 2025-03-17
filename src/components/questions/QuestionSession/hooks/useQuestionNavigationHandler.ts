@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 interface NavigationHandlerProps {
   currentQuestionIndex: number;
@@ -32,8 +32,18 @@ export const useQuestionNavigationHandler = ({
   setSessionComplete,
   setTimerActive
 }: NavigationHandlerProps) => {
+  // Reference to track if navigation is in progress
+  const isNavigatingRef = useRef(false);
+  
   // Create a function to go to the next question
   const goToNextQuestion = useCallback(() => {
+    // Prevent duplicate navigation
+    if (isNavigatingRef.current) {
+      console.log("Navigation already in progress, skipping duplicate call");
+      return;
+    }
+    
+    isNavigatingRef.current = true;
     console.log("Going to next question, current index:", currentQuestionIndex);
     
     // First pause the timer if available
@@ -72,6 +82,12 @@ export const useQuestionNavigationHandler = ({
       // Keep modal open for completion screen
       setIsModalOpen(true);
     }
+    
+    // Reset navigation flag after a short delay
+    setTimeout(() => {
+      isNavigatingRef.current = false;
+      console.log("Navigation flag reset, ready for next navigation");
+    }, 300);
   }, [
     currentQuestionIndex, 
     questions.length, 

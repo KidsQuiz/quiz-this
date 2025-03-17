@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { Question, AnswerOption } from '@/hooks/questionsTypes';
 import { playSound } from '@/utils/soundEffects';
@@ -74,6 +73,7 @@ export const useTimeUpHandler = ({
     setIsTimeUp(true);
     setAnswerSubmitted(true);
     setIsCorrect(false);
+    setShowingTimeUpFeedback(true);
     
     // Find and highlight the correct answer
     const correctAnswer = answerOptions.find(option => option.is_correct);
@@ -97,19 +97,16 @@ export const useTimeUpHandler = ({
       
       // Force-advance to next question with a slightly longer delay
       // to ensure all state updates are completed
+      goToNextQuestion();
+      
+      // Reset processing flag after question advancement
       setTimeout(() => {
-        console.log("FINAL ADVANCEMENT: Moving to next question now");
-        goToNextQuestion();
-        
-        // Reset processing flag after question advancement
-        setTimeout(() => {
-          isProcessingTimeUpRef.current = false;
-          timeoutRef.current = null;
-          console.log("Time up processing cycle complete");
-        }, 100);
+        isProcessingTimeUpRef.current = false;
+        timeoutRef.current = null;
+        console.log("Time up processing cycle complete");
       }, 100);
       
-    }, 800); // Longer delay to ensure the correct answer is visible
+    }, 1500); // Longer delay to ensure the correct answer is visible
     
     return () => {
       // Clean up if component unmounts during timeout

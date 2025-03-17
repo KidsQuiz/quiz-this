@@ -31,9 +31,9 @@ export const useQuestionTimer = (
   
   useEffect(() => {
     initialTimeRef.current = initialTime;
-    // Only reset timer when initialTime changes AND timer is not active
+    // Only apply initial time when timer is not active
     if (!isActive) {
-      setTimeRemaining(initialTime);
+      pendingResetRef.current = initialTime;
     }
   }, [initialTime, isActive]);
   
@@ -75,11 +75,9 @@ export const useQuestionTimer = (
             console.log("Time's up! Calling onTimeUp callback");
             timeUpCalledRef.current = true;
             
-            // Call onTimeUp with a slight delay to ensure state stability
-            setTimeout(() => {
-              onTimeUp(); // Execute the time up callback
-              console.log("onTimeUp callback executed with short delay");
-            }, 10);
+            // Call onTimeUp immediately
+            onTimeUp(); // Execute the time up callback
+            console.log("onTimeUp callback executed");
           }
           
           return 0;
