@@ -76,7 +76,8 @@ export const useSessionHandlers = (props: {
     currentQuestion: props.currentQuestion,
     goToNextQuestion,
     setSelectedAnswerId: props.setSelectedAnswerId,
-    answerOptions: props.answerOptions
+    answerOptions: props.answerOptions,
+    setTimerActive: props.setTimerActive // Pass the required setTimerActive prop
   });
 
   // Use answer handling

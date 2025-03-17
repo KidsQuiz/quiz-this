@@ -19,10 +19,23 @@ export const useTimeUpHandler = ({
   setSelectedAnswerId,
   answerOptions,
   setTimerActive
+}: {
+  timeUpTriggered: boolean;
+  setTimeUpTriggered: React.Dispatch<React.SetStateAction<boolean>>;
+  answerSubmitted: boolean;
+  setAnswerSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsCorrect: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsTimeUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowingTimeUpFeedback: React.Dispatch<React.SetStateAction<boolean>>;
+  currentQuestion: Question | null;
+  goToNextQuestion: () => void;
+  setSelectedAnswerId: React.Dispatch<React.SetStateAction<string | null>>;
+  answerOptions: AnswerOption[];
+  setTimerActive?: React.Dispatch<React.SetStateAction<boolean>>; // Make this optional
 }) => {
   // Single processing lock
   const processingRef = useRef(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clean up on unmount
   useEffect(() => {
